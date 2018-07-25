@@ -4,11 +4,11 @@ from LM_DB.views import * #Index, StartSurvey, Interests, Questionnaire, Demogra
 from LM_DB_Django import settings
 from . import views
 
-app_name = 'AMO_BA_Survey'
+app_name = 'LM_DB'
 # name nur bei Verwendung von Links aus anderen Seiten relevant
 urlpatterns = [
-    re_path(r'^viewData$', Table.as_view(), name="viewData"),
-    re_path(r'^enterData$', EnterData.as_view(), name="enterData")
+    re_path(r'^viewData/$', ViewData.as_view(), name="viewData"),
+    re_path(r'^enterData/$', EnterData.as_view(), name="enterData")
 
 
 ]
