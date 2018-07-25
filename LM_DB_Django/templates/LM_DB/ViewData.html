@@ -1,0 +1,33 @@
+{% extends 'LM_DB/Base.html' %}
+{% load staticfiles %}
+{% load lmDBExtras %}
+{% block title %}View Data{% endblock %}
+
+{% block body_block %}
+  <!--TODO:
+    1) display a table, where each row contains all the data relevant for one paper-object, and an edit button
+    2) pressing the edit button submits the data from that row to editData.get (or post?), and prepopulates the necessary fields in the form with the values from the row
+    3) names for edit buttons: "SubmitEdit[id] ?
+  -->
+    <table>
+        <thead>
+            <tr>
+                {% for heading in included_columns %}
+                    <th>{{ heading }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for paper in papers %}
+                <tr>
+                    {% for attribute in paper %}
+                        {% with paper|lookup:attribute as cell_value  %}
+                            <td>{{ cell_value}}</td>
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

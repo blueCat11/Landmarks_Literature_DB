@@ -1,0 +1,18 @@
+{% extends 'LM_DB/Base.html' %}
+{% load staticfiles %}
+{% block title %}{{ type_of_edit }}{% endblock %}
+
+{% block body_block %}
+    <h1>{{ type_of_edit }}</h1>
+    <form action="/LM_DB/enterData/" method="post">
+        {% csrf_token %}
+        <ul>
+        {% if paper_form %}
+            {{ paper_form.as_ul }}
+        {% endif %}
+        </ul>
+        <input class="button" type="submit" name="{{ origin_form_name }}" value="Submit"/>
+    </form>
+
+
+{% endblock %}
