@@ -92,6 +92,7 @@ def get_dict_of_all_data_on_one_paper(paper):
 
 
 def get_list_of_included_columns():
-    included_columns = ["pk", "doi", "bibtex", "cite_command", "title", "abstract"]
+    #first column empty because in table, the edit button should not have a heading
+    included_columns = ["","pk", "doi", "bibtex", "cite_command", "title", "abstract"]
     return included_columns
 

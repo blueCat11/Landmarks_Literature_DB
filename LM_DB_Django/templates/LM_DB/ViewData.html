@@ -20,6 +20,15 @@
         <tbody>
             {% for paper in papers %}
                 <tr>
+                    <td>
+                        <form action="/LM_DB/enterData/" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="paperId" value="{{ paper|lookup:"pk"}}">
+                            <input class="button" type="submit" name="editStart" value="Submit"/>
+
+                        </form>
+
+                    </td>
                     {% for attribute in paper %}
                         {% with paper|lookup:attribute as cell_value  %}
                             <td>{{ cell_value}}</td>
