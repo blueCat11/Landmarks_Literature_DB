@@ -10,6 +10,7 @@ class PaperForm (forms.ModelForm):
     cite_command = forms.CharField(max_length=50, required=False)
     title = forms.CharField(widget=forms.Textarea, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
+    is_fulltext_in_repo = forms.BooleanField(required=False)
 
     class Meta:
         model = Papers
