@@ -77,6 +77,28 @@ class AuthUserUserPermissions(models.Model):
 
 
 
+class ConceptNames(models.Model):
+    concept_name_id = models.AutoField(primary_key=True)
+    concept_name = models.TextField(blank=True, null=True)
+    ref_concept_name_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_concept_name_to_paper', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'concept_names'
+
+
+class CoreAttributes(models.Model):
+    core_attribute_id = models.AutoField(primary_key=True)
+    core_attribute = models.TextField(blank=True, null=True)
+    is_literal_quotation = models.NullBooleanField()
+    page_num = models.IntegerField(blank=True, null=True)
+    ref_core_attribute_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_core_attribute_to_paper', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'core_attributes'
+
+
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
@@ -121,6 +143,36 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 
+class Keywords(models.Model):
+    keyword_id = models.AutoField(primary_key=True)
+    keyword = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'keywords'
+
+
+class Links(models.Model):
+    link_id = models.AutoField(primary_key=True)
+    link_text = models.TextField(blank=True, null=True)
+    is_local_link = models.NullBooleanField()
+    ref_link_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_link_to_paper', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'links'
+
+
+class PaperKeyword(models.Model):
+    paper_keyword_id = models.AutoField(primary_key=True)
+    ref_paper_keyword_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_paper_keyword_to_paper', blank=True, null=True)
+    ref_paper_keyword_to_keyword = models.ForeignKey(Keywords, models.DO_NOTHING, db_column='ref_paper_keyword_to_keyword', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'paper_keyword'
+
+
 class Papers(models.Model):
     paper_id = models.AutoField(primary_key=True)
     doi = models.CharField(max_length=50, blank=True, null=True)
@@ -128,7 +180,17 @@ class Papers(models.Model):
     cite_command = models.CharField(max_length=50, blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     abstract = models.TextField(blank=True, null=True)
+    is_fulltext_in_repo = models.NullBooleanField()
 
     class Meta:
         managed = False
         db_table = 'papers'
+
+
+class SuperCategories(models.Model):
+    super_category_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'super_categories'
