@@ -72,9 +72,29 @@ class AuthUserUserPermissions(models.Model):
         managed = False
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
-# Unable to inspect table 'categories'
-# The error was: permission denied for relation categories
 
+
+class Categories(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    category_name = models.CharField(max_length=50, blank=True, null=True)
+    shortcut = models.CharField(max_length=10, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    ref_category_to_super_category = models.ForeignKey('SuperCategories', models.DO_NOTHING, db_column='ref_category_to_super_category', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'categories'
+
+
+class CategoriesUnused(models.Model):
+    uniqueid = models.SmallIntegerField(primary_key=True)
+    short = models.CharField(max_length=-1, blank=True, null=True)
+    lng = models.CharField(max_length=-1, blank=True, null=True)
+    descr = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'categories_unused'
 
 
 class ConceptNames(models.Model):
@@ -161,6 +181,16 @@ class Links(models.Model):
     class Meta:
         managed = False
         db_table = 'links'
+
+
+class PaperCategory(models.Model):
+    paper_category_id = models.AutoField(primary_key=True)
+    ref_paper_category_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_paper_category_to_paper', blank=True, null=True)
+    ref_paper_category_to_category = models.ForeignKey(Categories, models.DO_NOTHING, db_column='ref_paper_category_to_category', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'paper_category'
 
 
 class PaperKeyword(models.Model):
