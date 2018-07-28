@@ -8,10 +8,13 @@
         {% csrf_token %}
         <ul>
         {% if paper_form %}
+            {% for field in paper_form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
             {{ paper_form.as_ul }}
         {% endif %}
         </ul>
-        <input class="button" type="submit" name="{{ origin_form_name }}" value="Submit"/>
+        <input class="button" type="submit" name="{{ original_form_name }}" value="Submit"/>
     </form>
 
 
