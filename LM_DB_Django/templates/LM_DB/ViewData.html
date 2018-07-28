@@ -4,11 +4,6 @@
 {% block title %}View Data{% endblock %}
 
 {% block body_block %}
-  <!--TODO:
-    1) display a table, where each row contains all the data relevant for one paper-object, and an edit button
-    2) pressing the edit button submits the data from that row to editData.get (or post?), and prepopulates the necessary fields in the form with the values from the row
-    3) names for edit buttons: "SubmitEdit[id] ?
-  -->
     <table>
         <thead>
             <tr>
@@ -23,8 +18,8 @@
                     <td>
                         <form action="/LM_DB/enterData/" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="paperId" value="{{ paper|lookup:"pk"}}">
-                            <input class="button" type="submit" name="editStart" value="Submit"/>
+                            <input type="hidden" name="paper_id" value="{{ paper|lookup:"paper_id"}}">
+                            <input class="button" type="submit" name="editStart" value="Edit"/>
 
                         </form>
 
@@ -38,5 +33,8 @@
             {% endfor %}
         </tbody>
     </table>
+
+
+        <a type="button" href="/LM_DB/enterData/">+</a>
 
 {% endblock %}
