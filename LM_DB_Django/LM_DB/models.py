@@ -88,8 +88,8 @@ class Categories(models.Model):
 
 class CategoriesUnused(models.Model):
     uniqueid = models.SmallIntegerField(primary_key=True)
-    short = models.CharField(max_length=-1, blank=True, null=True)
-    lng = models.CharField(max_length=-1, blank=True, null=True)
+    short = models.CharField(max_length=10, blank=True, null=True)
+    lng = models.CharField(max_length=50, blank=True, null=True)
     descr = models.TextField(blank=True, null=True)
 
     class Meta:
