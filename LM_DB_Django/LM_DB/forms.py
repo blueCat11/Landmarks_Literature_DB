@@ -11,8 +11,9 @@ class PaperForm (forms.ModelForm):
     title = forms.CharField(widget=forms.Textarea, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
     is_fulltext_in_repo = forms.BooleanField(required=False)
+    paper_id = forms.IntegerField(widget=forms.HiddenInput())
 
     class Meta:
         model = Papers
-        fields = ('doi', 'bibtex', 'cite_command', 'title', 'abstract')
+        fields = ('paper_id', 'doi', 'bibtex', 'cite_command', 'title', 'abstract')
 
