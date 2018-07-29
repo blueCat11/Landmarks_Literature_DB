@@ -5,6 +5,8 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+
+# ATTENTION: Don't redo inspectdb to overwrite this - all defined (and necessary) toString (__str__) methods will be lost
 from django.db import models
 
 
@@ -118,6 +120,16 @@ class CoreAttributes(models.Model):
         managed = False
         db_table = 'core_attributes'
 
+    def __str__(self):
+        string = ""
+        if self.is_literal_quotation:
+            string += '"' + str(self.core_attribute) + '"'
+        else:
+            string += str(self.core_attribute)
+        if self.page_num is not None:
+            string += ', p. ' + str(self.page_num)
+
+
 
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
@@ -181,6 +193,14 @@ class Links(models.Model):
     class Meta:
         managed = False
         db_table = 'links'
+
+    def __str__(self):
+        string = ""
+        if self.is_local_link:
+            string += "local: "
+        else:
+            string += "web: "
+        string += self.link_text
 
 
 class PaperCategory(models.Model):
