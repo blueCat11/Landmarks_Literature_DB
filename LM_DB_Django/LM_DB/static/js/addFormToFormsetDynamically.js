@@ -14,8 +14,12 @@
 
 $(document).ready( function() {
 
-    $("#about-btn").click( function(event) {
-        alert("You clicked the button using JQuery!");
+    $("#add_core_attribute").click( function(event) {
+        cloneMore('div.core_attribute_form:last', 'core_attribute');
+    });
+
+    $("#add_link").click( function(event) {
+        cloneMore('div.link_form:last', 'link');
     });
 });
 
