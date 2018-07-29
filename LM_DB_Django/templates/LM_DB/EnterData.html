@@ -29,7 +29,7 @@
                     {{ link_form.as_ul }}
                     </div>
                 {% endfor %}
-                <div>add</div>
+                <input type="button" value="Add" id="add_link">
             {% endif %}
             {% if core_attribute_forms %}
                 <h2>Core attributes</h2>
@@ -42,7 +42,7 @@
                     {{ core_attribute_form.as_ul }}
                     </div>
                 {% endfor %}
-                <div>add</div>
+                <input type="button" value="Add" id="add_core_attribute">
             {% endif %}
         </ul>
         <input class="button" type="submit" name="{{ original_form_name }}" value="Submit"/>

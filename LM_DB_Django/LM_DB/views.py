@@ -11,8 +11,6 @@ from LM_DB.models import *
 
 class ViewData(View):
     def get(self, request):
-        # https://stackoverflow.com/questions/3319632/join-tables-with-django
-        # join data here, so all the info about one paper is in one "row", e.g. categories stringified, and concatenated with commas between them
         # how to form queryset into list: https://stackoverflow.com/questions/7811556/how-do-i-convert-a-django-queryset-into-list-of-dicts
         all_papers = Papers.objects.all()
         paper_list = []
@@ -41,12 +39,12 @@ class EnterData(View):
         # get more forms here, multiple model form in one form template, use prefixes
         # save info for template (like forms etc) to contextDict
 
-        core_attributes_formset = self.CoreAttributeFormset(prefix="core_attribute")
+        core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute")
         links_formset = self.LinkFormset(prefix="link")
 
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry", "paper_form": paper_form,
-                        "core_attribute_forms": core_attributes_formset, "link_forms": links_formset
+                        "core_attribute_forms": core_attribute_formset, "link_forms": links_formset
                         }
 
         return render(request, "LM_DB/EnterData.html", context_dict)
@@ -55,6 +53,7 @@ class EnterData(View):
     # src: https://stackoverflow.com/questions/2770810/multiple-models-in-a-single-django-modelform
     def post(self, request):
         request_data = request.POST
+
         if request_data.get('editStart', -1)!=-1:
             print("editStart")
             # pass data to the template to render the fields with data in them
@@ -62,19 +61,33 @@ class EnterData(View):
             current_paper_pk = request_data["paper_id"]
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
-
             paper_form = PaperForm(prefix="paper", initial=paper_data)
-            context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form}
+
+            link_data = all_table_data["link"]
+            link_formset = self.LinkFormset(prefix="link", initial=link_data)
+
+            core_attribute_data = all_table_data["core_attributes"]
+            core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute", initial=core_attribute_data)
+            context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form,
+                            "core_attribute_forms": core_attribute_formset, "link_forms": link_formset}
             return render(request, "LM_DB/EnterData.html", context_dict)
+
         elif request_data.get('editSave', -1)!=-1:
             print("editSave")
-            # TODO: get corresponding data-object(s) from DB, make changes to it and save changes
+            # get corresponding data-object(s) from DB, make changes to it and save changes
             # src: https://docs.djangoproject.com/en/2.1/ref/forms/api/#checking-which-form-data-has-changed
             current_paper_pk = request_data["paper-paper_id"]
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
-            if paper_form.has_changed(): # add other forms into this if-clause with or later
+
+            link_data = all_table_data["link"]
+            link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
+
+            core_attribute_data = all_table_data["core_attributes"]
+            core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute", initial=core_attribute_data)
+
+            if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed(): # add other forms into this if-clause with or later
                 if paper_form.has_changed():
                     current_paper = get_current_paper(current_paper_pk)
                     if paper_form.is_valid():
@@ -96,6 +109,61 @@ class EnterData(View):
                     else:
                         # TODO: save errors in a context_dict and pass that back to EnterData-View
                         pass
+                if link_formset.has_changed():
+                    if link_formset.is_valid():
+                        current_paper = get_current_paper(current_paper_pk)
+                        for link_form in link_formset:
+                            if link_form.is_valid():
+                                data = link_form.cleaned_data
+                                if data.get("link_id", -1) != -1:
+                                    current_link_id = data["link_id"]
+                                    current_link = Links.objects.get(link_id=current_link_id)
+                                    for entry in link_form.changed_data:
+                                        if entry == "link_text":
+                                            current_link.link_text = convert_empty_string_to_none(data.get('link_text', None))
+                                        elif entry == "is_local_link":
+                                            current_link.is_local_link = data['is_local_link']
+                                    current_link.save()
+                                else:
+                                    link_text = convert_empty_string_to_none(data.get("link_text", None))
+                                    is_local_link = data.get("is_local_link", None)
+                                    Links.objects.create(link_text=link_text,
+                                                         is_local_link=is_local_link,
+                                                         ref_link_to_paper=current_paper
+                                                         )
+                            else:
+                                # TODO: error handling
+                                pass
+
+                    if core_attribute_formset.has_changed():
+                        if core_attribute_formset.is_valid():
+                            current_paper = get_current_paper(current_paper_pk)
+                            for core_attribute_form in core_attribute_formset:
+                                if core_attribute_form.is_valid():
+                                    data = core_attribute_form.cleaned_data
+                                    if data.get("core_attribute_id", -1) != -1:
+                                        current_core_attribute_id = data["core_attribute_id"]
+                                        current_core_attribute = CoreAttributes.objects.get(core_attribute_id= current_core_attribute_id)
+                                        for entry in core_attribute_form.changed_data:
+                                            if entry == "core_attribute":
+                                                current_core_attribute.core_attribute = convert_empty_string_to_none(
+                                                    data.get('core_attribute', None))
+                                            elif entry == "is_literal_quotation":
+                                                current_core_attribute.is_literal_quotation = data['is_literal_quotation']
+                                            elif entry == "page_num":
+                                                current_core_attribute.page_num = data['page_num'] # TODO: change pageNum to Varchar in DB and then add to-null-converter-method around this
+                                        current_core_attribute.save()
+                                    else:
+                                        core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
+                                        is_literal_quotation = data.get("is_literal_quotation", None)
+                                        page_num = data.get("page_num", None)
+                                        CoreAttributes.objects.create(core_attribute=core_attribute,
+                                                                      is_literal_quotation=is_literal_quotation,
+                                                                      page_num=page_num,
+                                                                      ref_core_attribute_to_paper=current_paper)
+                                else:
+                                    # TODO: error handling
+                                    pass
 
             return redirect("LM_DB:viewData")
 
@@ -104,9 +172,11 @@ class EnterData(View):
             # make new object(s) and save those to DB
             # construct forms from data here
             paper_form = PaperForm(request_data, prefix="paper")
+            link_formset = self.LinkFormset(request_data, prefix="link")
+            core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute")
 
             #check if all forms are valid, add further forms to the if-clause later
-            if paper_form.is_valid():
+            if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset:
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
@@ -121,7 +191,22 @@ class EnterData(View):
                                            abstract=abstract, is_fulltext_in_repo=is_in_repo)
                     current_paper.save()
 
+                if link_formset.is_valid():
+                    for link_form in link_formset:
+                        # TODO save links here!
+                        pass
+
+                if core_attribute_formset.is_valid():
+                    for core_attribute_form in core_attribute_formset:
+                        # TODO save ca here!
+                        pass
+
+
+
                 return redirect("LM_DB:viewData")
+            else:
+                # TODO: error handling
+                pass
         else:
             print("default")
             pass
@@ -189,7 +274,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
 # currently they are generated hard-coded :(
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
-    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "core_attributes", "links"]
+    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo" "core_attributes", "links"]
     return included_columns
 
 
