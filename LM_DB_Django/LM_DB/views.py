@@ -1,11 +1,12 @@
+from django.forms import formset_factory
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View
 
-#This View displays all current database entries in a table format
-from LM_DB.forms import PaperForm
-from LM_DB.models import Papers
+# This View displays all current database entries in a table format
+from LM_DB.forms import *
+from LM_DB.models import *
 
 
 class ViewData(View):
@@ -27,15 +28,26 @@ class ViewData(View):
     def post(self, request):
         pass
 
-#This View allows entering new data and editing data by means of forms
+
+# This View allows entering new data and editing data by means of forms
+# To add forms to formsets dynamically:
+# https://stackoverflow.com/questions/501719/dynamically-adding-a-form-to-a-django-formset-with-ajax
 class EnterData(View):
+    CoreAttributeFormset = formset_factory(CoreAttributeForm)
+    LinkFormset = formset_factory(LinkForm)
+
     def get(self, request):
         paper_form = PaperForm(prefix="paper")
         # get more forms here, multiple model form in one form template, use prefixes
         # save info for template (like forms etc) to contextDict
 
+        core_attributes_formset = self.CoreAttributeFormset(prefix="core_attribute")
+        links_formset = self.LinkFormset(prefix="link")
+
         context_dict = {"original_form_name": "newSave",
-                        "type_of_edit": "New Entry", "paper_form": paper_form}
+                        "type_of_edit": "New Entry", "paper_form": paper_form,
+                        "core_attribute_forms": core_attributes_formset, "link_forms": links_formset
+                        }
 
         return render(request, "LM_DB/EnterData.html", context_dict)
 
@@ -52,12 +64,11 @@ class EnterData(View):
             paper_data = all_table_data["paper"]
 
             paper_form = PaperForm(prefix="paper", initial=paper_data)
-            context_dict = {"original_form_name": "editSave", "paper_form": paper_form}
+            context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form}
             return render(request, "LM_DB/EnterData.html", context_dict)
         elif request_data.get('editSave', -1)!=-1:
             print("editSave")
             # TODO: get corresponding data-object(s) from DB, make changes to it and save changes
-            # TODO: Test the code below!
             # src: https://docs.djangoproject.com/en/2.1/ref/forms/api/#checking-which-form-data-has-changed
             current_paper_pk = request_data["paper-paper_id"]
             all_table_data = get_dict_for_enter_data(current_paper_pk)
@@ -128,36 +139,61 @@ def convert_empty_string_to_none(a_string):
 
 # This method returns all information on one paper in form of a dictionary, to be used for display in EnterData-View
 # information for different forms is stored in different dictionaries
+# some contain more than one object e.g. core attributes
 def get_dict_for_enter_data(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     all_table_data = {}
     paper_data = paper.values()[0]
-    all_table_data["paper"]= paper_data
+    all_table_data["paper"] = paper_data
+
+    current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
+    core_attributes_data = current_core_attributes.values()
+    all_table_data["core attributes"] = core_attributes_data
+
+    current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
+    links_data = current_links.values()
+    all_table_data["links"] = links_data
 
     # paper_data = {"pk":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command, "title":paper.title, "abstract":paper.abstract}
     return all_table_data
     # as long as there are no relations connected to paper:
 
 
-# This method returns all information on one paper in form of a dictionary, to be used for display in EnterData-View
-# information for different forms is stored in different dictionaries
+# This method returns all information on one paper in form of a dictionary, to be used in ViewData-View
 def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     paper_data = paper.values()[0]
-    # TODO: with other tables being displayed in relation, this dictionary needs to be updated
+
+    current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
+    core_attributes_data = ''
+    for core_attribute in current_core_attributes:
+        core_attributes_data += str(core_attribute) + "; "
+    paper_data['core_attributes'] = core_attributes_data
+
+    current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
+    links_data = ''
+    for link in current_links:
+        links_data += str(link) + "; "
+    paper_data['links'] = links_data
+
+    # old version:
     # paper_data = {"paper_id":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command,
     # "title":paper.title, "abstract":paper.abstract}
     return paper_data
+
+    # TODO: with other tables being displayed in relation, this dictionary needs to be updated
+    # TODO: missing: purposes, categories, keywords, conceptname
 
 
 # This method gets a list of the columns which should be displayed in ViewData-View,
 # currently they are generated hard-coded :(
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
-    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract"]
+    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "core_attributes", "links"]
     return included_columns
 
 
 # Gets the paper which is being currently edited
 def get_current_paper(pk):
     return Papers.objects.get(pk=pk)
+

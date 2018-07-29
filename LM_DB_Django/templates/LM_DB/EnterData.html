@@ -1,18 +1,49 @@
 {% extends 'LM_DB/Base.html' %}
 {% load staticfiles %}
 {% block title %}{{ type_of_edit }}{% endblock %}
+{% block head_block %}
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+     <script src="{% static 'js/addFormToFormsetDynamically.js' %}"></script>
+{% endblock %}
 
 {% block body_block %}
     <h1>{{ type_of_edit }}</h1>
     <form action="/LM_DB/enterData/" method="post">
         {% csrf_token %}
         <ul>
-        {% if paper_form %}
-            {% for field in paper_form.hidden_fields %}
-                {{ field }}
-            {% endfor %}
-            {{ paper_form.as_ul }}
-        {% endif %}
+            <h2>Paper</h2>
+            {% if paper_form %}
+                {% for field in paper_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ paper_form.as_ul }}
+            {% endif %}
+            {% if link_forms %}
+                <h2>Links</h2>
+                {{ link_forms.management_form }}
+                {% for link_form in link_forms %}
+                    <div class="link_form">
+                    {% for field in link_form.hidden_fields %}
+                        {{ field }}
+                    {% endfor %}
+                    {{ link_form.as_ul }}
+                    </div>
+                {% endfor %}
+                <div>add</div>
+            {% endif %}
+            {% if core_attribute_forms %}
+                <h2>Core attributes</h2>
+                {{ core_attribute_forms.management_form }}
+                {% for core_attribute_form in core_attribute_forms %}
+                    <div class="core_attribute_form">
+                    {% for field in core_attribute_form.hidden_fields %}
+                        {{ field }}
+                    {% endfor %}
+                    {{ core_attribute_form.as_ul }}
+                    </div>
+                {% endfor %}
+                <div>add</div>
+            {% endif %}
         </ul>
         <input class="button" type="submit" name="{{ original_form_name }}" value="Submit"/>
     </form>
