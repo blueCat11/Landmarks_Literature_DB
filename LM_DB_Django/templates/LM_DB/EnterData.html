@@ -1,9 +1,11 @@
 {% extends 'LM_DB/Base.html' %}
 {% load staticfiles %}
+{% load lmDBExtras %}
 {% block title %}{{ type_of_edit }}{% endblock %}
 {% block head_block %}
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-     <script src="{% static 'js/addFormToFormsetDynamically.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{% static 'js/addFormToFormsetDynamically.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/enterData.css' %}">
 {% endblock %}
 
 {% block body_block %}
@@ -22,12 +24,13 @@
                 <h2>Links</h2>
                 {{ link_forms.management_form }}
                 {% for link_form in link_forms %}
-                    <div class="link_form">
-                    {% for field in link_form.hidden_fields %}
-                        {{ field }}
-                    {% endfor %}
+                    {% if forloop.last and not errors|lookup:link_forms %}<div class="link_form hidden single_form">
+                    {% elif forloop.last %}<div class="link_form">{% endif%}
+                        {% for field in link_form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
                     {{ link_form.as_ul }}
-                    </div>
+                   {% if forloop.last %}</div>{% endif%}
                 {% endfor %}
                 <input type="button" value="Add" id="add_link">
             {% endif %}
@@ -35,12 +38,13 @@
                 <h2>Core attributes</h2>
                 {{ core_attribute_forms.management_form }}
                 {% for core_attribute_form in core_attribute_forms %}
-                    <div class="core_attribute_form">
+                    {% if forloop.last and not errors|lookup:core_attribute_forms %}<div class="core_attribute_form hidden single_form">
+                    {% elif forloop.last%}<div class="core_attribute_form">{% endif %}
                     {% for field in core_attribute_form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
                     {{ core_attribute_form.as_ul }}
-                    </div>
+                     {% if forloop.last %}</div>{% endif %}
                 {% endfor %}
                 <input type="button" value="Add" id="add_core_attribute">
             {% endif %}
