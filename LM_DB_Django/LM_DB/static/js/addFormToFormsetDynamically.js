@@ -15,13 +15,22 @@
 $(document).ready( function() {
 
     $("#add_core_attribute").click( function(event) {
-        cloneMore('div.core_attribute_form:last', 'core_attribute');
+
+        checkIfNeedsClone('div.core_attribute_form:last', 'core_attribute');
     });
 
     $("#add_link").click( function(event) {
-        cloneMore('div.link_form:last', 'link');
+        checkIfNeedsClone('div.link_form:last', 'link');
     });
 });
+
+function checkIfNeedsClone(selector, type){
+    if ($(selector).hasClass("hidden")){
+        $(selector).removeClass("hidden");
+    }else{
+        cloneMore(selector, type);
+    }
+}
 
 function cloneMore(selector, type) {
     let newElement = $(selector).clone(true);
@@ -29,7 +38,11 @@ function cloneMore(selector, type) {
     newElement.find(':input').each(function() {
         let name = $(this).attr('name').replace('-' + (total-1) + '-','-' + total + '-');
         let id = 'id_' + name;
-        $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+        if ($(this).attr('type')==="button"){
+             $(this).attr({'name': name, 'id': id});
+        }else {
+            $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+        }
     });
     newElement.find('label').each(function() {
         let newFor = $(this).attr('for').replace('-' + (total-1) + '-','-' + total + '-');
@@ -38,4 +51,34 @@ function cloneMore(selector, type) {
     total++;
     $('#id_' + type + '-TOTAL_FORMS').val(total);
     $(selector).after(newElement);
+}
+
+// delete (or hide) the selected form from view
+// should delete values in form in any case (but doesn't yet)
+// this function is currently not in use, too complicated consequences:
+// // The form-counts would have to be updated, too
+// // + the numbering of all the forms in the formset would need to be adjusted, so that there's no number higher than the total form-count
+
+// If you want to use delete buttons, add this or similar (change name, id...) into the html after each form
+//<input type="button" value="Delete" name="delete_core_attribute-{{ forloop.counter0 }}" id="delete_core_attribute-{{ forloop.counter0 }}" onclick="delete_form(this)">
+
+
+function delete_form(element){
+    let form = element.parentElement;
+    let parent_of_form = form.parentElement;
+    if ($(parent_of_form.children("div.single_form").length()) <= 1){
+        form.classList.add("hidden");
+        form.find(':input').each(function() {
+        let name = $(this).attr('name').replace('-' + (total-1) + '-','-' + total + '-');
+        let id = 'id_' + name;
+        if ($(this).attr('type')==="button"){
+             $(this).attr({'name': name, 'id': id});
+        }else {
+            $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+        }
+    });
+
+    }else {
+        parent_of_form.removeChild(form);
+    }
 }
