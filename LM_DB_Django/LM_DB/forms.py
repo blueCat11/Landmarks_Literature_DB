@@ -5,7 +5,7 @@ from LM_DB.models import *
 
 # form for main information on paper
 class PaperForm (forms.ModelForm):
-    paper_id = forms.IntegerField(widget=forms.HiddenInput())
+    paper_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     doi = forms.CharField(max_length=50)
     bibtex = forms.CharField(widget=forms.Textarea, required=False)
     cite_command = forms.CharField(max_length=50, required=False)
@@ -20,8 +20,8 @@ class PaperForm (forms.ModelForm):
 
 
 class CoreAttributeForm (forms.ModelForm):
-    core_attribute_id = forms.IntegerField(widget=forms.HiddenInput())
-    core_attribute = forms.CharField(widget=forms.Textarea, required=False)
+    core_attribute_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    core_attribute = forms.CharField(widget=forms.Textarea)
     is_literal_quotation = forms.BooleanField(required=False)
     page_num = forms.IntegerField(required=False)
 
@@ -31,8 +31,8 @@ class CoreAttributeForm (forms.ModelForm):
 
 
 class LinkForm (forms.ModelForm):
-    link_id = forms.IntegerField(widget=forms.HiddenInput())
-    link_text = forms.CharField(widget=forms.Textarea, required=False)
+    link_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    link_text = forms.CharField(widget=forms.Textarea)
     is_local_link = forms.BooleanField(required=False)
 
     class Meta:
