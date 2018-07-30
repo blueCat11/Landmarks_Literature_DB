@@ -66,7 +66,7 @@ class EnterData(View):
             link_data = all_table_data["link"]
             link_formset = self.LinkFormset(prefix="link", initial=link_data)
 
-            core_attribute_data = all_table_data["core_attributes"]
+            core_attribute_data = all_table_data["core_attribute"]
             core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute", initial=core_attribute_data)
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form,
                             "core_attribute_forms": core_attribute_formset, "link_forms": link_formset}
@@ -80,94 +80,115 @@ class EnterData(View):
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
+            print(request_data)
 
             link_data = all_table_data["link"]
             link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
 
-            core_attribute_data = all_table_data["core_attributes"]
+            core_attribute_data = all_table_data["core_attribute"]
             core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute", initial=core_attribute_data)
 
             if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed(): # add other forms into this if-clause with or later
-                if paper_form.has_changed():
-                    current_paper = get_current_paper(current_paper_pk)
-                    if paper_form.is_valid():
-                        data = paper_form.cleaned_data
-                        for entry in paper_form.changed_data:
-                            if entry == "doi":
-                                current_paper.doi = convert_empty_string_to_none(data.get('doi', None))
-                            elif entry == "bibtex":
-                                current_paper.bibtex = convert_empty_string_to_none(data.get('bibtex', None))
-                            elif entry == "cite_command":
-                                current_paper.cite_command = convert_empty_string_to_none(data.get('cite_command', None))
-                            elif entry == "title":
-                                current_paper.title =  convert_empty_string_to_none(data.get('title', None))
-                            elif entry == "abstract":
-                                current_paper.abstract = convert_empty_string_to_none(data.get('abstract', None))
-                            elif entry == "is_fulltext_in_repo":
-                                current_paper.is_fulltext_in_repo = data['is_fulltext_in_repo']
-                        current_paper.save()
-                    else:
-                        # TODO: save errors in a context_dict and pass that back to EnterData-View
-                        pass
-                if link_formset.has_changed():
-                    if link_formset.is_valid():
+                if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid():
+
+                    if paper_form.has_changed():
                         current_paper = get_current_paper(current_paper_pk)
-                        for link_form in link_formset:
-                            if link_form.is_valid():
-                                data = link_form.cleaned_data
-                                if data.get("link_id", -1) != -1:
-                                    current_link_id = data["link_id"]
-                                    current_link = Links.objects.get(link_id=current_link_id)
-                                    for entry in link_form.changed_data:
-                                        if entry == "link_text":
-                                            current_link.link_text = convert_empty_string_to_none(data.get('link_text', None))
-                                        elif entry == "is_local_link":
-                                            current_link.is_local_link = data['is_local_link']
-                                    current_link.save()
-                                else:
-                                    link_text = convert_empty_string_to_none(data.get("link_text", None))
-                                    is_local_link = data.get("is_local_link", None)
-                                    Links.objects.create(link_text=link_text,
-                                                         is_local_link=is_local_link,
-                                                         ref_link_to_paper=current_paper
-                                                         )
-                            else:
-                                # TODO: error handling
-                                pass
-
-                    if core_attribute_formset.has_changed():
-                        if core_attribute_formset.is_valid():
+                        if paper_form.is_valid():
+                            data = paper_form.cleaned_data
+                            for entry in paper_form.changed_data:
+                                if entry == "doi":
+                                    current_paper.doi = convert_empty_string_to_none(data.get('doi', None))
+                                elif entry == "bibtex":
+                                    current_paper.bibtex = convert_empty_string_to_none(data.get('bibtex', None))
+                                elif entry == "cite_command":
+                                    current_paper.cite_command = convert_empty_string_to_none(data.get('cite_command', None))
+                                elif entry == "title":
+                                    current_paper.title =  convert_empty_string_to_none(data.get('title', None))
+                                elif entry == "abstract":
+                                    current_paper.abstract = convert_empty_string_to_none(data.get('abstract', None))
+                                elif entry == "is_fulltext_in_repo":
+                                    current_paper.is_fulltext_in_repo = data['is_fulltext_in_repo']
+                            current_paper.save()
+                        else:
+                            # error display is managed in outside else-clause, all have to be valid to get here
+                            pass
+                    if link_formset.has_changed():
+                        print("linkformset changed")
+                        if link_formset.is_valid():
+                            print("link formset valid")
                             current_paper = get_current_paper(current_paper_pk)
-                            for core_attribute_form in core_attribute_formset:
-                                if core_attribute_form.is_valid():
-                                    data = core_attribute_form.cleaned_data
-                                    if data.get("core_attribute_id", -1) != -1:
-                                        current_core_attribute_id = data["core_attribute_id"]
-                                        current_core_attribute = CoreAttributes.objects.get(core_attribute_id= current_core_attribute_id)
-                                        for entry in core_attribute_form.changed_data:
-                                            if entry == "core_attribute":
-                                                current_core_attribute.core_attribute = convert_empty_string_to_none(
-                                                    data.get('core_attribute', None))
-                                            elif entry == "is_literal_quotation":
-                                                current_core_attribute.is_literal_quotation = data['is_literal_quotation']
-                                            elif entry == "page_num":
-                                                current_core_attribute.page_num = data['page_num'] # TODO: change pageNum to Varchar in DB and then add to-null-converter-method around this
-                                        current_core_attribute.save()
+                            for link_form in link_formset:
+                                if link_form.is_valid():
+                                    print("link form valid")
+                                    data = link_form.cleaned_data
+                                    if data.get("link_id", None) is not None:
+                                        current_link_id = data["link_id"]
+                                        current_link = Links.objects.get(link_id=current_link_id)
+                                        for entry in link_form.changed_data:
+                                            if entry == "link_text":
+                                                current_link.link_text = convert_empty_string_to_none(data.get('link_text', None))
+                                            elif entry == "is_local_link":
+                                                current_link.is_local_link = data['is_local_link']
+                                        current_link.save()
+                                        print("link saved")
                                     else:
-                                        core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
-                                        is_literal_quotation = data.get("is_literal_quotation", None)
-                                        page_num = data.get("page_num", None)
-                                        CoreAttributes.objects.create(core_attribute=core_attribute,
-                                                                      is_literal_quotation=is_literal_quotation,
-                                                                      page_num=page_num,
-                                                                      ref_core_attribute_to_paper=current_paper)
+                                        link_text = convert_empty_string_to_none(data.get("link_text", None))
+                                        is_local_link = data.get("is_local_link", None)
+                                        Links.objects.create(link_text=link_text,
+                                                             is_local_link=is_local_link,
+                                                             ref_link_to_paper=current_paper
+                                                             )
                                 else:
-                                    # TODO: error handling
+                                    # error handling done in outside else clause
                                     pass
-
+                        else:
+                            print("link_formset_not_valid")
+                            print(link_formset.errors)
+                        if core_attribute_formset.has_changed():
+                            if core_attribute_formset.is_valid():
+                                current_paper = get_current_paper(current_paper_pk)
+                                for core_attribute_form in core_attribute_formset:
+                                    if core_attribute_form.is_valid():
+                                        data = core_attribute_form.cleaned_data
+                                        if data.get("core_attribute_id", None) is not None:
+                                            current_core_attribute_id = data["core_attribute_id"]
+                                            current_core_attribute = CoreAttributes.objects.get(core_attribute_id= current_core_attribute_id)
+                                            for entry in core_attribute_form.changed_data:
+                                                if entry == "core_attribute":
+                                                    current_core_attribute.core_attribute = convert_empty_string_to_none(
+                                                        data.get('core_attribute', None))
+                                                elif entry == "is_literal_quotation":
+                                                    current_core_attribute.is_literal_quotation = data['is_literal_quotation']
+                                                elif entry == "page_num":
+                                                    current_core_attribute.page_num = data['page_num'] # TODO: change pageNum to Varchar in DB and then add to-null-converter-method around this
+                                            current_core_attribute.save()
+                                        else:
+                                            core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
+                                            is_literal_quotation = data.get("is_literal_quotation", None)
+                                            page_num = data.get("page_num", None)
+                                            CoreAttributes.objects.create(core_attribute=core_attribute,
+                                                                          is_literal_quotation=is_literal_quotation,
+                                                                          page_num=page_num,
+                                                                          ref_core_attribute_to_paper=current_paper)
+                                    else:
+                                        # error handling done in outside else-clause
+                                        pass
+                else:
+                    error_dict = {}
+                    if not paper_form.is_valid():
+                        error_dict["paper"]=True
+                    if not core_attribute_formset.is_valid():
+                        error_dict["core_attribute_forms"] =True
+                    if not link_formset.is_valid():
+                        error_dict["link_forms"]=True
+                    context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
+                                    "paper_form": paper_form,
+                                    "core_attribute_forms": core_attribute_formset, "link_forms": link_formset,
+                                    "errors":error_dict}
+                    return render(request, "LM_DB/enterData.html", context_dict)
             return redirect("LM_DB:viewData")
 
-        elif request_data.get('newSave', -1)!= 1:
+        elif request_data.get('newSave', -1) != 1:
             print("newSave")
             # make new object(s) and save those to DB
             # construct forms from data here
@@ -180,27 +201,46 @@ class EnterData(View):
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
-                    print(data)
+                    #print(data)
                     doi = data['doi']
                     bibtex = convert_empty_string_to_none(data.get('bibtex', None))
                     cite_command = convert_empty_string_to_none(data.get('cite_command', None))
                     title = convert_empty_string_to_none(data.get('title', None))
                     abstract = convert_empty_string_to_none(data.get('abstract', None))
-                    is_in_repo = data['is_fulltext_in_repo']
+                    is_in_repo = data.get('is_fulltext_in_repo', None)
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract, is_fulltext_in_repo=is_in_repo)
                     current_paper.save()
 
-                if link_formset.is_valid():
-                    for link_form in link_formset:
-                        # TODO save links here!
-                        pass
+                    if link_formset.is_valid():
+                        for link_form in link_formset:
+                            # save links here
+                            if link_form.is_valid():
+                                data = link_form.cleaned_data
+                                link_text = convert_empty_string_to_none(data.get('link_text', None))
+                                is_local_link = data.get('is_local_link', None)
+                                current_link = Links(link_text=link_text, is_local_link=is_local_link,
+                                                     ref_link_to_paper=current_paper)
+                                current_link.save()
 
-                if core_attribute_formset.is_valid():
-                    for core_attribute_form in core_attribute_formset:
-                        # TODO save ca here!
-                        pass
+                    if core_attribute_formset.is_valid():
+                        for core_attribute_form in core_attribute_formset:
+                            # save core attributes here!
+                            if core_attribute_form.is_valid():
+                                data = core_attribute_form.cleaned_data
+                                core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
+                                is_literal_quotation = data.get('is_literal_quotation', None)
+                                page_num = data.get('is_literal_quotation', None) # TOD add empty string to none later, after has been converted to char-field
+                                current_core_attribute = CoreAttributes(core_attribute=core_attribute,
+                                                                        is_literal_quotation=is_literal_quotation,
+                                                                        page_num=page_num,
+                                                                        ref_core_attribute_to_paper= current_paper)
+                                current_core_attribute.save()
 
+
+                else:
+                    # paper form is not valid
+                    pass
 
 
                 return redirect("LM_DB:viewData")
@@ -233,11 +273,11 @@ def get_dict_for_enter_data(current_paper_pk):
 
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
     core_attributes_data = current_core_attributes.values()
-    all_table_data["core attributes"] = core_attributes_data
+    all_table_data["core_attribute"] = core_attributes_data
 
     current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
     links_data = current_links.values()
-    all_table_data["links"] = links_data
+    all_table_data["link"] = links_data
 
     # paper_data = {"pk":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command, "title":paper.title, "abstract":paper.abstract}
     return all_table_data
