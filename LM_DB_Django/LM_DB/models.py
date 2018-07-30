@@ -127,8 +127,8 @@ class CoreAttributes(models.Model):
         else:
             string += str(self.core_attribute)
         if self.page_num is not None:
-            string += ', p. ' + str(self.page_num)
-
+                string += ', p. ' + str(self.page_num)
+        return string
 
 
 class DjangoAdminLog(models.Model):
@@ -190,17 +190,18 @@ class Links(models.Model):
     is_local_link = models.NullBooleanField()
     ref_link_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_link_to_paper', blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'links'
-
     def __str__(self):
         string = ""
         if self.is_local_link:
             string += "local: "
         else:
             string += "web: "
-        string += self.link_text
+        string += str(self.link_text)
+        return string
+
+    class Meta:
+        managed = False
+        db_table = 'links'
 
 
 class PaperCategory(models.Model):
