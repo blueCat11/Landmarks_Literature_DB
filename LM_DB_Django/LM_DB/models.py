@@ -177,12 +177,14 @@ class DjangoSession(models.Model):
 
 class Keywords(models.Model):
     keyword_id = models.AutoField(primary_key=True)
-    keyword = models.TextField(blank=True, null=True)
+    keyword = models.TextField(blank=True, null=True) # TODO: add unique=True in DB
 
     class Meta:
         managed = False
         db_table = 'keywords'
 
+    def __str__(self):
+        return self.keyword
 
 class Links(models.Model):
     link_id = models.AutoField(primary_key=True)
