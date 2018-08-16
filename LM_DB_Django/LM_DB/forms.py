@@ -38,3 +38,17 @@ class LinkForm (forms.ModelForm):
     class Meta:
         model=Links
         fields=('link_id', 'link_text', 'is_local_link')
+
+
+class KeywordForm(forms.ModelForm):
+    keyword_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    keyword = forms.CharField(max_length=60, required=False)
+
+    class Meta:
+        model = Keywords
+        exclude = ()
+
+
+class PaperKeywordForm(forms.Form):
+    paper_keywords = forms.ModelMultipleChoiceField(label="", queryset=Keywords.objects.all().order_by('keyword'),
+                                                   widget=forms.CheckboxSelectMultiple, required=False)
