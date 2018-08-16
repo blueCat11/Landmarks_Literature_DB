@@ -1,4 +1,5 @@
 from django.forms import formset_factory
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -34,6 +35,7 @@ class EnterData(View):
     CoreAttributeFormset = formset_factory(CoreAttributeForm)
     LinkFormset = formset_factory(LinkForm)
 
+
     def get(self, request):
         paper_form = PaperForm(prefix="paper")
         # get more forms here, multiple model form in one form template, use prefixes
@@ -41,10 +43,13 @@ class EnterData(View):
 
         core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute")
         links_formset = self.LinkFormset(prefix="link")
+        keyword_form = KeywordForm(prefix="new_keyword")
+        paper_keywords_form = PaperKeywordForm(prefix="paper_keywords")
 
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry", "paper_form": paper_form,
-                        "core_attribute_forms": core_attribute_formset, "link_forms": links_formset
+                        "core_attribute_forms": core_attribute_formset, "link_forms": links_formset,
+                        "keyword_form":keyword_form, "paper_keywords_form":paper_keywords_form
                         }
 
         return render(request, "LM_DB/EnterData.html", context_dict)
@@ -188,6 +193,21 @@ class EnterData(View):
                     return render(request, "LM_DB/enterData.html", context_dict)
             return redirect("LM_DB:viewData")
 
+        elif request_data.get("isNewKeyword", -1) != -1:
+            print("isNewKeyword")
+            #print(request_data)
+            keyword = request_data['keyword']
+            is_not_unique = Keywords.objects.filter(keyword=keyword).exists()
+            if not is_not_unique:
+                new_keyword = Keywords(keyword=keyword)
+                new_keyword.save()
+                print("keyword saved")
+                response_data = {"result": "Create keyword successful!", "keyword": keyword, "keyword_id": new_keyword.pk}
+            else:
+                response_data = {"result": "Keyword not unique!", "error":"This keyword already exists."}
+            json_response = JsonResponse(response_data)
+            return json_response
+
         elif request_data.get('newSave', -1) != 1:
             print("newSave")
             # make new object(s) and save those to DB
@@ -195,9 +215,11 @@ class EnterData(View):
             paper_form = PaperForm(request_data, prefix="paper")
             link_formset = self.LinkFormset(request_data, prefix="link")
             core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute")
+            paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords")
 
             #check if all forms are valid, add further forms to the if-clause later
-            if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset:
+            if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and \
+                    paper_keywords_form.is_valid():
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
@@ -230,13 +252,19 @@ class EnterData(View):
                                 data = core_attribute_form.cleaned_data
                                 core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
                                 is_literal_quotation = data.get('is_literal_quotation', None)
-                                page_num = data.get('is_literal_quotation', None) # TOD add empty string to none later, after has been converted to char-field
+                                page_num = data.get('is_literal_quotation', None) # TODO add empty string to none later, after has been converted to char-field
                                 current_core_attribute = CoreAttributes(core_attribute=core_attribute,
                                                                         is_literal_quotation=is_literal_quotation,
                                                                         page_num=page_num,
                                                                         ref_core_attribute_to_paper= current_paper)
                                 current_core_attribute.save()
 
+                    if paper_keywords_form.is_valid():
+                        data = paper_keywords_form.cleaned_data
+                        ref_paper = current_paper
+                        # TODO: save paper-keywords data - don't know how to do that yet
+                        # need to iterate over all checked results and add their keyword ids and the ref_paper
+                        # to new entries in paper_keywords table
 
                 else:
                     # paper form is not valid
@@ -245,8 +273,10 @@ class EnterData(View):
 
                 return redirect("LM_DB:viewData")
             else:
-                # TODO: error handling
                 pass
+                # TODO: error handling
+
+
         else:
             print("default")
             pass
@@ -279,12 +309,14 @@ def get_dict_for_enter_data(current_paper_pk):
     links_data = current_links.values()
     all_table_data["link"] = links_data
 
+    # TODO: add version for keywords (many-to-many) Don't know yet how...
     # paper_data = {"pk":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command, "title":paper.title, "abstract":paper.abstract}
     return all_table_data
     # as long as there are no relations connected to paper:
 
 
 # This method returns all information on one paper in form of a dictionary, to be used in ViewData-View
+# for each column per paper, the data is in String-form
 def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     paper_data = paper.values()[0]
@@ -301,20 +333,28 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
         links_data += str(link) + "; "
     paper_data['links'] = links_data
 
+    # the keywords that are linked to a paper
+    current_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
+    keywords_data = ''
+    for keyword in current_keywords:
+        keywords_data += str(keyword) + ", "
+    paper_data['keywords'] = keywords_data
+
     # old version:
     # paper_data = {"paper_id":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command,
     # "title":paper.title, "abstract":paper.abstract}
     return paper_data
 
     # TODO: with other tables being displayed in relation, this dictionary needs to be updated
-    # TODO: missing: purposes, categories, keywords, conceptname
+    # TODO: missing: purposes, categories, conceptname
 
 
 # This method gets a list of the columns which should be displayed in ViewData-View,
 # currently they are generated hard-coded :(
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
-    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo" "core_attributes", "links"]
+    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo",
+                        "core_attributes", "links", "keywords"]
     return included_columns
 
 
