@@ -11,7 +11,6 @@ $.ajax({
 
     // handle a successful response
     success : function(json) {
-        // TODO: implement catching non unique entries
 
         if(json.hasOwnProperty('keyword_pk')) {
             $('#id_new_keyword-keyword').val(''); // remove the value from the input
