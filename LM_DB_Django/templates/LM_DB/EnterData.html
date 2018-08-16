@@ -5,6 +5,7 @@
 {% block head_block %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="{% static 'js/addFormToFormsetDynamically.js' %}"></script>
+    <script src="{% static 'js/ajaxSaveKeyword.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/enterData.css' %}">
 {% endblock %}
 
@@ -47,6 +48,23 @@
                      {% if forloop.last %}</div>{% endif %}
                 {% endfor %}
                 <input type="button" value="Add" id="add_core_attribute">
+            {% endif %}
+            {% if paper_keywords_form %}
+                <h2>Keywords</h2>
+                <div class="paper_keywords">
+                {% for field in paper_keywords_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ paper_keywords_form.as_ul }}
+                </div>
+            {% endif %}
+            {% if keyword_form %}
+                <h3 id="add_keywords">Add keyword</h3>
+                {% for field in keyword_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ keyword_form.as_ul }}
+                <input type="button" name="new_keyword" value="add new keyword" onclick="saveNewKeyword()"/>
             {% endif %}
         </ul>
         <input class="button" type="submit" name="{{ original_form_name }}" value="Submit"/>
