@@ -21,20 +21,22 @@
                 {% endfor %}
                 {{ paper_form.as_ul }}
             {% endif %}
-            {% if link_forms %}
-                <h2>Links</h2>
-                {{ link_forms.management_form }}
-                {% for link_form in link_forms %}
-                    {% if forloop.last and not errors|lookup:link_forms %}<div class="link_form hidden single_form">
-                    {% elif forloop.last %}<div class="link_form">{% endif%}
-                        {% for field in link_form.hidden_fields %}
+
+            {% if concept_name_forms %}
+                <h2>Concept Name</h2>
+                {{ concept_name_forms.management_form }}
+                {% for concept_name_form in concept_name_forms %}
+                    {% if forloop.last and not errors|lookup:concept_name_forms %}<div class="concept_name_form hidden single_form">
+                    {% elif forloop.last %}<div class="concept_name_form">{% endif%}
+                        {% for field in concept_name_form.hidden_fields %}
                             {{ field }}
                         {% endfor %}
-                    {{ link_form.as_ul }}
+                    {{ concept_name_form.as_ul }}
                    {% if forloop.last %}</div>{% endif%}
                 {% endfor %}
                 <input type="button" value="Add" id="add_link">
             {% endif %}
+
             {% if core_attribute_forms %}
                 <h2>Core attributes</h2>
                 {{ core_attribute_forms.management_form }}
@@ -49,6 +51,22 @@
                 {% endfor %}
                 <input type="button" value="Add" id="add_core_attribute">
             {% endif %}
+
+            {% if link_forms %}
+                <h2>Links</h2>
+                {{ link_forms.management_form }}
+                {% for link_form in link_forms %}
+                    {% if forloop.last and not errors|lookup:link_forms %}<div class="link_form hidden single_form">
+                    {% elif forloop.last %}<div class="link_form">{% endif%}
+                        {% for field in link_form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+                    {{ link_form.as_ul }}
+                   {% if forloop.last %}</div>{% endif%}
+                {% endfor %}
+                <input type="button" value="Add" id="add_link">
+            {% endif %}
+
             {% if paper_keywords_form %}
                 <h2>Keywords</h2>
                 <div class="paper_keywords">
@@ -58,6 +76,7 @@
                 {{ paper_keywords_form.as_ul }}
                 </div>
             {% endif %}
+
             {% if keyword_form %}
                 <h3 id="add_keywords">Add keyword</h3>
                 {% for field in keyword_form.hidden_fields %}

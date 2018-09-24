@@ -86,6 +86,9 @@ class Categories(models.Model):
         managed = False
         db_table = 'categories'
 
+    def __str__(self):
+        return self.category_name
+
 
 class CategoriesUnused(models.Model):
     uniqueid = models.SmallIntegerField(primary_key=True)
@@ -107,6 +110,8 @@ class ConceptNames(models.Model):
         managed = False
         db_table = 'concept_names'
 
+    def __str__(self):
+        return self.concept_name
 
 class CoreAttributes(models.Model):
     core_attribute_id = models.AutoField(primary_key=True)

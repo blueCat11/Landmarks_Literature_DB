@@ -9,6 +9,8 @@ from django.views import View
 from LM_DB.forms import *
 from LM_DB.models import *
 
+#TODO autocomplete for concept names: https://stackoverflow.com/questions/5074329/django-jquery-and-autocomplete
+
 
 class ViewData(View):
     def get(self, request):
@@ -34,6 +36,8 @@ class ViewData(View):
 class EnterData(View):
     CoreAttributeFormset = formset_factory(CoreAttributeForm)
     LinkFormset = formset_factory(LinkForm)
+    ConceptNameFormset = formset_factory((ConceptNameForm))
+
 
 
     def get(self, request):
@@ -41,13 +45,19 @@ class EnterData(View):
         # get more forms here, multiple model form in one form template, use prefixes
         # save info for template (like forms etc) to contextDict
 
+        concept_name_formset = self.ConceptNameFormset(prefix="concept_name")
         core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute")
         links_formset = self.LinkFormset(prefix="link")
         keyword_form = KeywordForm(prefix="new_keyword")
         paper_keywords_form = PaperKeywordForm(prefix="paper_keywords")
 
+        #TODO integrate the forms into the context_dict
+        category_form = CategoryForm(prefix="new_category")
+        paper_categories_forms = PaperCategoryForm(prefix="paper_categories")
+
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry", "paper_form": paper_form,
+                        "concept_name_forms": concept_name_formset,
                         "core_attribute_forms": core_attribute_formset, "link_forms": links_formset,
                         "keyword_form":keyword_form, "paper_keywords_form":paper_keywords_form
                         }
@@ -68,6 +78,9 @@ class EnterData(View):
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(prefix="paper", initial=paper_data)
 
+            concept_name_data = all_table_data["concept_name"]
+            concept_name_formset = self.ConceptNameFormset(prefix="concept_name", initial=concept_name_data)
+
             link_data = all_table_data["link"]
             link_formset = self.LinkFormset(prefix="link", initial=link_data)
 
@@ -76,10 +89,16 @@ class EnterData(View):
 
             keyword_form = KeywordForm(prefix="new_keyword")
             paper_keyword_data = all_table_data["paper_keyword"]
-            paper_keywords_form = PaperKeywordForm(prefix="paper_keywords", initial = {
+            paper_keywords_form = PaperKeywordForm(prefix="paper_keywords", initial={
                 'paper_keywords': paper_keyword_data})
 
+            #TODO decomment the category stuff and integrate into context_dict
+            category_form = CategoryForm(prefix="new_category")
+            #paper_category_data = all_table_data["paper_category"]
+            #paper_category_form = PaperCategoryForm(prefix="paper_categories", initital={'paper_categories': paper_category_data})
+
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form,
+                            "concept_name_forms": concept_name_formset,
                             "core_attribute_forms": core_attribute_formset, "link_forms": link_formset,
                             "paper_keywords_form":paper_keywords_form, "keyword_form": keyword_form}
             return render(request, "LM_DB/EnterData.html", context_dict)
@@ -93,6 +112,9 @@ class EnterData(View):
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
 
+            concept_name_data = all_table_data["concept_name"]
+            concept_name_formset = self.ConceptNameFormset(prefix="concept_name", initial=concept_name_data)
+
             link_data = all_table_data["link"]
             link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
 
@@ -103,14 +125,15 @@ class EnterData(View):
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords", initial={
                 'paper_keywords': paper_keyword_data})
 
-            if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed() or paper_keywords_form.has_changed():
+            #TODO: decomment the following (category stuff)
+            # paper_category_data = all_table_data["paper_category"]
+            # paper_category_form = PaperCategoryForm(prefix="paper_categories", initital={'paper_categories': paper_category_data})
+
+            if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or concept_name_formset.has_changed():
                 print("something changed")
-                print(paper_form.is_valid())
-                print(link_formset.is_valid())
-                print(core_attribute_formset.is_valid())
-                print(paper_keywords_form.is_valid())
+                print(concept_name_formset.is_valid()) #TODO most urgent: this is currently false, but error message not displayed
                 # add other forms into this if-clause with or later
-                if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and paper_keywords_form.is_valid():
+                if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and concept_name_formset.is_valid():
                     print("everything valid")
                     if paper_form.has_changed():
                         current_paper = get_current_paper(current_paper_pk)
@@ -133,6 +156,36 @@ class EnterData(View):
                         else:
                             # error display is managed in outside else-clause, all have to be valid to get here
                             pass
+                    if concept_name_formset.has_changed():
+                        print("concept name changed")
+                        if concept_name_formset.is_valid():
+                            print("concept name formset valid")
+                            for concept_name_form in concept_name_formset:
+                                if concept_name_form.is_valid():
+                                    print("concept name form valid")
+                                    data = concept_name_form.cleaned_data
+                                    if data.get("concept_name_id", None) is not None:
+                                        current_concept_name_id = data["concept_name_id"]
+                                        current_concept_name = ConceptNames.objects.get(concept_name_id=current_concept_name_id)
+                                        is_to_be_deleted = False
+                                        for entry in concept_name_form.changed_data:
+                                            if entry == "delete_this_concept_name":
+                                                is_to_be_deleted = True
+                                                break
+                                            elif entry == "concept_name":
+                                                current_concept_name.concept_name = convert_empty_string_to_none(data.get('concept_name', None))
+                                        if is_to_be_deleted:
+                                            current_concept_name.delete()
+                                        else:
+                                            current_concept_name.save()
+                                        print("concept name saved")
+                                    else:
+                                        # what happens, when adding a new concept name
+                                        if not data.get("delete_this_concept_name", False):
+                                            concept_name = convert_empty_string_to_none(data.get("concept_name", None))
+                                            ConceptNames.objects.create(concept_name=concept_name,
+                                                                        ref_concept_name_to_paper_id=current_paper_pk)
+
                     if link_formset.has_changed():
                         print("linkformset changed")
                         if link_formset.is_valid():
@@ -275,13 +328,14 @@ class EnterData(View):
             # make new object(s) and save those to DB
             # construct forms from data here
             paper_form = PaperForm(request_data, prefix="paper")
+            concept_name_formset = self.ConceptNameFormset(request_data, prefix="concept_name")
             link_formset = self.LinkFormset(request_data, prefix="link")
             core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute")
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords")
 
             #check if all forms are valid, add further forms to the if-clause later
             if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and \
-                    paper_keywords_form.is_valid():
+                    paper_keywords_form.is_valid() and concept_name_formset.is_valid:
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
@@ -295,6 +349,17 @@ class EnterData(View):
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract, is_fulltext_in_repo=is_in_repo)
                     current_paper.save()
+
+                    if concept_name_formset.is_valid():
+                        for concept_name_form in concept_name_formset:
+                            if concept_name_form.is_valid():
+                                data = concept_name_form.cleaned_data
+                                is_to_be_deleted = data.get("delete_this_concept_name", False)
+                                if not is_to_be_deleted:
+                                    concept_name = convert_empty_string_to_none(data.get('concept_name', None))
+                                    current_concept_name = ConceptNames(concept_name = concept_name,
+                                                                        ref_concept_name_to_paper=current_paper)
+                                    current_concept_name.save()
 
                     if link_formset.is_valid():
                         for link_form in link_formset:
@@ -371,6 +436,10 @@ def get_dict_for_enter_data(current_paper_pk):
     paper_data = paper.values()[0]
     all_table_data["paper"] = paper_data
 
+    current_concept_name = ConceptNames.objects.filter(ref_concept_name_to_paper=current_paper_pk)
+    concept_name_data = current_concept_name.values()
+    all_table_data["concept_name"] = concept_name_data
+
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
     core_attributes_data = current_core_attributes.values()
     all_table_data["core_attribute"] = core_attributes_data
@@ -392,6 +461,12 @@ def get_dict_for_enter_data(current_paper_pk):
 def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     paper_data = paper.values()[0]
+
+    current_concept_name = ConceptNames.objects.filter(ref_concept_name_to_paper=current_paper_pk)
+    concept_name_data = ''
+    for concept_name in current_concept_name:
+        concept_name_data += str(concept_name)+", "
+    paper_data["conceptname"] = concept_name_data
 
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
     core_attributes_data = ''
@@ -418,7 +493,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     return paper_data
 
     # TODO: with other tables being displayed in relation, this dictionary needs to be updated
-    # TODO: missing: purposes, categories, conceptname
+    # TODO: missing: purposes, categories,
 
 
 # This method gets a list of the columns which should be displayed in ViewData-View,
@@ -426,7 +501,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
     included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo",
-                        "core_attributes", "links", "keywords"]
+                        "concept_name", "core_attributes", "links", "keywords"]
     return included_columns
 
 
