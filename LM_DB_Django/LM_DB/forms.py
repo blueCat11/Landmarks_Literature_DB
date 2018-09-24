@@ -19,6 +19,16 @@ class PaperForm (forms.ModelForm):
         fields = ('paper_id', 'doi', 'bibtex', 'cite_command', 'title', 'abstract')
 
 
+class ConceptNameForm (forms.ModelForm):
+    concept_name_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    concept_name = forms.CharField(widget=forms.Textarea, required=False)
+    delete_this_concept_name = forms.BooleanField(required=False)
+
+    class Meta:
+        model=ConceptNames
+        fields = ('concept_name_id', 'concept_name')
+
+
 class CoreAttributeForm (forms.ModelForm):
     core_attribute_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     core_attribute = forms.CharField(widget=forms.Textarea, required=False)
@@ -54,3 +64,27 @@ class KeywordForm(forms.ModelForm):
 class PaperKeywordForm(forms.Form):
     paper_keywords = forms.ModelMultipleChoiceField(label="", queryset=Keywords.objects.all().order_by('keyword'),
                                                    widget=forms.CheckboxSelectMultiple, required=False)
+
+
+class CategoryForm(forms.ModelForm):
+    category_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    category_name = forms.CharField(max_length=50, required=False)
+    shortcut = forms.CharField(max_length=10, required=False)
+    description = forms.CharField(widget=forms.Textarea, required=False)
+    #TODO super_category_choices should be generated from DB if possible
+    # first part of tuple is unique id of super category, second part is name of super category
+    super_category_choices = (
+        (1, 'environment'),
+        (2, 'type of paper'),
+        (3, 'size of landmark'),
+    )
+    super_category = forms.ChoiceField(choices=super_category_choices)
+
+    class Meta:
+        model = Categories
+        exclude = ('ref_category_to_super_category',)
+
+
+class PaperCategoryForm(forms.Form):
+    paper_categories = forms.ModelMultipleChoiceField(label="", queryset=Categories.objects.all().order_by('category_name'),
+                                                    widget=forms.CheckboxSelectMultiple, required=False)
