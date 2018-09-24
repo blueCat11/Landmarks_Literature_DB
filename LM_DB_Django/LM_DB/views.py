@@ -73,8 +73,19 @@ class EnterData(View):
 
             core_attribute_data = all_table_data["core_attribute"]
             core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute", initial=core_attribute_data)
+
+            keyword_form = KeywordForm(prefix="new_keyword")
+            paper_keyword_data = all_table_data["paper_keyword"]
+            print(paper_keyword_data)
+            paper_keywords_form = PaperKeywordForm(prefix="paper_keywords", initial = {
+                'paper_keywords': all_table_data["paper_keyword"]}
+                                                   )
+            print(paper_keywords_form)
+
+
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form,
-                            "core_attribute_forms": core_attribute_formset, "link_forms": link_formset}
+                            "core_attribute_forms": core_attribute_formset, "link_forms": link_formset,
+                            "paper_keywords_form":paper_keywords_form, "keyword_form": keyword_form}
             return render(request, "LM_DB/EnterData.html", context_dict)
 
         elif request_data.get('editSave', -1)!=-1:
@@ -165,7 +176,7 @@ class EnterData(View):
                                                 elif entry == "is_literal_quotation":
                                                     current_core_attribute.is_literal_quotation = data['is_literal_quotation']
                                                 elif entry == "page_num":
-                                                    current_core_attribute.page_num = data['page_num'] # TODO: change pageNum to Varchar in DB and then add to-null-converter-method around this
+                                                    current_core_attribute.page_num = convert_empty_string_to_none(data['page_num'])
                                             current_core_attribute.save()
                                         else:
                                             core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
@@ -261,14 +272,18 @@ class EnterData(View):
 
                     if paper_keywords_form.is_valid():
                         data = paper_keywords_form.cleaned_data
+                        print("paper keywords")
+                        print(data)
                         ref_paper = current_paper
-                        # TODO: save paper-keywords data - don't know how to do that yet
-                        # need to iterate over all checked results and add their keyword ids and the ref_paper
-                        # to new entries in paper_keywords table
+                        for keyword in data.get("paper_keywords", None):
+                            current_paper_keyword = PaperKeyword(ref_paper_keyword_to_paper=ref_paper, ref_paper_keyword_to_keyword=keyword)
+                            current_paper_keyword.save()
+                    else:
+                        print("paper keywords not valid")
 
                 else:
                     # paper form is not valid
-                    pass
+                    print("paper form not valid")
 
 
                 return redirect("LM_DB:viewData")
@@ -309,6 +324,9 @@ def get_dict_for_enter_data(current_paper_pk):
     links_data = current_links.values()
     all_table_data["link"] = links_data
 
+    current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
+    paper_keywords_data = current_paper_keywords.values_list('keyword_id', flat=True)
+    all_table_data["paper_keyword"] = paper_keywords_data
     # TODO: add version for keywords (many-to-many) Don't know yet how...
     # paper_data = {"pk":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command, "title":paper.title, "abstract":paper.abstract}
     return all_table_data
