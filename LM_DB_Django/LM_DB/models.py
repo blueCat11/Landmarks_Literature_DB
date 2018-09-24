@@ -9,7 +9,6 @@
 # ATTENTION: Don't redo inspectdb to overwrite this - all defined (and necessary) toString (__str__) methods will be lost
 from django.db import models
 
-
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=80)
 

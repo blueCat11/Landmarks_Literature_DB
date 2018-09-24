@@ -76,12 +76,8 @@ class EnterData(View):
 
             keyword_form = KeywordForm(prefix="new_keyword")
             paper_keyword_data = all_table_data["paper_keyword"]
-            print(paper_keyword_data)
             paper_keywords_form = PaperKeywordForm(prefix="paper_keywords", initial = {
-                'paper_keywords': all_table_data["paper_keyword"]}
-                                                   )
-            print(paper_keywords_form)
-
+                'paper_keywords': paper_keyword_data})
 
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "paper_form": paper_form,
                             "core_attribute_forms": core_attribute_formset, "link_forms": link_formset,
@@ -96,7 +92,6 @@ class EnterData(View):
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
-            print(request_data)
 
             link_data = all_table_data["link"]
             link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
@@ -104,9 +99,19 @@ class EnterData(View):
             core_attribute_data = all_table_data["core_attribute"]
             core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute", initial=core_attribute_data)
 
-            if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed(): # add other forms into this if-clause with or later
-                if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid():
+            paper_keyword_data = all_table_data["paper_keyword"]
+            paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords", initial={
+                'paper_keywords': paper_keyword_data})
 
+            if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed() or paper_keywords_form.has_changed():
+                print("something changed")
+                print(paper_form.is_valid())
+                print(link_formset.is_valid())
+                print(core_attribute_formset.is_valid())
+                print(paper_keywords_form.is_valid())
+                # add other forms into this if-clause with or later
+                if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and paper_keywords_form.is_valid():
+                    print("everything valid")
                     if paper_form.has_changed():
                         current_paper = get_current_paper(current_paper_pk)
                         if paper_form.is_valid():
@@ -140,66 +145,112 @@ class EnterData(View):
                                     if data.get("link_id", None) is not None:
                                         current_link_id = data["link_id"]
                                         current_link = Links.objects.get(link_id=current_link_id)
+                                        is_to_be_deleted = False
                                         for entry in link_form.changed_data:
-                                            if entry == "link_text":
+                                            if entry == "delete_this_link":
+                                                is_to_be_deleted = True
+                                                break
+                                            elif entry == "link_text":
                                                 current_link.link_text = convert_empty_string_to_none(data.get('link_text', None))
                                             elif entry == "is_local_link":
                                                 current_link.is_local_link = data['is_local_link']
-                                        current_link.save()
+                                        if is_to_be_deleted:
+                                            current_link.delete()
+                                        else:
+                                            current_link.save()
                                         print("link saved")
                                     else:
-                                        link_text = convert_empty_string_to_none(data.get("link_text", None))
-                                        is_local_link = data.get("is_local_link", None)
-                                        Links.objects.create(link_text=link_text,
-                                                             is_local_link=is_local_link,
-                                                             ref_link_to_paper=current_paper
-                                                             )
+                                        #handles cases, when there's no link-id yet (= new links)
+                                        if data.get("delete_this_link", False) == False:
+                                            link_text = convert_empty_string_to_none(data.get("link_text", None))
+                                            is_local_link = data.get("is_local_link", None)
+                                            Links.objects.create(link_text=link_text,
+                                                                 is_local_link=is_local_link,
+                                                                 ref_link_to_paper=current_paper
+                                                                )
                                 else:
                                     # error handling done in outside else clause
                                     pass
                         else:
                             print("link_formset_not_valid")
                             print(link_formset.errors)
-                        if core_attribute_formset.has_changed():
-                            if core_attribute_formset.is_valid():
-                                current_paper = get_current_paper(current_paper_pk)
-                                for core_attribute_form in core_attribute_formset:
-                                    if core_attribute_form.is_valid():
-                                        data = core_attribute_form.cleaned_data
-                                        if data.get("core_attribute_id", None) is not None:
-                                            current_core_attribute_id = data["core_attribute_id"]
-                                            current_core_attribute = CoreAttributes.objects.get(core_attribute_id= current_core_attribute_id)
-                                            for entry in core_attribute_form.changed_data:
-                                                if entry == "core_attribute":
-                                                    current_core_attribute.core_attribute = convert_empty_string_to_none(
+                    if core_attribute_formset.has_changed():
+                        if core_attribute_formset.is_valid():
+                            current_paper = get_current_paper(current_paper_pk)
+                            for core_attribute_form in core_attribute_formset:
+                                if core_attribute_form.is_valid():
+                                    data = core_attribute_form.cleaned_data
+                                    if data.get("core_attribute_id", None) is not None:
+                                        current_core_attribute_id = data["core_attribute_id"]
+                                        current_core_attribute = CoreAttributes.objects.get(core_attribute_id= current_core_attribute_id)
+                                        print(core_attribute_form.changed_data)
+                                        is_to_be_deleted=False
+                                        for entry in core_attribute_form.changed_data:
+                                            if entry == "delete_this_core_attribute":
+                                                is_to_be_deleted = True
+                                                break
+                                            elif entry == "core_attribute":
+                                                current_core_attribute.core_attribute = convert_empty_string_to_none(
                                                         data.get('core_attribute', None))
-                                                elif entry == "is_literal_quotation":
-                                                    current_core_attribute.is_literal_quotation = data['is_literal_quotation']
-                                                elif entry == "page_num":
-                                                    current_core_attribute.page_num = convert_empty_string_to_none(data['page_num'])
-                                            current_core_attribute.save()
+                                            elif entry == "is_literal_quotation":
+                                                current_core_attribute.is_literal_quotation = data['is_literal_quotation']
+                                            elif entry == "page_num":
+                                                current_core_attribute.page_num = convert_empty_string_to_none(data['page_num'])
+                                        if is_to_be_deleted:
+                                            current_core_attribute.delete()
                                         else:
+                                            current_core_attribute.save()
+                                    else:
+                                        #handles cases in which id was not given yet (= new core attributes)
+                                        if data.get("delete_this_core_attribute", False) == False:
                                             core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
                                             is_literal_quotation = data.get("is_literal_quotation", None)
                                             page_num = data.get("page_num", None)
                                             CoreAttributes.objects.create(core_attribute=core_attribute,
-                                                                          is_literal_quotation=is_literal_quotation,
-                                                                          page_num=page_num,
-                                                                          ref_core_attribute_to_paper=current_paper)
-                                    else:
-                                        # error handling done in outside else-clause
-                                        pass
+                                                                              is_literal_quotation=is_literal_quotation,
+                                                                              page_num=page_num,
+                                                                              ref_core_attribute_to_paper=current_paper)
+                                else:
+                                    # error handling done in outside else-clause
+                                    pass
+                    if paper_keywords_form.has_changed():
+                        print("paper keywords changed")
+                        if paper_keywords_form.is_valid():
+                            current_paper = get_current_paper(current_paper_pk) #not necessary
+                            data = paper_keywords_form.cleaned_data #not necessary
+                            keywords_before = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
+                            list_keywords_before = keywords_before.values_list('keyword_id',flat=True)
+                            keywords_after = paper_keywords_form.cleaned_data['paper_keywords']
+                            list_keywords_after = keywords_after.values_list('keyword_id', flat=True)
+                            for keyword in keywords_after:
+                                if keyword not in keywords_before:
+                                    #in after, not before
+                                    #add relation to paper_keywords relation
+                                    keyword_id = keyword.keyword_id
+                                    PaperKeyword.objects.create(ref_paper_keyword_to_keyword_id =keyword_id, ref_paper_keyword_to_paper_id=current_paper_pk)
+                            for keyword in keywords_before:
+                                if keyword not in keywords_after:
+                                    #in before, now not anymore
+                                    #delete appropriate entry in paper_keywords
+                                    keyword_id = keyword.keyword_id
+                                    PaperKeyword.objects.get(ref_paper_keyword_to_keyword_id=keyword_id, ref_paper_keyword_to_paper_id=current_paper_pk).delete()
+
+                            print("valid cleaned paper keywords")
+
                 else:
                     error_dict = {}
                     if not paper_form.is_valid():
-                        error_dict["paper"]=True
+                        error_dict["paper"] = True
                     if not core_attribute_formset.is_valid():
-                        error_dict["core_attribute_forms"] =True
+                        error_dict["core_attribute_forms"] = True
                     if not link_formset.is_valid():
                         error_dict["link_forms"]=True
+                    if not paper_keywords_form.is_valid():
+                        error_dict["paper_keywords_form"] = True
                     context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
                                     "paper_form": paper_form,
                                     "core_attribute_forms": core_attribute_formset, "link_forms": link_formset,
+                                    "paper_keywords_form":paper_keywords_form,
                                     "errors":error_dict}
                     return render(request, "LM_DB/enterData.html", context_dict)
             return redirect("LM_DB:viewData")
@@ -250,25 +301,29 @@ class EnterData(View):
                             # save links here
                             if link_form.is_valid():
                                 data = link_form.cleaned_data
-                                link_text = convert_empty_string_to_none(data.get('link_text', None))
-                                is_local_link = data.get('is_local_link', None)
-                                current_link = Links(link_text=link_text, is_local_link=is_local_link,
-                                                     ref_link_to_paper=current_paper)
-                                current_link.save()
+                                is_to_be_deleted = data.get("delete_this_link", False)
+                                if not is_to_be_deleted:
+                                    link_text = convert_empty_string_to_none(data.get('link_text', None))
+                                    is_local_link = data.get('is_local_link', None)
+                                    current_link = Links(link_text=link_text, is_local_link=is_local_link,
+                                                         ref_link_to_paper=current_paper)
+                                    current_link.save()
 
                     if core_attribute_formset.is_valid():
                         for core_attribute_form in core_attribute_formset:
                             # save core attributes here!
                             if core_attribute_form.is_valid():
                                 data = core_attribute_form.cleaned_data
-                                core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
-                                is_literal_quotation = data.get('is_literal_quotation', None)
-                                page_num = data.get('is_literal_quotation', None) # TODO add empty string to none later, after has been converted to char-field
-                                current_core_attribute = CoreAttributes(core_attribute=core_attribute,
-                                                                        is_literal_quotation=is_literal_quotation,
-                                                                        page_num=page_num,
-                                                                        ref_core_attribute_to_paper= current_paper)
-                                current_core_attribute.save()
+                                is_to_be_deleted = data.get("delete_this_core_attribute", False)
+                                if not is_to_be_deleted:
+                                    core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
+                                    is_literal_quotation = data.get('is_literal_quotation', None)
+                                    page_num = data.get('is_literal_quotation', None) # TODO add empty string to none later, after has been converted to char-field
+                                    current_core_attribute = CoreAttributes(core_attribute=core_attribute,
+                                                                            is_literal_quotation=is_literal_quotation,
+                                                                            page_num=page_num,
+                                                                            ref_core_attribute_to_paper= current_paper)
+                                    current_core_attribute.save()
 
                     if paper_keywords_form.is_valid():
                         data = paper_keywords_form.cleaned_data
@@ -327,7 +382,6 @@ def get_dict_for_enter_data(current_paper_pk):
     current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
     paper_keywords_data = current_paper_keywords.values_list('keyword_id', flat=True)
     all_table_data["paper_keyword"] = paper_keywords_data
-    # TODO: add version for keywords (many-to-many) Don't know yet how...
     # paper_data = {"pk":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command, "title":paper.title, "abstract":paper.abstract}
     return all_table_data
     # as long as there are no relations connected to paper:

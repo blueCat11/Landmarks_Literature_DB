@@ -21,9 +21,10 @@ class PaperForm (forms.ModelForm):
 
 class CoreAttributeForm (forms.ModelForm):
     core_attribute_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    core_attribute = forms.CharField(widget=forms.Textarea)
+    core_attribute = forms.CharField(widget=forms.Textarea, required=False)
     is_literal_quotation = forms.BooleanField(required=False)
     page_num = forms.IntegerField(required=False)
+    delete_this_core_attribute = forms.BooleanField(required=False)
 
     class Meta:
         model = CoreAttributes
@@ -32,8 +33,9 @@ class CoreAttributeForm (forms.ModelForm):
 
 class LinkForm (forms.ModelForm):
     link_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    link_text = forms.CharField(widget=forms.Textarea)
+    link_text = forms.CharField(widget=forms.Textarea, required=False)
     is_local_link = forms.BooleanField(required=False)
+    delete_this_link = forms.BooleanField(required=False)
 
     class Meta:
         model=Links
