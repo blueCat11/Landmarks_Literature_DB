@@ -113,8 +113,8 @@ class CoreAttributes(models.Model):
     core_attribute_id = models.AutoField(primary_key=True)
     core_attribute = models.TextField(blank=True, null=True)
     is_literal_quotation = models.NullBooleanField()
-    page_num = models.IntegerField(blank=True, null=True)
     ref_core_attribute_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_core_attribute_to_paper', blank=True, null=True)
+    page_num = models.CharField(max_length=15, blank=True, null=True)
 
     class Meta:
         managed = False
