@@ -33,7 +33,7 @@ class CoreAttributeForm (forms.ModelForm):
     core_attribute_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     core_attribute = forms.CharField(widget=forms.Textarea, required=False)
     is_literal_quotation = forms.BooleanField(required=False)
-    page_num = forms.IntegerField(required=False)
+    page_num = forms.CharField(required=False)
     delete_this_core_attribute = forms.BooleanField(required=False)
 
     class Meta:

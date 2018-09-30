@@ -113,7 +113,7 @@ class EnterData(View):
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
 
             concept_name_data = all_table_data["concept_name"]
-            concept_name_formset = self.ConceptNameFormset(prefix="concept_name", initial=concept_name_data)
+            concept_name_formset = self.ConceptNameFormset(request_data, prefix="concept_name", initial=concept_name_data)
 
             link_data = all_table_data["link"]
             link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
@@ -128,10 +128,16 @@ class EnterData(View):
             #TODO: decomment the following (category stuff)
             # paper_category_data = all_table_data["paper_category"]
             # paper_category_form = PaperCategoryForm(prefix="paper_categories", initital={'paper_categories': paper_category_data})
-
+            print(concept_name_formset.has_changed())
             if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or concept_name_formset.has_changed():
                 print("something changed")
+                print(paper_form.is_valid())
+                print(link_formset.is_valid())
+                print(core_attribute_formset.is_valid())
+                print(paper_keywords_form.is_valid())
+                print(concept_name_formset.errors)
                 print(concept_name_formset.is_valid()) #TODO most urgent: this is currently false, but error message not displayed
+                print(concept_name_formset.errors)
                 # add other forms into this if-clause with or later
                 if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and concept_name_formset.is_valid():
                     print("everything valid")
@@ -300,8 +306,10 @@ class EnterData(View):
                         error_dict["link_forms"]=True
                     if not paper_keywords_form.is_valid():
                         error_dict["paper_keywords_form"] = True
+                    if not concept_name_formset.is_valid():
+                        error_dict["concept_name"] = True
                     context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
-                                    "paper_form": paper_form,
+                                    "paper_form": paper_form, "concept_name_forms": concept_name_formset,
                                     "core_attribute_forms": core_attribute_formset, "link_forms": link_formset,
                                     "paper_keywords_form":paper_keywords_form,
                                     "errors":error_dict}
@@ -438,10 +446,14 @@ def get_dict_for_enter_data(current_paper_pk):
 
     current_concept_name = ConceptNames.objects.filter(ref_concept_name_to_paper=current_paper_pk)
     concept_name_data = current_concept_name.values()
+    print("concept_name: ")
+    print(concept_name_data)
     all_table_data["concept_name"] = concept_name_data
 
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
     core_attributes_data = current_core_attributes.values()
+    print("core_attributes:")
+    print(core_attributes_data)
     all_table_data["core_attribute"] = core_attributes_data
 
     current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)

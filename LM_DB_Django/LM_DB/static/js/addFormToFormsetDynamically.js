@@ -22,6 +22,11 @@ $(document).ready( function() {
     $("#add_link").click( function(event) {
         checkIfNeedsClone('div.link_form:last', 'link');
     });
+
+    $("#add_concept_name").click( function(event) {
+        checkIfNeedsClone('div.concept_name_form:last', 'concept_name');
+    });
+
 });
 
 function checkIfNeedsClone(selector, type){
