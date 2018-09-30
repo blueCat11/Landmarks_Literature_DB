@@ -22,7 +22,7 @@ class PaperForm (forms.ModelForm):
 class ConceptNameForm (forms.ModelForm):
     concept_name_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     concept_name = forms.CharField(widget=forms.Textarea, required=False)
-    delete_this_concept_name = forms.BooleanField(required=False)
+    delete_this_concept_name = forms.BooleanField(required=False, initial=True)
 
     class Meta:
         model=ConceptNames
@@ -34,7 +34,7 @@ class CoreAttributeForm (forms.ModelForm):
     core_attribute = forms.CharField(widget=forms.Textarea, required=False)
     is_literal_quotation = forms.BooleanField(required=False)
     page_num = forms.CharField(required=False)
-    delete_this_core_attribute = forms.BooleanField(required=False)
+    delete_this_core_attribute = forms.BooleanField(required=False, initial=True)
 
     class Meta:
         model = CoreAttributes
@@ -45,7 +45,7 @@ class LinkForm (forms.ModelForm):
     link_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     link_text = forms.CharField(widget=forms.Textarea, required=False)
     is_local_link = forms.BooleanField(required=False)
-    delete_this_link = forms.BooleanField(required=False)
+    delete_this_link = forms.BooleanField(required=False, initial=True)
 
     class Meta:
         model=Links

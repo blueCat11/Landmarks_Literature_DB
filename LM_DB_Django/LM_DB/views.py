@@ -166,31 +166,38 @@ class EnterData(View):
                         print("concept name changed")
                         if concept_name_formset.is_valid():
                             print("concept name formset valid")
-                            for concept_name_form in concept_name_formset:
+                            for concept_name_form in concept_name_formset.forms:
                                 if concept_name_form.is_valid():
                                     print("concept name form valid")
                                     data = concept_name_form.cleaned_data
+                                    print("data")
+                                    print(data)
                                     if data.get("concept_name_id", None) is not None:
                                         current_concept_name_id = data["concept_name_id"]
                                         current_concept_name = ConceptNames.objects.get(concept_name_id=current_concept_name_id)
                                         is_to_be_deleted = False
                                         for entry in concept_name_form.changed_data:
                                             if entry == "delete_this_concept_name":
-                                                is_to_be_deleted = True
-                                                break
+                                                is_to_be_deleted = data["delete_this_concept_name"]
                                             elif entry == "concept_name":
                                                 current_concept_name.concept_name = convert_empty_string_to_none(data.get('concept_name', None))
                                         if is_to_be_deleted:
                                             current_concept_name.delete()
+                                            print("concept name deleted")
                                         else:
                                             current_concept_name.save()
-                                        print("concept name saved")
+                                            print("concept name saved")
                                     else:
                                         # what happens, when adding a new concept name
-                                        if not data.get("delete_this_concept_name", False):
+                                        print("new concept name")
+                                        print(data)
+                                        if data.get("delete_this_concept_name", "none") == False:
                                             concept_name = convert_empty_string_to_none(data.get("concept_name", None))
                                             ConceptNames.objects.create(concept_name=concept_name,
                                                                         ref_concept_name_to_paper_id=current_paper_pk)
+                                            print("concept name saved")
+                                        else:
+                                            print("concept name not saved")
 
                     if link_formset.has_changed():
                         print("linkformset changed")
@@ -207,8 +214,7 @@ class EnterData(View):
                                         is_to_be_deleted = False
                                         for entry in link_form.changed_data:
                                             if entry == "delete_this_link":
-                                                is_to_be_deleted = True
-                                                break
+                                                is_to_be_deleted = data["delete_this_link"]
                                             elif entry == "link_text":
                                                 current_link.link_text = convert_empty_string_to_none(data.get('link_text', None))
                                             elif entry == "is_local_link":
@@ -220,13 +226,15 @@ class EnterData(View):
                                         print("link saved")
                                     else:
                                         #handles cases, when there's no link-id yet (= new links)
-                                        if data.get("delete_this_link", False) == False:
+                                        print(data)
+                                        if data.get("delete_this_link", "none") == False:
                                             link_text = convert_empty_string_to_none(data.get("link_text", None))
                                             is_local_link = data.get("is_local_link", None)
                                             Links.objects.create(link_text=link_text,
                                                                  is_local_link=is_local_link,
                                                                  ref_link_to_paper=current_paper
                                                                 )
+
                                 else:
                                     # error handling done in outside else clause
                                     pass
@@ -246,8 +254,7 @@ class EnterData(View):
                                         is_to_be_deleted=False
                                         for entry in core_attribute_form.changed_data:
                                             if entry == "delete_this_core_attribute":
-                                                is_to_be_deleted = True
-                                                break
+                                                is_to_be_deleted = data["delete_this_core_attribute"]
                                             elif entry == "core_attribute":
                                                 current_core_attribute.core_attribute = convert_empty_string_to_none(
                                                         data.get('core_attribute', None))
@@ -260,8 +267,10 @@ class EnterData(View):
                                         else:
                                             current_core_attribute.save()
                                     else:
+                                        print("core attribute data, new")
+                                        print (data)
                                         #handles cases in which id was not given yet (= new core attributes)
-                                        if data.get("delete_this_core_attribute", False) == False:
+                                        if data.get("delete_this_core_attribute", "None") == False:
                                             core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
                                             is_literal_quotation = data.get("is_literal_quotation", None)
                                             page_num = data.get("page_num", None)
@@ -446,18 +455,21 @@ def get_dict_for_enter_data(current_paper_pk):
 
     current_concept_name = ConceptNames.objects.filter(ref_concept_name_to_paper=current_paper_pk)
     concept_name_data = current_concept_name.values()
-    print("concept_name: ")
-    print(concept_name_data)
+    # priorly empty forms are automatically set to be deleted
+    for concept_name in concept_name_data:
+        concept_name['delete_this_concept_name'] = False
     all_table_data["concept_name"] = concept_name_data
 
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
     core_attributes_data = current_core_attributes.values()
-    print("core_attributes:")
-    print(core_attributes_data)
+    for core_attribute in core_attributes_data:
+        core_attribute['delete_this_core_attribute'] = False
     all_table_data["core_attribute"] = core_attributes_data
 
     current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
     links_data = current_links.values()
+    for link in links_data:
+        link['delete_this_link']=False
     all_table_data["link"] = links_data
 
     current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
