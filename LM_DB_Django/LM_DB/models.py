@@ -251,3 +251,6 @@ class SuperCategories(models.Model):
     class Meta:
         managed = False
         db_table = 'super_categories'
+
+    def __str__(self):
+        return self.name

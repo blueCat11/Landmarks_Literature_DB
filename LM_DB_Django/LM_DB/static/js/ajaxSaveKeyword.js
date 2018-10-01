@@ -1,3 +1,43 @@
+//TODO add a function to save new categories (possibly also for concept names??)
+function saveNewCategory(){
+    let keyword = $('#id_new_category-category').val();
+
+$.ajax({
+    url : "/LM_DB/enterData/", // the endpoint
+    type : "POST", // http method
+    data : {
+        isNewCategory: true,
+        category: keyword, //TODO add more data
+    }, // data sent with the post request
+
+    // handle a successful response
+    success : function(json) {
+        // TODO look into this in more detail
+        if(json.hasOwnProperty('keyword_pk')) {
+            $('#id_new_keyword-keyword').val(''); // remove the value from the input
+            let keyword_pk = json.keyword_id;
+            let new_keyword_element = '<li><label for="id_paper_keywords-paperKeywords_' +
+                keyword_pk + '"><input name="paper_keywords-paperKeywords" value="' +
+                keyword_pk + '" id="id_paper_keywords-paperKeywords_' +
+                keyword_pk + '" type="checkbox"> ' +
+                String(keyword) + '</label> </li>';
+
+            $("#id_paper_keywords-paperKeywords").append(new_keyword_element);
+        }else if (json.hasOwnProperty('error')){
+            $('#add_keywords').after('<div class="error">'+json.error+'</div>')
+        }
+        console.log("success"); // another sanity check
+    },
+
+    // handle a non-successful response
+    error : function(xhr,errmsg,err) {
+        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+    }
+    });
+
+}
+
+
 function saveNewKeyword(){
 let keyword = $('#id_new_keyword-keyword').val();
 
@@ -11,7 +51,7 @@ $.ajax({
 
     // handle a successful response
     success : function(json) {
-
+        //TODO: look into this in more detail, not quite working correctly yet (not displaying right away)
         if(json.hasOwnProperty('keyword_pk')) {
             $('#id_new_keyword-keyword').val(''); // remove the value from the input
             let keyword_pk = json.keyword_id;

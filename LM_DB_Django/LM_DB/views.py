@@ -10,7 +10,7 @@ from LM_DB.forms import *
 from LM_DB.models import *
 
 #TODO autocomplete for concept names: https://stackoverflow.com/questions/5074329/django-jquery-and-autocomplete
-
+#TODO change concept name to many-to-many relation
 
 class ViewData(View):
     def get(self, request):
@@ -50,8 +50,6 @@ class EnterData(View):
         links_formset = self.LinkFormset(prefix="link")
         keyword_form = KeywordForm(prefix="new_keyword")
         paper_keywords_form = PaperKeywordForm(prefix="paper_keywords")
-
-        #TODO integrate the forms into the context_dict
         category_form = CategoryForm(prefix="new_category")
         paper_categories_forms = PaperCategoryForm(prefix="paper_categories")
 
@@ -59,7 +57,8 @@ class EnterData(View):
                         "type_of_edit": "New Entry", "paper_form": paper_form,
                         "concept_name_forms": concept_name_formset,
                         "core_attribute_forms": core_attribute_formset, "link_forms": links_formset,
-                        "keyword_form":keyword_form, "paper_keywords_form":paper_keywords_form
+                        "keyword_form":keyword_form, "paper_keywords_form":paper_keywords_form,
+                        "category_form":category_form, "paper_categories_form":paper_categories_forms
                         }
 
         return render(request, "LM_DB/EnterData.html", context_dict)
@@ -136,7 +135,7 @@ class EnterData(View):
                 print(core_attribute_formset.is_valid())
                 print(paper_keywords_form.is_valid())
                 print(concept_name_formset.errors)
-                print(concept_name_formset.is_valid()) #TODO most urgent: this is currently false, but error message not displayed
+                print(concept_name_formset.is_valid())
                 print(concept_name_formset.errors)
                 # add other forms into this if-clause with or later
                 if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and concept_name_formset.is_valid():
@@ -469,15 +468,17 @@ def get_dict_for_enter_data(current_paper_pk):
     current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
     links_data = current_links.values()
     for link in links_data:
-        link['delete_this_link']=False
+        link['delete_this_link']=False # makes default for already there data not deleted automatically
     all_table_data["link"] = links_data
 
     current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
     paper_keywords_data = current_paper_keywords.values_list('keyword_id', flat=True)
     all_table_data["paper_keyword"] = paper_keywords_data
-    # paper_data = {"pk":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command, "title":paper.title, "abstract":paper.abstract}
+
+    current_paper_categories = Categories.objects.filter(papercategory__ref_paper_category_to_paper=current_paper_pk)
+    paper_categories_data = current_paper_categories.values_list('category_id', flat=True)
+    all_table_data["paper_category"] = paper_categories_data
     return all_table_data
-    # as long as there are no relations connected to paper:
 
 
 # This method returns all information on one paper in form of a dictionary, to be used in ViewData-View
@@ -511,13 +512,20 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
         keywords_data += str(keyword) + ", "
     paper_data['keywords'] = keywords_data
 
+    #the categories that are linked to a paper
+    current_categories = Categories.objects.filter(papercategory__ref_paper_category_to_paper=current_paper_pk)
+    categories_data = ""
+    for category in current_categories:
+        categories_data += str(category) + ";"
+    paper_data['categories'] = categories_data
+
     # old version:
     # paper_data = {"paper_id":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command,
     # "title":paper.title, "abstract":paper.abstract}
     return paper_data
 
     # TODO: with other tables being displayed in relation, this dictionary needs to be updated
-    # TODO: missing: purposes, categories,
+    # TODO: missing: purposes,
 
 
 # This method gets a list of the columns which should be displayed in ViewData-View,
@@ -525,7 +533,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
     included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo",
-                        "concept_name", "core_attributes", "links", "keywords"]
+                        "concept_name", "core_attributes", "links", "keywords", "categories"]
     return included_columns
 
 

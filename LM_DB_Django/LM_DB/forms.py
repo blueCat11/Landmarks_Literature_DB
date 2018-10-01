@@ -73,12 +73,14 @@ class CategoryForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea, required=False)
     #TODO super_category_choices should be generated from DB if possible
     # first part of tuple is unique id of super category, second part is name of super category
-    super_category_choices = (
+    ''' super_category_choices = (
         (1, 'environment'),
         (2, 'type of paper'),
         (3, 'size of landmark'),
-    )
-    super_category = forms.ChoiceField(choices=super_category_choices)
+    )'''
+    #super_category = forms.ChoiceField(choices=super_category_choices)
+    super_category = forms.ModelChoiceField( queryset=SuperCategories.objects.all().order_by('name'),
+                                                    widget=forms.RadioSelect, required=False)
 
     class Meta:
         model = Categories

@@ -85,6 +85,25 @@
                 {{ keyword_form.as_ul }}
                 <input type="button" name="new_keyword" value="add new keyword" onclick="saveNewKeyword()"/>
             {% endif %}
+
+             {% if paper_categories_form %}
+                <h2>Categories</h2>
+                <div class="paper_categories">
+                {% for field in paper_categories_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ paper_categories_form.as_ul }}
+                </div>
+            {% endif %}
+
+            {% if category_form %}
+                <h3 id="add_categories">Add Categories</h3>
+                {% for field in category_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ category_form.as_ul }}
+                <input type="button" name="new_category" value="add new category" onclick="saveNewCategory()"/>
+            {% endif %}
         </ul>
         <input class="button" type="submit" name="{{ original_form_name }}" value="Submit"/>
     </form>
