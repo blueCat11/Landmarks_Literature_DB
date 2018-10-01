@@ -265,6 +265,8 @@ class Purposes(models.Model):
         managed = False
         db_table = 'purposes'
 
+    def __str__(self):
+        return self.purpose
 
 class SuperCategories(models.Model):
     super_category_id = models.AutoField(primary_key=True)

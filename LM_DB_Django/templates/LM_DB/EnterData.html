@@ -11,7 +11,7 @@
 
 {% block body_block %}
     <h1>{{ type_of_edit }}</h1>
-    <form action="/LM_DB/enterData/" method="post">
+    <form id="lm_data_form" action="/LM_DB/enterData/" method="post">
         {% csrf_token %}
         <ul>
             <h2>Paper</h2>
@@ -22,19 +22,38 @@
                 {{ paper_form.as_ul }}
             {% endif %}
 
-            {% if concept_name_forms %}
-                <h2>Concept Name</h2>
-                {{ concept_name_forms.management_form }}
-                {% for concept_name_form in concept_name_forms %}
-                    {% if forloop.last and not errors|lookup:concept_name_forms %}<div class="concept_name_form hidden single_form">
-                    {% elif forloop.last %}<div class="concept_name_form">{% endif%}
-                        {% for field in concept_name_form.hidden_fields %}
+            {% if paper_concept_names_form %}
+                <h2>Concept Names</h2>
+                <div class="paper_concept_names">
+                {% for field in paper_concept_names_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ paper_concept_names_form.as_ul }}
+                </div>
+            {% endif %}
+
+            {% if concept_name_form %}
+                <h3 id="add_concept_name">New concept name</h3>
+                {% for field in concept_name_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                {{ concept_name_form.as_ul }}
+                <input type="button" name="new_concept_name" value="add new concept name" onclick="saveNewConceptName()"/>
+            {% endif %}
+
+            {% if purpose_forms %}
+                <h2>Purpose</h2>
+                {{ purpose_forms.management_form }}
+                {% for purpose_form in purpose_forms %}
+                    {% if forloop.last and not errors|lookup:purpose_forms %}<div class="purpose_form hidden single_form">
+                    {% elif forloop.last %}<div class="purpose_form">{% endif%}
+                        {% for field in purpose_form.hidden_fields %}
                             {{ field }}
                         {% endfor %}
-                    {{ concept_name_form.as_ul }}
+                    {{ purpose_form.as_ul }}
                    {% if forloop.last %}</div>{% endif%}
                 {% endfor %}
-                <input type="button" value="Add" id="add_concept_name">
+                <input type="button" value="Add" id="add_purpose">
             {% endif %}
 
             {% if core_attribute_forms %}

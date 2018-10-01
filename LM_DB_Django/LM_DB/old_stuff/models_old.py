@@ -7,7 +7,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 
 # ATTENTION: Don't redo inspectdb to overwrite this - all defined (and necessary) toString (__str__) methods will be lost
-from django.db import models
+'''from django.db import models
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=80)
@@ -254,3 +254,4 @@ class SuperCategories(models.Model):
 
     def __str__(self):
         return self.name
+'''

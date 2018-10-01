@@ -1,30 +1,80 @@
 //TODO add a function to save new categories (possibly also for concept names??)
+function saveNewConceptName(){
+    let conceptName = $('#id_concept_name-concept_name').val();
+
+$.ajax({
+    url : "/LM_DB/enterData/", // the endpoint
+    type : "POST", // http method
+    data : {
+        isNewConceptName: true,
+        concept_name: conceptName,
+    }, // data sent with the post request
+
+    // handle a successful response
+    success : function(json) {
+        // TODO look into this in more detail
+        if(json.hasOwnProperty('concept_name_id')) {
+            $('#id_concept_name-concept_name').val(''); // remove the value from the input
+            let concept_name_pk = json.concept_name_id;
+            let new_concept_name_element = '<li><label for="id_paper_concept_names-paper_concept_names_' +
+                concept_name_pk + '"><input name="paper_conceptNames-paper_concept_names" value="' +
+                concept_name_pk + '" id="id_paper_conceptNames-paper_concept_names_' +
+                concept_name_pk + '" type="checkbox"> ' +
+                String(conceptName) + '</label> </li>';
+
+            $("#id_paper_concept_names-paper_concept_names").append(new_concept_name_element);
+        }else if (json.hasOwnProperty('error')){
+            $('#add_concept_name').after('<div class="error">'+json.error+'</div>')
+        }
+        console.log("success"); // another sanity check
+    },
+
+    // handle a non-successful response
+    error : function(xhr,errmsg,err) {
+        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+    }
+    });
+}
+
+
 function saveNewCategory(){
-    let keyword = $('#id_new_category-category').val();
+    let category_name = $('#id_new_category-category_name').val();
+    let shortcut = $('#id_new_category-shortcut').val();
+    let description = $('#id_new_category-description').val();
+    let super_category = $('input[name=new_category-super_category]:checked', '#id_new_category-super_category').val();
+
 
 $.ajax({
     url : "/LM_DB/enterData/", // the endpoint
     type : "POST", // http method
     data : {
         isNewCategory: true,
-        category: keyword, //TODO add more data
+        category_name: category_name,
+        shortcut: shortcut,
+        description: description,
+        super_category: super_category
     }, // data sent with the post request
 
     // handle a successful response
     success : function(json) {
-        // TODO look into this in more detail
-        if(json.hasOwnProperty('keyword_pk')) {
-            $('#id_new_keyword-keyword').val(''); // remove the value from the input
-            let keyword_pk = json.keyword_id;
-            let new_keyword_element = '<li><label for="id_paper_keywords-paperKeywords_' +
-                keyword_pk + '"><input name="paper_keywords-paperKeywords" value="' +
-                keyword_pk + '" id="id_paper_keywords-paperKeywords_' +
-                keyword_pk + '" type="checkbox"> ' +
-                String(keyword) + '</label> </li>';
+        if(json.hasOwnProperty('category_id')) {
+            // remove the value from the input
+            $('#id_new_category-category_name').val('');
+            $('#id_new_category-shortcut').val('');
+            $('#id_new_category-description').val('');
+            $('input[name=new_category-super_category]:checked', '#id_new_category-super_category').prop('checked', false); //TODO this might be cause for trouble... not tested yet
 
-            $("#id_paper_keywords-paperKeywords").append(new_keyword_element);
+            //add the new category to the list
+            let category_pk = json.category_id;
+            let new_category_element = '<li><label for="id_paper_categories-paper_categories_' +
+                category_pk + '"><input name="paper_categories-paper_categories" value="' +
+                category_pk + '" id="id_paper_categories-paper_categories_' +
+                category_pk + '" type="checkbox"> ' +
+                String(category_name) + '</label> </li>';
+
+            $("#id_paper_categories-paper_categories").append(new_category_element);
         }else if (json.hasOwnProperty('error')){
-            $('#add_keywords').after('<div class="error">'+json.error+'</div>')
+            $('#add_categories').after('<div class="error">'+json.error+'</div>')
         }
         console.log("success"); // another sanity check
     },
@@ -52,16 +102,18 @@ $.ajax({
     // handle a successful response
     success : function(json) {
         //TODO: look into this in more detail, not quite working correctly yet (not displaying right away)
-        if(json.hasOwnProperty('keyword_pk')) {
+        if(json.hasOwnProperty('keyword_id')) {
             $('#id_new_keyword-keyword').val(''); // remove the value from the input
             let keyword_pk = json.keyword_id;
-            let new_keyword_element = '<li><label for="id_paper_keywords-paperKeywords_' +
-                keyword_pk + '"><input name="paper_keywords-paperKeywords" value="' +
-                keyword_pk + '" id="id_paper_keywords-paperKeywords_' +
+            let new_keyword_element = '<li><label for="id_paper_keywords-paper_keywords_' +
+                keyword_pk + '"><input name="paper_keywords-paper_keywords" value="' +
+                keyword_pk + '" id="id_paper_keywords-paper_keywords_' +
                 keyword_pk + '" type="checkbox"> ' +
                 String(keyword) + '</label> </li>';
 
-            $("#id_paper_keywords-paperKeywords").append(new_keyword_element);
+            $("#id_paper_keywords-paper_keywords").append(new_keyword_element);
+            console.log(new_keyword_element)
+            console.log("new keyword element")
         }else if (json.hasOwnProperty('error')){
             $('#add_keywords').after('<div class="error">'+json.error+'</div>')
         }

@@ -23,8 +23,8 @@ $(document).ready( function() {
         checkIfNeedsClone('div.link_form:last', 'link');
     });
 
-    $("#add_concept_name").click( function(event) {
-        checkIfNeedsClone('div.concept_name_form:last', 'concept_name');
+    $("#add_purpose").click( function(event) {
+        checkIfNeedsClone('div.concept_name_form:last', 'purpose');
     });
 
 });

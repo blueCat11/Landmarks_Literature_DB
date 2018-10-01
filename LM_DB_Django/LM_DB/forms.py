@@ -1,7 +1,7 @@
 
 from django import forms
 
-from LM_DB.models_old import *
+from LM_DB.models import *
 
 # form for main information on paper
 class PaperForm (forms.ModelForm):
@@ -22,11 +22,16 @@ class PaperForm (forms.ModelForm):
 class ConceptNameForm (forms.ModelForm):
     concept_name_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     concept_name = forms.CharField(widget=forms.Textarea, required=False)
-    delete_this_concept_name = forms.BooleanField(required=False, initial=True)
 
     class Meta:
         model=ConceptNames
         fields = ('concept_name_id', 'concept_name')
+
+
+class PaperConceptNameForm (forms.Form):
+    paper_concept_name = forms.ModelMultipleChoiceField(label="",
+                                                        queryset=ConceptNames.objects.all().order_by('concept_name'),
+                                                        widget=forms.CheckboxSelectMultiple, required=False)
 
 
 class CoreAttributeForm (forms.ModelForm):
@@ -71,14 +76,6 @@ class CategoryForm(forms.ModelForm):
     category_name = forms.CharField(max_length=50, required=False)
     shortcut = forms.CharField(max_length=10, required=False)
     description = forms.CharField(widget=forms.Textarea, required=False)
-    #TODO super_category_choices should be generated from DB if possible
-    # first part of tuple is unique id of super category, second part is name of super category
-    ''' super_category_choices = (
-        (1, 'environment'),
-        (2, 'type of paper'),
-        (3, 'size of landmark'),
-    )'''
-    #super_category = forms.ChoiceField(choices=super_category_choices)
     super_category = forms.ModelChoiceField( queryset=SuperCategories.objects.all().order_by('name'),
                                                     widget=forms.RadioSelect, required=False)
 
@@ -90,3 +87,13 @@ class CategoryForm(forms.ModelForm):
 class PaperCategoryForm(forms.Form):
     paper_categories = forms.ModelMultipleChoiceField(label="", queryset=Categories.objects.all().order_by('category_name'),
                                                     widget=forms.CheckboxSelectMultiple, required=False)
+
+
+class PurposeForm(forms.ModelForm):
+    purpose_id = models.AutoField(primary_key=True)
+    purpose = forms.CharField(widget=forms.Textarea, required=False)
+    delete_this_purpose = forms.BooleanField(required=False, initial=True)
+
+    class Meta:
+        model = Purposes
+        fields = ('purpose_id', 'purpose',)
