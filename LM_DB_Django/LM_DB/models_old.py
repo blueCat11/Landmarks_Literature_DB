@@ -5,8 +5,9 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models
 
+# ATTENTION: Don't redo inspectdb to overwrite this - all defined (and necessary) toString (__str__) methods will be lost
+from django.db import models
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=80)
@@ -84,7 +85,6 @@ class Categories(models.Model):
     class Meta:
         managed = False
         db_table = 'categories'
-        unique_together = (('category_name', 'shortcut'),)
 
     def __str__(self):
         return self.category_name
@@ -103,7 +103,8 @@ class CategoriesUnused(models.Model):
 
 class ConceptNames(models.Model):
     concept_name_id = models.AutoField(primary_key=True)
-    concept_name = models.TextField(unique=True, blank=True, null=True)
+    concept_name = models.TextField(blank=True, null=True)
+    ref_concept_name_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_concept_name_to_paper', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -111,7 +112,6 @@ class ConceptNames(models.Model):
 
     def __str__(self):
         return self.concept_name
-
 
 class CoreAttributes(models.Model):
     core_attribute_id = models.AutoField(primary_key=True)
@@ -181,7 +181,7 @@ class DjangoSession(models.Model):
 
 class Keywords(models.Model):
     keyword_id = models.AutoField(primary_key=True)
-    keyword = models.TextField(unique=True, blank=True, null=True)
+    keyword = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -190,16 +190,11 @@ class Keywords(models.Model):
     def __str__(self):
         return self.keyword
 
-
 class Links(models.Model):
     link_id = models.AutoField(primary_key=True)
     link_text = models.TextField(blank=True, null=True)
     is_local_link = models.NullBooleanField()
     ref_link_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_link_to_paper', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'links'
 
     def __str__(self):
         string = ""
@@ -210,6 +205,9 @@ class Links(models.Model):
         string += str(self.link_text)
         return string
 
+    class Meta:
+        managed = False
+        db_table = 'links'
 
 
 class PaperCategory(models.Model):
@@ -220,16 +218,6 @@ class PaperCategory(models.Model):
     class Meta:
         managed = False
         db_table = 'paper_category'
-
-
-class PaperConceptName(models.Model):
-    paper_concept_name_id = models.AutoField(primary_key=True)
-    ref_paper_concept_name_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_paper_concept_name_to_paper', blank=True, null=True)
-    ref_paper_concept_name_to_concept_name = models.ForeignKey(ConceptNames, models.DO_NOTHING, db_column='ref_paper_concept_name_to_concept_name', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'paper_concept_name'
 
 
 class PaperKeyword(models.Model):
@@ -254,16 +242,6 @@ class Papers(models.Model):
     class Meta:
         managed = False
         db_table = 'papers'
-
-
-class Purposes(models.Model):
-    purpose_id = models.AutoField(primary_key=True)
-    purpose = models.TextField(blank=True, null=True)
-    ref_purpose_to_paper = models.ForeignKey(Papers, models.DO_NOTHING, db_column='ref_purpose_to_paper', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'purposes'
 
 
 class SuperCategories(models.Model):

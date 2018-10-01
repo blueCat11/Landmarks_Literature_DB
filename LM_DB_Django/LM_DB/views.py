@@ -7,9 +7,10 @@ from django.views import View
 
 # This View displays all current database entries in a table format
 from LM_DB.forms import *
-from LM_DB.models import *
+from LM_DB.models_old import *
 
-#TODO autocomplete for concept names: https://stackoverflow.com/questions/5074329/django-jquery-and-autocomplete
+#TODO authentification: http://www.tangowithdjango.com/book17/chapters/login.html
+#TODO enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
 #TODO change concept name to many-to-many relation
 
 class ViewData(View):

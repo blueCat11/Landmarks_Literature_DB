@@ -1,7 +1,7 @@
 
 from django import forms
 
-from LM_DB.models import *
+from LM_DB.models_old import *
 
 # form for main information on paper
 class PaperForm (forms.ModelForm):
