@@ -12,6 +12,7 @@ class PaperForm (forms.ModelForm):
     title = forms.CharField(widget=forms.Textarea, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
     is_fulltext_in_repo = forms.BooleanField(required=False)
+    file = forms.FileField(required=False)
 
 
     class Meta:

@@ -126,7 +126,7 @@ class EnterData(View):
             current_paper_pk = request_data["paper-paper_id"]
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
-            paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
+            paper_form = PaperForm(request_data, request.FILES, prefix="paper", initial=paper_data)
 
             purpose_data = all_table_data["purpose"]
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose", initial=purpose_data)
@@ -446,7 +446,7 @@ class EnterData(View):
             print("newSave")
             # make new object(s) and save those to DB
             # construct forms from data here
-            paper_form = PaperForm(request_data, prefix="paper")
+            paper_form = PaperForm(request_data, request.FILES, prefix="paper")
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose")
             link_formset = self.LinkFormset(request_data, prefix="link")
             core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute")
@@ -468,6 +468,8 @@ class EnterData(View):
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract, is_fulltext_in_repo=is_in_repo)
                     current_paper.save()
+
+                    handle_uploaded_file(request.FILES['file'])
 
                     if purpose_formset.is_valid():
                         for purpose_form in purpose_formset:
@@ -648,3 +650,14 @@ def get_list_of_included_columns():
 # Gets the paper which is being currently edited
 def get_current_paper(pk):
     return Papers.objects.get(pk=pk)
+import bibtexparser
+
+def handle_uploaded_file(f, bibtex_str):#TODO test this
+    baseDestination = "" #TODO define base location of files
+    filename = "" #TODO get file name
+    bib = bibtexparser.loads(bibtex_str)
+    year = bib.year
+    current_location = baseDestination + "/" +str(year) +"/"+filename
+    with open(current_location, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
