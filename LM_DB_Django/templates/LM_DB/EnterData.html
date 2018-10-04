@@ -11,7 +11,7 @@
 
 {% block body_block %}
     <h1>{{ type_of_edit }}</h1>
-    <form id="lm_data_form" action="/LM_DB/enterData/" method="post">
+    <form id="lm_data_form" action="/LM_DB/enterData/" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <ul>
             <h2>Paper</h2>

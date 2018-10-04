@@ -1,4 +1,4 @@
-//TODO add a function to save new categories (possibly also for concept names??)
+
 function saveNewConceptName(){
     let conceptName = $('#id_concept_name-concept_name').val();
 
@@ -12,17 +12,16 @@ $.ajax({
 
     // handle a successful response
     success : function(json) {
-        // TODO look into this in more detail
         if(json.hasOwnProperty('concept_name_id')) {
             $('#id_concept_name-concept_name').val(''); // remove the value from the input
             let concept_name_pk = json.concept_name_id;
-            let new_concept_name_element = '<li><label for="id_paper_concept_names-paper_concept_names_' +
-                concept_name_pk + '"><input name="paper_conceptNames-paper_concept_names" value="' +
-                concept_name_pk + '" id="id_paper_conceptNames-paper_concept_names_' +
+            let new_concept_name_element = '<li><label for="id_concept_name-paper_concept_name_' +
+                concept_name_pk + '"><input name="concept-name-paper_concept_name" value="' +
+                concept_name_pk + '" id="id_concept_name-paper_concept_name_' +
                 concept_name_pk + '" type="checkbox"> ' +
                 String(conceptName) + '</label> </li>';
 
-            $("#id_paper_concept_names-paper_concept_names").append(new_concept_name_element);
+            $("#id_concept_name-paper_concept_name").append(new_concept_name_element);
         }else if (json.hasOwnProperty('error')){
             $('#add_concept_name').after('<div class="error">'+json.error+'</div>')
         }
@@ -101,7 +100,6 @@ $.ajax({
 
     // handle a successful response
     success : function(json) {
-        //TODO: look into this in more detail, not quite working correctly yet (not displaying right away)
         if(json.hasOwnProperty('keyword_id')) {
             $('#id_new_keyword-keyword').val(''); // remove the value from the input
             let keyword_pk = json.keyword_id;

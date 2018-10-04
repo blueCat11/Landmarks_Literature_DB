@@ -11,7 +11,7 @@ from LM_DB.old_stuff.models_old import *
 
 #TODO authentification: http://www.tangowithdjango.com/book17/chapters/login.html
 #TODO enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
-# change concept name to many-to-many relation
+# DONE change concept name to many-to-many relation
 #DONE empty core attributes and links are added for new papers, should not be (must be something specific to new, because they can be deleted using edit)
 
 class ViewData(View):
@@ -72,6 +72,7 @@ class EnterData(View):
     # src: https://stackoverflow.com/questions/2770810/multiple-models-in-a-single-django-modelform
     def post(self, request):
         request_data = request.POST
+        print(request_data)
 
         if request_data.get('editStart', -1)!=-1:
             print("editStart")
@@ -119,6 +120,7 @@ class EnterData(View):
 
         elif request_data.get('editSave', -1)!=-1:
             print("editSave")
+
             # get corresponding data-object(s) from DB, make changes to it and save changes
             # src: https://docs.djangoproject.com/en/2.1/ref/forms/api/#checking-which-form-data-has-changed
             current_paper_pk = request_data["paper-paper_id"]
@@ -407,8 +409,7 @@ class EnterData(View):
             json_response = JsonResponse(response_data)
             return json_response
 
-        elif request_data.get("isNewCategory,", -1) != -1 :
-            #TODO, this doesn't kick in yet
+        elif request_data.get("isNewCategory", -1) != -1 :
             print("isNewCategory")
             category_name = request_data['category_name']
             is_not_unique = Categories.objects.filter(category_name=category_name).exists()
