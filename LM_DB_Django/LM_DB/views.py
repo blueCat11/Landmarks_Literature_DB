@@ -1,6 +1,8 @@
 from django.forms import formset_factory
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+import bibtexparser  # for bibtex
+import os #for paths
 
 # Create your views here.
 from django.views import View
@@ -468,8 +470,12 @@ class EnterData(View):
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract, is_fulltext_in_repo=is_in_repo)
                     current_paper.save()
+                    print(request.FILES)
+                    print(request.FILES.keys)
+                    print(request.FILES['paper-file'].name)
+                    print(request.FILES)
+                    handle_uploaded_file(request.FILES['paper-file'], bibtex)
 
-                    handle_uploaded_file(request.FILES['file'])
 
                     if purpose_formset.is_valid():
                         for purpose_form in purpose_formset:
@@ -557,7 +563,7 @@ def get_dict_for_enter_data(current_paper_pk):
     current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = current_concept_name.values_list('concept_name_id', flat=True)
     # priorly empty forms are automatically set to be deleted
-    all_table_data["concept_name"] = concept_name_data
+    all_table_data["paper_concept_name"] = concept_name_data
 
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
     core_attributes_data = current_core_attributes.values()
@@ -650,14 +656,22 @@ def get_list_of_included_columns():
 # Gets the paper which is being currently edited
 def get_current_paper(pk):
     return Papers.objects.get(pk=pk)
-import bibtexparser
 
-def handle_uploaded_file(f, bibtex_str):#TODO test this
-    baseDestination = "" #TODO define base location of files
-    filename = "" #TODO get file name
-    bib = bibtexparser.loads(bibtex_str)
-    year = bib.year
-    current_location = baseDestination + "/" +str(year) +"/"+filename
-    with open(current_location, 'wb+') as destination:
-        for chunk in f.chunks():
+
+def handle_uploaded_file(file, bibtex_str):
+    base_destination = os.path.join("D:","Dokumente","Uni", "SHK","LM-DB", "test_for_files" ) # TODO change base location of files when deploying
+    filename = file.name
+    if bibtex_str is not None:
+        bib = bibtexparser.loads(bibtex_str)
+        print(bib.entries)
+        year = str(bib.entries[0]['year'])
+    else:
+        year = "unknown_year"
+    current_location = os.path.join(base_destination , year)
+    if not os.path.isdir(current_location):
+        os.makedirs(current_location)
+    path_and_paper = os.path.join(current_location, filename)
+
+    with open(path_and_paper, 'wb+') as destination:
+        for chunk in file.chunks():
             destination.write(chunk)
