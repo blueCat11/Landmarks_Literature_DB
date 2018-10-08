@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 
-from LM_DB.views import * #Index, StartSurvey, Interests, Questionnaire, Demographics, InterestValues
+from LM_DB.views import * # Index, StartSurvey, Interests, Questionnaire, Demographics, InterestValues
 from LM_DB_Django import settings
 from . import views
 

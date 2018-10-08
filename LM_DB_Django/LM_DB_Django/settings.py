@@ -15,9 +15,14 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates/')
 STATIC_PATH = os.path.join(BASE_DIR, 'LM_DB/static/')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL = '/media/'
+print(MEDIA_ROOT)
+#MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -42,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'LM_DB.apps.LmDbConfig',
-    #'mod_wsgi.server', # leave this line commented when running on local host
+    'registration',  # for registration app
+    # 'mod_wsgi.server', # leave this line commented when running on local host
 ]
 
 MIDDLEWARE = [
@@ -54,6 +60,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+PASSWORD_HASHERS = (
+'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+)
+
+REGISTRATION_OPEN = False               # If True, users can register
+ACCOUNT_ACTIVATION_DAYS = 7     # One-week activation window; you may, of course, use a different value.
+REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
+LOGIN_REDIRECT_URL = '/LM_DB/viewData/'  # The page you want users to arrive at after they successful log in
+LOGIN_URL = '/accounts/login/'  # The page users are directed to if they are not logged in
+                                # and are trying to access pages requiring authentication
 
 ROOT_URLCONF = 'LM_DB_Django.urls'
 
