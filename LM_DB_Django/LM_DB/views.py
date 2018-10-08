@@ -4,6 +4,9 @@ from django.shortcuts import render, redirect
 import bibtexparser  # for bibtex
 import os #for paths
 
+import LM_DB_Django
+from LM_DB.display_methods import *
+
 # Create your views here.
 from django.views import View
 
@@ -11,10 +14,15 @@ from django.views import View
 from LM_DB.forms import *
 from LM_DB.old_stuff.models_old import *
 
-#TODO authentification: http://www.tangowithdjango.com/book17/chapters/login.html
-#TODO enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
+#DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
+#TODO user permissions # https://docs.djangoproject.com/en/2.1/topics/auth/default/#topic-authorization
+#DONE enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
+#DONE display file as field with "is_file_in_repo", false when empty, path-string when true
+#TODO integrate separate file form -> currently only possible for new papers, not in edit mode
 # DONE change concept name to many-to-many relation
 #DONE empty core attributes and links are added for new papers, should not be (must be something specific to new, because they can be deleted using edit)
+from LM_DB_Django.settings import MEDIA_ROOT
+
 
 class ViewData(View):
     def get(self, request):
@@ -46,7 +54,7 @@ class EnterData(View):
         paper_form = PaperForm(prefix="paper")
         # get more forms here, multiple model form in one form template, use prefixes
         # save info for template (like forms etc) to contextDict
-
+        file_form = FileForm(prefix="file")
         concept_name_form= ConceptNameForm(prefix="concept_name")
         purpose_formset = self.PurposeFormset(prefix="purpose")
         paper_concept_name_form = PaperConceptNameForm(prefix="concept_name")
@@ -60,6 +68,7 @@ class EnterData(View):
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry",
                         "paper_form": paper_form,
+                        "file_form": file_form,
                         "concept_name_form": concept_name_form, "paper_concept_names_form":paper_concept_name_form,
                         "core_attribute_forms": core_attribute_formset,
                         "link_forms": links_formset,
@@ -84,6 +93,9 @@ class EnterData(View):
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(prefix="paper", initial=paper_data)
+
+            file_data = all_table_data["file"]
+            file_form = FileForm(prefix="file", initial=file_data)
 
             purpose_data = all_table_data["purpose"]
             purpose_formset = self.PurposeFormset(prefix="purpose", initial=purpose_data)
@@ -112,6 +124,7 @@ class EnterData(View):
 
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
                             "paper_form": paper_form,
+                            "file_form": file_form,
                             "purpose_forms": purpose_formset,
                             "core_attribute_forms": core_attribute_formset,
                             "link_forms": link_formset,
@@ -128,7 +141,10 @@ class EnterData(View):
             current_paper_pk = request_data["paper-paper_id"]
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
-            paper_form = PaperForm(request_data, request.FILES, prefix="paper", initial=paper_data)
+            paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
+
+            file_data = all_table_data["file"]
+            file_form = FileForm(request_data, request.FILES, prefix="file", initial=file_data)
 
             purpose_data = all_table_data["purpose"]
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose", initial=purpose_data)
@@ -156,9 +172,15 @@ class EnterData(View):
             category_form = CategoryForm(prefix="new_category")
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
 
-            if paper_form.has_changed() or link_formset.has_changed() or core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or purpose_formset.has_changed() or paper_categories_form.has_changed() or paper_concept_names_form.has_changed():
+            if paper_form.has_changed() or file_form.has_changed() or link_formset.has_changed() or\
+                    core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or \
+                    purpose_formset.has_changed() or paper_categories_form.has_changed() or \
+                    paper_concept_names_form.has_changed():
                 # add other forms into this if-clause with or later
-                if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and purpose_formset.is_valid() and paper_categories_form.is_valid() and paper_concept_names_form.is_valid():
+                if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and \
+                        core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and \
+                        purpose_formset.is_valid() and paper_categories_form.is_valid() and \
+                        paper_concept_names_form.is_valid():
                     print("everything valid")
                     if paper_form.has_changed():
                         current_paper = get_current_paper(current_paper_pk)
@@ -175,12 +197,13 @@ class EnterData(View):
                                     current_paper.title =  convert_empty_string_to_none(data.get('title', None))
                                 elif entry == "abstract":
                                     current_paper.abstract = convert_empty_string_to_none(data.get('abstract', None))
-                                elif entry == "is_fulltext_in_repo":
-                                    current_paper.is_fulltext_in_repo = data['is_fulltext_in_repo']
                             current_paper.save()
                         else:
                             # error display is managed in outside else-clause, all have to be valid to get here
                             pass
+                    if file_form.has_changed():
+                        # TODO implement file_has_changed behavior (delete old file, save new one)
+                        pass
 
                     if purpose_formset.has_changed():
                         print("purpose changed")
@@ -369,9 +392,11 @@ class EnterData(View):
 
                             print("valid cleaned paper categories")
                 else:
-                    error_dict = {}
+                    error_dict = {}  # TODO check whether the errors are displayed correctly for each (is the key right)
                     if not paper_form.is_valid():
                         error_dict["paper"] = True
+                    if not file_form.is_valid():
+                        error_dict["file"] = True
                     if not core_attribute_formset.is_valid():
                         error_dict["core_attribute_forms"] = True
                     if not link_formset.is_valid():
@@ -386,6 +411,7 @@ class EnterData(View):
                         error_dict["paper_concept_name"] = True
                     context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
                                     "paper_form": paper_form,
+                                    "file_form": file_form,
                                     "purpose_forms": purpose_formset,
                                     "core_attribute_forms": core_attribute_formset,
                                     "link_forms": link_formset,
@@ -448,15 +474,21 @@ class EnterData(View):
             print("newSave")
             # make new object(s) and save those to DB
             # construct forms from data here
-            paper_form = PaperForm(request_data, request.FILES, prefix="paper")
+            paper_form = PaperForm(request_data, prefix="paper")
+            file_form = FileForm(request_data, request.FILES, prefix="file")
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose")
             link_formset = self.LinkFormset(request_data, prefix="link")
             core_attribute_formset = self.CoreAttributeFormset(request_data, prefix="core_attribute")
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords")
+            paper_categories_form = PaperCategoryForm(request_data, prefix="paper_categories")
+            paper_concept_names_form = PaperConceptNameForm(request_data, prefix="paper_concept_names")
+            # TODO what about paper_categories??? paper_concept_names?
 
-            #check if all forms are valid, add further forms to the if-clause later
-            if paper_form.is_valid() and link_formset.is_valid() and core_attribute_formset.is_valid() and \
-                    paper_keywords_form.is_valid() and purpose_formset.is_valid:
+            # check if all forms are valid, add further forms to the if-clause later
+            if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and\
+                    core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and \
+                    purpose_formset.is_valid and paper_categories_form.is_valid() and \
+                    paper_concept_names_form.is_valid():
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
@@ -466,16 +498,20 @@ class EnterData(View):
                     cite_command = convert_empty_string_to_none(data.get('cite_command', None))
                     title = convert_empty_string_to_none(data.get('title', None))
                     abstract = convert_empty_string_to_none(data.get('abstract', None))
-                    is_in_repo = data.get('is_fulltext_in_repo', None)
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
-                                           abstract=abstract, is_fulltext_in_repo=is_in_repo)
+                                           abstract=abstract)
                     current_paper.save()
-                    print(request.FILES)
-                    print(request.FILES.keys)
-                    print(request.FILES['paper-file'].name)
-                    print(request.FILES)
-                    handle_uploaded_file(request.FILES['paper-file'], bibtex)
 
+                    if file_form.is_valid():
+                        data = file_form.cleaned_data
+                        file_name = convert_empty_string_to_none(data.get('file_name', None))
+                        file = request.FILES["file-file"]
+                        file_data = handle_uploaded_file(file, bibtex, file_name)
+                        file_name = file_data["file_name"]
+                        file_path = file_data["complete_file_path"]
+                        current_file = Files(file_name=file_name, complete_file_path=file_path,
+                                             ref_file_to_paper=current_paper)
+                        current_file.save()
 
                     if purpose_formset.is_valid():
                         for purpose_form in purpose_formset:
@@ -520,10 +556,28 @@ class EnterData(View):
                         print(data)
                         ref_paper = current_paper
                         for keyword in data.get("paper_keywords", None):
-                            current_paper_keyword = PaperKeyword(ref_paper_keyword_to_paper=ref_paper, ref_paper_keyword_to_keyword=keyword)
+                            current_paper_keyword = PaperKeyword(ref_paper_keyword_to_paper=ref_paper,
+                                                                 ref_paper_keyword_to_keyword=keyword)
                             current_paper_keyword.save()
                     else:
                         print("paper keywords not valid")
+
+                    if paper_categories_form.is_valid():
+                        data = paper_categories_form.cleaned_data
+                        for category in data.get("paper_categories", None):
+                            current_paper_category = PaperCategory(ref_paper_category_to_paper=current_paper,
+                                                                   ref_paper_category_to_category=category)
+                            current_paper_category.save()
+                    else:
+                        print("paper categories not valid")
+
+                    if paper_concept_names_form.is_valid():
+                        data = paper_concept_names_form.cleaned_data
+                        for concept_name in data.get("paper_concept_name", None):
+                            current_paper_concept_name = PaperConceptName(ref_paper_concept_name_to_paper=current_paper,
+                                                                          ref_paper_concept_name_to_concept_name=concept_name)
+                            current_paper_concept_name.save()
+
 
                 else:
                     # paper form is not valid
@@ -534,7 +588,6 @@ class EnterData(View):
             else:
                 pass
                 # TODO: error handling
-
 
         else:
             print("default")
@@ -551,127 +604,31 @@ def convert_empty_string_to_none(a_string):
         return a_string
 
 
-# This method returns all information on one paper in form of a dictionary, to be used for display in EnterData-View
-# information for different forms is stored in different dictionaries
-# some contain more than one object e.g. core attributes
-def get_dict_for_enter_data(current_paper_pk):
-    paper = Papers.objects.filter(pk=current_paper_pk)
-    all_table_data = {}
-    paper_data = paper.values()[0]
-    all_table_data["paper"] = paper_data
-
-    current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
-    concept_name_data = current_concept_name.values_list('concept_name_id', flat=True)
-    # priorly empty forms are automatically set to be deleted
-    all_table_data["paper_concept_name"] = concept_name_data
-
-    current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
-    core_attributes_data = current_core_attributes.values()
-    for core_attribute in core_attributes_data:
-        core_attribute['delete_this_core_attribute'] = False
-    all_table_data["core_attribute"] = core_attributes_data
-
-    current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
-    links_data = current_links.values()
-    for link in links_data:
-        link['delete_this_link']=False # makes default for already there data not deleted automatically
-    all_table_data["link"] = links_data
-
-    current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
-    paper_keywords_data = current_paper_keywords.values_list('keyword_id', flat=True)
-    all_table_data["paper_keyword"] = paper_keywords_data
-
-    current_paper_categories = Categories.objects.filter(papercategory__ref_paper_category_to_paper=current_paper_pk)
-    paper_categories_data = current_paper_categories.values_list('category_id', flat=True)
-    all_table_data["paper_category"] = paper_categories_data
-
-    current_purposes = Purposes.objects.filter(ref_purpose_to_paper = current_paper_pk)
-    purposes_data = current_purposes.values()
-    for purpose in purposes_data:
-        purpose['delete_this_purpose'] = False
-    all_table_data["purpose"] = purposes_data
-
-    return all_table_data
-
-
-# This method returns all information on one paper in form of a dictionary, to be used in ViewData-View
-# for each column per paper, the data is in String-form
-def get_dict_of_all_data_on_one_paper(current_paper_pk):
-    paper = Papers.objects.filter(pk=current_paper_pk)
-    paper_data = paper.values()[0]
-
-    current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
-    concept_name_data = ''
-    for concept_name in current_concept_name:
-        concept_name_data += str(concept_name)+", "
-    paper_data["concept_name"] = concept_name_data
-
-    current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
-    core_attributes_data = ''
-    for core_attribute in current_core_attributes:
-        core_attributes_data += str(core_attribute) + "; "
-    paper_data['core_attributes'] = core_attributes_data
-
-    current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
-    links_data = ''
-    for link in current_links:
-        links_data += str(link) + "; "
-    paper_data['links'] = links_data
-
-    # the keywords that are linked to a paper
-    current_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
-    keywords_data = ''
-    for keyword in current_keywords:
-        keywords_data += str(keyword) + ", "
-    paper_data['keywords'] = keywords_data
-
-    # the categories that are linked to a paper
-    current_categories = Categories.objects.filter(papercategory__ref_paper_category_to_paper=current_paper_pk)
-    categories_data = ""
-    for category in current_categories:
-        categories_data += str(category) + ";"
-    paper_data['categories'] = categories_data
-
-    current_purposes = Purposes.objects.filter(ref_purpose_to_paper=current_paper_pk)
-    purposes_data = ''
-    for purpose in current_purposes:
-        purposes_data += str(purpose) + "; "
-    paper_data['purpose'] = purposes_data
-
-    # old version:
-    # paper_data = {"paper_id":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command,
-    # "title":paper.title, "abstract":paper.abstract}
-    return paper_data
-
-
-# This method gets a list of the columns which should be displayed in ViewData-View,
-# currently they are generated hard-coded :(
-def get_list_of_included_columns():
-    # first column empty because in table, the edit button should not have a heading
-    included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo",
-                        "concept_name", "core_attributes", "links", "keywords", "categories", "purpose"]
-    return included_columns
-
-
-# Gets the paper which is being currently edited
-def get_current_paper(pk):
-    return Papers.objects.get(pk=pk)
-
-
-def handle_uploaded_file(file, bibtex_str):
-    base_destination = os.path.join("D:","Dokumente","Uni", "SHK","LM-DB", "test_for_files" ) # TODO change base location of files when deploying
-    filename = file.name
+def handle_uploaded_file(file, bibtex_str, file_name):
+    base_destination = MEDIA_ROOT[:-1]  # has a wrong sided slash at the end, doesn't cause problem, but still slicing it off for now
+    if file_name is None:
+        filename = file.name
+    else:
+        filename = file_name
+        file.name = file_name  # change name
     if bibtex_str is not None:
         bib = bibtexparser.loads(bibtex_str)
         print(bib.entries)
         year = str(bib.entries[0]['year'])
     else:
         year = "unknown_year"
-    current_location = os.path.join(base_destination , year)
-    if not os.path.isdir(current_location):
+    current_location = os.path.join(base_destination, year)
+    print(current_location)
+    if not os.path.isdir(current_location) and not os.path.exists(current_location):
         os.makedirs(current_location)
+        print("making dir")
     path_and_paper = os.path.join(current_location, filename)
+    print(path_and_paper)
 
     with open(path_and_paper, 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
+            print("writing")
+
+    file_dict = {"complete_file_path": current_location, "file_name": filename}
+    return file_dict

@@ -5,6 +5,8 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+import os
+
 from django.db import models
 
 
@@ -179,6 +181,23 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 
+class Files(models.Model):
+    file_id = models.AutoField(primary_key=True)
+    ref_file_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_file_to_paper', blank=True, null=True)
+    file_name = models.CharField(max_length=50, blank=True, null=True)
+    complete_file_path = models.CharField(max_length=150, blank=True, null=True)  # only path saved here, not filename
+
+    class Meta:
+        managed = False
+        db_table = 'files'
+
+    def __str__(self):
+        if self.complete_file_path is not None and self.file_name is not None:
+            return str(os.path.join(self.complete_file_path , self.file_name))
+        else:
+            return "None"
+
+
 class Keywords(models.Model):
     keyword_id = models.AutoField(primary_key=True)
     keyword = models.TextField(unique=True, blank=True, null=True)
@@ -249,7 +268,6 @@ class Papers(models.Model):
     cite_command = models.CharField(max_length=50, blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     abstract = models.TextField(blank=True, null=True)
-    is_fulltext_in_repo = models.NullBooleanField()
 
     class Meta:
         managed = False

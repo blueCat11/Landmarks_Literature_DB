@@ -3,6 +3,7 @@ from django import forms
 
 from LM_DB.models import *
 
+
 # form for main information on paper
 class PaperForm (forms.ModelForm):
     paper_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
@@ -11,13 +12,16 @@ class PaperForm (forms.ModelForm):
     cite_command = forms.CharField(max_length=50, required=False)
     title = forms.CharField(widget=forms.Textarea, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
-    is_fulltext_in_repo = forms.BooleanField(required=False)
-    file = forms.FileField(required=False)
-
 
     class Meta:
         model = Papers
         fields = ('paper_id', 'doi', 'bibtex', 'cite_command', 'title', 'abstract')
+
+
+class FileForm (forms.Form):
+    file_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    file_name = forms.CharField(max_length=50, required=False)
+    file = forms.FileField(required=False)
 
 
 class ConceptNameForm (forms.ModelForm):
@@ -25,7 +29,7 @@ class ConceptNameForm (forms.ModelForm):
     concept_name = forms.CharField(widget=forms.Textarea, required=False)
 
     class Meta:
-        model=ConceptNames
+        model = ConceptNames
         fields = ('concept_name_id', 'concept_name')
 
 
@@ -54,8 +58,8 @@ class LinkForm (forms.ModelForm):
     delete_this_link = forms.BooleanField(required=False, initial=True)
 
     class Meta:
-        model=Links
-        fields=('link_id', 'link_text', 'is_local_link')
+        model = Links
+        fields = ('link_id', 'link_text', 'is_local_link')
 
 
 class KeywordForm(forms.ModelForm):
@@ -69,7 +73,7 @@ class KeywordForm(forms.ModelForm):
 
 class PaperKeywordForm(forms.Form):
     paper_keywords = forms.ModelMultipleChoiceField(label="", queryset=Keywords.objects.all().order_by('keyword'),
-                                                   widget=forms.CheckboxSelectMultiple, required=False)
+                                                    widget=forms.CheckboxSelectMultiple, required=False)
 
 
 class CategoryForm(forms.ModelForm):
@@ -77,8 +81,8 @@ class CategoryForm(forms.ModelForm):
     category_name = forms.CharField(max_length=50, required=False)
     shortcut = forms.CharField(max_length=10, required=False)
     description = forms.CharField(widget=forms.Textarea, required=False)
-    super_category = forms.ModelChoiceField( queryset=SuperCategories.objects.all().order_by('name'),
-                                                    widget=forms.RadioSelect, required=False)
+    super_category = forms.ModelChoiceField(queryset=SuperCategories.objects.all().order_by('name'),
+                                            widget=forms.RadioSelect, required=False)
 
     class Meta:
         model = Categories
@@ -86,8 +90,9 @@ class CategoryForm(forms.ModelForm):
 
 
 class PaperCategoryForm(forms.Form):
-    paper_categories = forms.ModelMultipleChoiceField(label="", queryset=Categories.objects.all().order_by('category_name'),
-                                                    widget=forms.CheckboxSelectMultiple, required=False)
+    paper_categories = forms.ModelMultipleChoiceField(label="",
+                                                      queryset=Categories.objects.all().order_by('category_name'),
+                                                      widget=forms.CheckboxSelectMultiple, required=False)
 
 
 class PurposeForm(forms.ModelForm):
