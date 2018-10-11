@@ -1,3 +1,4 @@
+from django.core.files.storage import default_storage
 from django.forms import formset_factory
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -95,8 +96,20 @@ class EnterData(View):
             paper_form = PaperForm(prefix="paper", initial=paper_data)
 
             file_data = all_table_data["file"]
-            file_form = FileForm(prefix="file", initial=file_data)
+            file_pk = file_data.get('file_id', None)
+            if file_pk is not None:
+                file = Files.objects.filter(pk=file_data['file_id'])[0]
+            else:
+                file = None
 
+            #file_path = os.path.join(file_data['complete_file_path'], file_data['file_name'])
+            #current_file = default_storage.open(file_path).read()
+
+            file_form = FileForm(prefix="file", instance=file)
+
+
+            print(file_form)
+            print("file")
             purpose_data = all_table_data["purpose"]
             purpose_formset = self.PurposeFormset(prefix="purpose", initial=purpose_data)
 
@@ -144,7 +157,12 @@ class EnterData(View):
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
 
             file_data = all_table_data["file"]
-            file_form = FileForm(request_data, request.FILES, prefix="file", initial=file_data)
+            file_pk = file_data.get('file_id', None)
+            if file_pk is not None:
+                file = Files.objects.filter(pk=file_data['file_id'])[0]
+            else:
+                file = None
+            file_form = FileForm(request_data, request.FILES, prefix="file", instance=file)
 
             purpose_data = all_table_data["purpose"]
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose", initial=purpose_data)
@@ -202,6 +220,33 @@ class EnterData(View):
                             # error display is managed in outside else-clause, all have to be valid to get here
                             pass
                     if file_form.has_changed():
+                        print("clear?")
+                        data = file_form.cleaned_data
+                        #print(file_form['complete_file_path'])
+                        if data['complete_file_path'] == False:
+                            print("delete file")#TODO really delete it, from folders as well
+                            current_file = Files.objects.get(file_id=data['file_id'], ref_file_to_paper=current_paper_pk)
+                            current_file.delete()
+                        else:
+                            print(request.FILES)
+                            data = file_form.cleaned_data
+                            if data.get('file_id', None) is not None:#changing old file
+                                current_file = Files.objects.get(file_id=data['file_id'])
+                                for entry in file_form.changed_data:
+                                    if entry == "year":
+                                        current_file.year = convert_empty_string_to_none(data['year'])
+                                    elif entry == "file_name":
+                                        current_file.file_name = convert_empty_string_to_none(data['file_name'])
+                                    elif entry == "complete_file_path":
+                                        current_file.complete_file_path = request.FILES["file-complete_file_path"]
+                                    current_file.save()
+                            else:# new file
+                                file_name = convert_empty_string_to_none(data.get('file_name', None))
+                                file = request.FILES["file-complete_file_path"]
+                                year = data["year"]
+                                current_file = Files(file_name=file_name, complete_file_path=file, year=year,
+                                                     ref_file_to_paper_id=current_paper_pk)
+                                current_file.save()
                         # TODO implement file_has_changed behavior (delete old file, save new one)
                         pass
 
@@ -475,6 +520,9 @@ class EnterData(View):
             # make new object(s) and save those to DB
             # construct forms from data here
             paper_form = PaperForm(request_data, prefix="paper")
+            print(request_data)
+            print("request.FILES")
+            print(request.FILES)
             file_form = FileForm(request_data, request.FILES, prefix="file")
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose")
             link_formset = self.LinkFormset(request_data, prefix="link")
@@ -503,14 +551,15 @@ class EnterData(View):
                     current_paper.save()
 
                     if file_form.is_valid():
+                        print(request.FILES)
                         data = file_form.cleaned_data
                         file_name = convert_empty_string_to_none(data.get('file_name', None))
-                        file = request.FILES["file-file"]
-                        file_data = handle_uploaded_file(file, bibtex, file_name)
-                        file_name = file_data["file_name"]
-                        file_path = file_data["complete_file_path"]
-                        current_file = Files(file_name=file_name, complete_file_path=file_path,
-                                             ref_file_to_paper=current_paper)
+                        file = request.FILES["file-complete_file_path"]
+                        #file_data = handle_uploaded_file(file, bibtex, file_name)
+                        #file_name = file_data["file_name"]
+                        year = data["year"]
+                        current_file = Files(file_name=file_name, complete_file_path=file, year = year,
+                                            ref_file_to_paper=current_paper)
                         current_file.save()
 
                     if purpose_formset.is_valid():
@@ -603,7 +652,7 @@ def convert_empty_string_to_none(a_string):
     else:
         return a_string
 
-
+#currently not necessary anymore TODO: transfer functionality from this into on upload
 def handle_uploaded_file(file, bibtex_str, file_name):
     base_destination = MEDIA_ROOT[:-1]  # has a wrong sided slash at the end, doesn't cause problem, but still slicing it off for now
     if file_name is None:
@@ -630,5 +679,5 @@ def handle_uploaded_file(file, bibtex_str, file_name):
             destination.write(chunk)
             print("writing")
 
-    file_dict = {"complete_file_path": current_location, "file_name": filename}
+    file_dict = {"complete_file_path": year, "file_name": filename}
     return file_dict

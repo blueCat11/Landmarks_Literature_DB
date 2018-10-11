@@ -1,5 +1,6 @@
 
 from django import forms
+from django.forms import ClearableFileInput
 
 from LM_DB.models import *
 
@@ -18,10 +19,15 @@ class PaperForm (forms.ModelForm):
         fields = ('paper_id', 'doi', 'bibtex', 'cite_command', 'title', 'abstract')
 
 
-class FileForm (forms.Form):
+class FileForm (forms.ModelForm):
     file_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     file_name = forms.CharField(max_length=50, required=False)
-    file = forms.FileField(required=False)
+    complete_file_path = forms.FileField(widget=forms.ClearableFileInput, label="file", required=False)
+    year = forms.CharField(max_length = 11)
+
+    class Meta:
+        model = Files
+        fields = ('file_id', 'complete_file_path', 'file_name', 'year')
 
 
 class ConceptNameForm (forms.ModelForm):

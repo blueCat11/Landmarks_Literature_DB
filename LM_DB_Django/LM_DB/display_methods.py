@@ -13,7 +13,13 @@ def get_dict_for_enter_data(current_paper_pk):
     all_table_data["paper"] = paper_data
 
     current_file = Files.objects.filter(ref_file_to_paper=current_paper_pk)
-    file_data = current_file.values()
+    print(len(current_file))
+    if len(current_file) > 0:
+        file_data = current_file.values()[0]
+    else:
+        file_data = {}
+    print("file data in method: ")
+    print(file_data)
     all_table_data["file"] = file_data  # TODO: possibly add possibility to delete files
 
     current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)

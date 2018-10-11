@@ -182,10 +182,17 @@ class DjangoSession(models.Model):
 
 
 class Files(models.Model):
+    # method from docs (strg f for files: https://docs.djangoproject.com/en/2.1/ref/models/fields/)
+    def year_directory_path(instance, filename):
+        # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+        path = os.path.join(instance.year, instance.file_name)
+        return path
+
     file_id = models.AutoField(primary_key=True)
     ref_file_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_file_to_paper', blank=True, null=True)
     file_name = models.CharField(max_length=50, blank=True, null=True)
-    complete_file_path = models.CharField(max_length=150, blank=True, null=True)  # only path saved here, not filename
+    complete_file_path = models.FileField(upload_to=year_directory_path, blank=True, null=True)  # only path saved here, not filename
+    year = models.CharField(max_length=11, blank=True, null=True)#TODO change widget to hidden and prepopulate from bibtex
 
     class Meta:
         managed = False
@@ -193,7 +200,7 @@ class Files(models.Model):
 
     def __str__(self):
         if self.complete_file_path is not None and self.file_name is not None:
-            return str(os.path.join(self.complete_file_path , self.file_name))
+            return str(self.file_name)
         else:
             return "None"
 
