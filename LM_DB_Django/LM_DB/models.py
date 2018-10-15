@@ -183,16 +183,25 @@ class DjangoSession(models.Model):
 
 class Files(models.Model):
     # method from docs (strg f for files: https://docs.djangoproject.com/en/2.1/ref/models/fields/)
-    def year_directory_path(instance, filename):
+    def year_directory_path(instance, file_name):
         # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-        path = os.path.join(instance.year, instance.file_name)
+        # in case user did not enter data for file_name, use default of previous name of file
+        if instance.file_name != "" or instance.file_name is not None:
+            filename = instance.file_name
+        if instance.year is None or instance.year == "":
+            instance.year = "unknown_year"
+
+        path = os.path.join(instance.year, filename)
         return path
 
     file_id = models.AutoField(primary_key=True)
     ref_file_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_file_to_paper', blank=True, null=True)
     file_name = models.CharField(max_length=50, blank=True, null=True)
     complete_file_path = models.FileField(upload_to=year_directory_path, blank=True, null=True)  # only path saved here, not filename
-    year = models.CharField(max_length=11, blank=True, null=True)#TODO change widget to hidden and prepopulate from bibtex
+    year = models.CharField(max_length=12, blank=True, null=True)#TODO change widget to hidden and prepopulate from bibtex
+
+    def filename(self):
+        return os.path.basename(self.file.name)
 
     class Meta:
         managed = False
@@ -275,6 +284,12 @@ class Papers(models.Model):
     cite_command = models.CharField(max_length=50, blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     abstract = models.TextField(blank=True, null=True)
+    creation_timestamp = models.DateTimeField(blank=True, null=True)
+    creation_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='creation_user', blank=True, null=True,
+                                      related_name="creation_user")
+    last_edit_timestamp = models.DateTimeField(blank=True, null=True)
+    last_edit_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='last_edit_user', blank=True, null=True,
+                                       related_name="last_edit_user")
 
     class Meta:
         managed = False

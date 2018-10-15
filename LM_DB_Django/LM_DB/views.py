@@ -1,30 +1,25 @@
-from django.core.files.storage import default_storage
 from django.forms import formset_factory
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 import bibtexparser  # for bibtex
-import os #for paths
-
-import LM_DB_Django
+from datetime import datetime, timezone  # for edit and creation times
 from LM_DB.display_methods import *
-
-# Create your views here.
 from django.views import View
-
-# This View displays all current database entries in a table format
+from LM_DB_Django.settings import MEDIA_ROOT
 from LM_DB.forms import *
-from LM_DB.old_stuff.models_old import *
+
+# To-Dos
 
 #DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
-#TODO user permissions # https://docs.djangoproject.com/en/2.1/topics/auth/default/#topic-authorization
+#DONE user permissions # https://docs.djangoproject.com/en/2.1/topics/auth/default/#topic-authorization
 #DONE enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
 #DONE display file as field with "is_file_in_repo", false when empty, path-string when true
-#TODO integrate separate file form -> currently only possible for new papers, not in edit mode
+#DONE integrate separate file form -> currently only possible for new papers, not in edit mode
 # DONE change concept name to many-to-many relation
 #DONE empty core attributes and links are added for new papers, should not be (must be something specific to new, because they can be deleted using edit)
-from LM_DB_Django.settings import MEDIA_ROOT
 
 
+# This View displays all current database entries in a table format
 class ViewData(View):
     def get(self, request):
         # how to form queryset into list: https://stackoverflow.com/questions/7811556/how-do-i-convert-a-django-queryset-into-list-of-dicts
@@ -84,9 +79,10 @@ class EnterData(View):
     # src: https://stackoverflow.com/questions/2770810/multiple-models-in-a-single-django-modelform
     def post(self, request):
         request_data = request.POST
+        user = get_current_auth_user(request.user)
         print(request_data)
 
-        if request_data.get('editStart', -1)!=-1:
+        if request_data.get('editStart', -1) != -1:
             print("editStart")
             # pass data to the template to render the fields with data in them
             # src: https: // docs.djangoproject.com / en / dev / ref / forms / api /  # dynamic-initial-values
@@ -200,8 +196,9 @@ class EnterData(View):
                         purpose_formset.is_valid() and paper_categories_form.is_valid() and \
                         paper_concept_names_form.is_valid():
                     print("everything valid")
+                    current_paper = get_current_paper(current_paper_pk)
+                    update_last_edit(current_paper, user)
                     if paper_form.has_changed():
-                        current_paper = get_current_paper(current_paper_pk)
                         if paper_form.is_valid():
                             data = paper_form.cleaned_data
                             for entry in paper_form.changed_data:
@@ -548,19 +545,21 @@ class EnterData(View):
                     abstract = convert_empty_string_to_none(data.get('abstract', None))
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract)
+                    set_creation_meta_data(current_paper, user)
                     current_paper.save()
 
                     if file_form.is_valid():
                         print(request.FILES)
                         data = file_form.cleaned_data
                         file_name = convert_empty_string_to_none(data.get('file_name', None))
-                        file = request.FILES["file-complete_file_path"]
-                        #file_data = handle_uploaded_file(file, bibtex, file_name)
-                        #file_name = file_data["file_name"]
-                        year = data["year"]
-                        current_file = Files(file_name=file_name, complete_file_path=file, year = year,
-                                            ref_file_to_paper=current_paper)
-                        current_file.save()
+                        file = request.FILES.get("file-complete_file_path", None)
+                        if file is not None:
+                            # file_data = handle_uploaded_file(file, bibtex, file_name)
+                            # file_name = file_data["file_name"]
+                            year = data["year"]
+                            current_file = Files(file_name=file_name, complete_file_path=file, year=year,
+                                                 ref_file_to_paper=current_paper)
+                            current_file.save()
 
                     if purpose_formset.is_valid():
                         for purpose_form in purpose_formset:
@@ -681,3 +680,71 @@ def handle_uploaded_file(file, bibtex_str, file_name):
 
     file_dict = {"complete_file_path": year, "file_name": filename}
     return file_dict
+
+
+def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_concept_name, core_attribute,
+                             links, paper_keywords, paper_categories, purpose, keyword, category):
+    context_dict["paper_form"] = paper
+    context_dict["file_form"] = file
+    context_dict["concept_name_form"] = concept_name
+    context_dict["paper_concept_names_form"] = paper_concept_name
+    context_dict["core_attribute_forms"] = core_attribute
+    context_dict["link_forms"] = links
+    context_dict["keyword_form"] = keyword
+    context_dict["paper_keywords_form"] = paper_keywords
+    context_dict["category_form"] = category
+    context_dict["paper_categories_form"] = paper_categories
+    context_dict["purpose_forms"] = purpose
+
+    return context_dict
+
+
+# the attributes of user who performed the last edit on data related to a paper and time of the edit are updated
+# to current user and time
+def update_last_edit(current_paper, current_user):
+    current_utc_dt = datetime.now(timezone.utc)  # UTC time
+    current_date_time = current_utc_dt.astimezone()
+
+    current_paper.last_edit_user = current_user
+    current_paper.last_edit_timestamp = current_date_time
+    current_paper.save()
+
+
+def set_creation_meta_data(current_paper, current_user):
+    current_utc_dt = datetime.now(timezone.utc)  # UTC time
+    current_date_time = current_utc_dt.astimezone()
+
+    current_paper.creation_user = current_user
+    current_paper.creation_timestamp = current_date_time
+
+    # maybe calling the method again is a bit slower than
+    update_last_edit(current_paper, current_user)
+
+
+def get_current_auth_user(current_user):
+    return AuthUser.objects.get(id=current_user.id)
+
+
+# tries to extract a year from a given bibtex and returns a json response
+def get_year_from_bibtex(request_data):
+    print("new file upload - bibtex processing")
+    bibtex_str = request_data['bibtex']
+    error = None
+    if bibtex_str is None or bibtex_str == "":
+        year = "unknown_year"
+    else:
+        try:
+            bib = bibtexparser.loads(bibtex_str)
+            year = str(bib.entries[0]['year'])
+            print(bib.entries)
+        except Exception as e:
+            error = "Something is wrong with the bibtex, could find no year. Will save file to unknown year"
+            year = "unknown_year"
+            print(e)
+
+    response_data = {"result": "year extracted from bibtex! ", "year": year}
+    if error is not None:
+            response_data["error"]=error
+
+    json_response = JsonResponse(response_data)
+    return json_response
