@@ -33,10 +33,6 @@ class ViewData(View):
         context_dict = {"papers": paper_list, "included_columns": columns}
         return render(request, "LM_DB/ViewData.html", context_dict)
 
-    # maybe we don't need a post here
-    def post(self, request):
-        pass
-
 
 # This View allows entering new data and editing data by means of forms
 # To add forms to formsets dynamically:
@@ -48,8 +44,6 @@ class EnterData(View):
 
     def get(self, request):
         paper_form = PaperForm(prefix="paper")
-        # get more forms here, multiple model form in one form template, use prefixes
-        # save info for template (like forms etc) to contextDict
         file_form = FileForm(prefix="file")
         concept_name_form= ConceptNameForm(prefix="concept_name")
         purpose_formset = self.PurposeFormset(prefix="purpose")
@@ -62,16 +56,14 @@ class EnterData(View):
         paper_categories_forms = PaperCategoryForm(prefix="paper_categories")
 
         context_dict = {"original_form_name": "newSave",
-                        "type_of_edit": "New Entry",
-                        "paper_form": paper_form,
-                        "file_form": file_form,
-                        "concept_name_form": concept_name_form, "paper_concept_names_form":paper_concept_name_form,
-                        "core_attribute_forms": core_attribute_formset,
-                        "link_forms": links_formset,
-                        "keyword_form":keyword_form, "paper_keywords_form":paper_keywords_form,
-                        "category_form":category_form, "paper_categories_form":paper_categories_forms,
-                        "purpose_forms":purpose_formset
-                        }
+                        "type_of_edit": "New Entry"}
+
+        context_dict = add_forms_to_context_dict(context_dict, paper=paper_form, file=file_form,
+                                                 concept_name=concept_name_form, paper_concept_name=paper_concept_name_form,
+                                                 purpose=purpose_formset, core_attribute=core_attribute_formset,
+                                                 links=links_formset,
+                                                 keyword=keyword_form, paper_keywords=paper_keywords_form,
+                                                 category=category_form, paper_categories=paper_categories_forms)
 
         return render(request, "LM_DB/EnterData.html", context_dict)
 
@@ -97,15 +89,8 @@ class EnterData(View):
                 file = Files.objects.filter(pk=file_data['file_id'])[0]
             else:
                 file = None
-
-            #file_path = os.path.join(file_data['complete_file_path'], file_data['file_name'])
-            #current_file = default_storage.open(file_path).read()
-
             file_form = FileForm(prefix="file", instance=file)
 
-
-            print(file_form)
-            print("file")
             purpose_data = all_table_data["purpose"]
             purpose_formset = self.PurposeFormset(prefix="purpose", initial=purpose_data)
 
@@ -120,7 +105,6 @@ class EnterData(View):
             paper_keywords_form = PaperKeywordForm(prefix="paper_keywords", initial={
                 'paper_keywords': paper_keyword_data})
 
-            #DONE decomment the category stuff and integrate into context_dict
             category_form = CategoryForm(prefix="new_category")
             paper_category_data = all_table_data["paper_category"]
             paper_categories_form = PaperCategoryForm(prefix="paper_categories", initial={
@@ -129,17 +113,16 @@ class EnterData(View):
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
             paper_concept_name_data = all_table_data["paper_concept_name"]
             paper_concept_names_form = PaperConceptNameForm(prefix="paper_concept_names", initial={
-                'paper_concept_names':paper_concept_name_data})
+                'paper_concept_names': paper_concept_name_data})
 
-            context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
-                            "paper_form": paper_form,
-                            "file_form": file_form,
-                            "purpose_forms": purpose_formset,
-                            "core_attribute_forms": core_attribute_formset,
-                            "link_forms": link_formset,
-                            "paper_keywords_form":paper_keywords_form, "keyword_form": keyword_form,
-                            "paper_categories_form":paper_categories_form, "category_form":category_form,
-                            "paper_concept_names_form":paper_concept_names_form, "concept_name_form": concept_name_form}
+            context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry"}
+            context_dict = add_forms_to_context_dict(context_dict, paper=paper_form, file=file_form,
+                                                     concept_name=concept_name_form,
+                                                     paper_concept_name=paper_concept_names_form,
+                                                     purpose=purpose_formset, core_attribute=core_attribute_formset,
+                                                     links=link_formset,
+                                                     keyword=keyword_form, paper_keywords=paper_keywords_form,
+                                                     category=category_form, paper_categories=paper_categories_form)
             return render(request, "LM_DB/EnterData.html", context_dict)
 
         elif request_data.get('editSave', -1)!=-1:
@@ -173,7 +156,7 @@ class EnterData(View):
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords", initial={
                 'paper_keywords': paper_keyword_data})
 
-            #DONE: decomment the following (category stuff)
+            # DONE: decomment the following (category stuff)
             paper_category_data = all_table_data["paper_category"]
             paper_categories_form = PaperCategoryForm(request_data, prefix="paper_categories",
                                                     initial={'paper_categories': paper_category_data})
@@ -369,21 +352,18 @@ class EnterData(View):
                     if paper_keywords_form.has_changed():
                         print("paper keywords changed")
                         if paper_keywords_form.is_valid():
-                            data = paper_keywords_form.cleaned_data #not necessary
                             keywords_before = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
-                            list_keywords_before = keywords_before.values_list('keyword_id',flat=True)
                             keywords_after = paper_keywords_form.cleaned_data['paper_keywords']
-                            list_keywords_after = keywords_after.values_list('keyword_id', flat=True)
                             for keyword in keywords_after:
                                 if keyword not in keywords_before:
-                                    #in after, not before
-                                    #add relation to paper_keywords relation
+                                    # in after, not before
+                                    # add relation to paper_keywords relation
                                     keyword_id = keyword.keyword_id
                                     PaperKeyword.objects.create(ref_paper_keyword_to_keyword_id =keyword_id, ref_paper_keyword_to_paper_id=current_paper_pk)
                             for keyword in keywords_before:
                                 if keyword not in keywords_after:
-                                    #in before, now not anymore
-                                    #delete appropriate entry in paper_keywords
+                                    # in before, now not anymore
+                                    # delete appropriate entry in paper_keywords
                                     keyword_id = keyword.keyword_id
                                     PaperKeyword.objects.get(ref_paper_keyword_to_keyword_id=keyword_id, ref_paper_keyword_to_paper_id=current_paper_pk).delete()
 
@@ -393,20 +373,18 @@ class EnterData(View):
                         if paper_concept_names_form.is_valid():
 
                             concept_names_before = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
-                            #list_concept_names_before = concept_names_before.values_list('concept_name_id',flat=True)
-                            concept_names_after = paper_concept_names_form.cleaned_data['paper_concept_names']
-                            #list_concept_names_after = concept_names_after.values_list('concept_name_id', flat=True)
+                            concept_names_after = paper_concept_names_form.cleaned_data['paper_concept_name']
                             for concept_name in concept_names_after:
                                 if concept_name not in concept_names_before:
-                                    #in after, not before
-                                    #add relation to paper_keywords relation
+                                    # in after, not before
+                                    # add relation to paper_keywords relation
                                     concept_name_id = concept_name.concept_name_id
                                     PaperConceptName.objects.create(ref_paper_concept_name_to_concept_name_id =concept_name_id,
                                                                     ref_paper_concept_name_to_paper_id=current_paper_pk)
                             for concept_name in concept_names_before:
                                 if concept_name not in concept_names_after:
-                                    #in before, now not anymore
-                                    #delete appropriate entry in paper_keywords
+                                    # in before, now not anymore
+                                    # delete appropriate entry in paper_keywords
                                     concept_name_id = concept_name.concept_name_id
                                     PaperConceptName.objects.get(ref_paper_concept_name_to_concept_name_id=concept_name_id,
                                                                  ref_paper_concept_name_to_paper_id=current_paper_pk).delete()
@@ -451,16 +429,20 @@ class EnterData(View):
                         error_dict["category"] = True
                     if not paper_concept_names_form.is_valid():
                         error_dict["paper_concept_name"] = True
-                    context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
-                                    "paper_form": paper_form,
-                                    "file_form": file_form,
-                                    "purpose_forms": purpose_formset,
-                                    "core_attribute_forms": core_attribute_formset,
-                                    "link_forms": link_formset,
-                                    "paper_keywords_form":paper_keywords_form, "keyword_form":keyword_form,
-                                    "paper_concept_names_form":paper_concept_names_form, "concept_name_form":concept_name_form,
-                                    "paper_categories_form":paper_categories_form, "category_form":category_form,
-                                    "errors":error_dict}
+
+                    context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry", "errors":error_dict}
+                    context_dict = add_forms_to_context_dict(context_dict, paper=paper_form,
+                                                             file=file_form,
+                                                             concept_name=concept_name_form,
+                                                             paper_concept_name=paper_concept_names_form,
+                                                             purpose=purpose_formset,
+                                                             core_attribute=core_attribute_formset,
+                                                             links=link_formset,
+                                                             keyword=keyword_form,
+                                                             paper_keywords=paper_keywords_form,
+                                                             category=category_form,
+                                                             paper_categories=paper_categories_form)
+
                     return render(request, "LM_DB/enterData.html", context_dict)
             return redirect("LM_DB:viewData")
 
@@ -527,7 +509,6 @@ class EnterData(View):
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords")
             paper_categories_form = PaperCategoryForm(request_data, prefix="paper_categories")
             paper_concept_names_form = PaperConceptNameForm(request_data, prefix="paper_concept_names")
-            # TODO what about paper_categories??? paper_concept_names?
 
             # check if all forms are valid, add further forms to the if-clause later
             if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and\
@@ -591,7 +572,7 @@ class EnterData(View):
                                 if data.get("delete_this_core_attribute", "None") == False:
                                     core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
                                     is_literal_quotation = data.get('is_literal_quotation', None)
-                                    page_num = data.get('is_literal_quotation', None) # TODO add empty string to none later, after has been converted to char-field
+                                    page_num = data.get('is_literal_quotation', None)
                                     current_core_attribute = CoreAttributes(core_attribute=core_attribute,
                                                                             is_literal_quotation=is_literal_quotation,
                                                                             page_num=page_num,
@@ -631,7 +612,6 @@ class EnterData(View):
                     # paper form is not valid
                     print("paper form not valid")
 
-
                 return redirect("LM_DB:viewData")
             else:
                 pass
@@ -643,17 +623,18 @@ class EnterData(View):
 
 
 # This method is necessary because django gets the value of empty text fields as '' and not as None, but we want null
-# for all empty fields in the DB, so you can check: How many papers do not have a saved bibTex or similiar queries
-# Pass all data-gets for textfields to this method, so that their empty values are converted to None
+# for all empty fields in the DB, so you can check: How many papers do not have a saved bibTex or similar queries
+# Pass all data-gets for text fields to this method, so that their empty values are converted to None
 def convert_empty_string_to_none(a_string):
     if a_string in [None, '']:
         return None
     else:
         return a_string
 
-#currently not necessary anymore TODO: transfer functionality from this into on upload
+
+# currently not necessary anymore TODO: transfer functionality from this into on upload
 def handle_uploaded_file(file, bibtex_str, file_name):
-    base_destination = MEDIA_ROOT[:-1]  # has a wrong sided slash at the end, doesn't cause problem, but still slicing it off for now
+    base_destination = MEDIA_ROOT[:-1]  # has wrong side slash at the end, no problem caused, but slicing it off for now
     if file_name is None:
         filename = file.name
     else:
