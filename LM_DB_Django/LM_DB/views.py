@@ -493,6 +493,9 @@ class EnterData(View):
                 response_data = {"result": "Creating concept name not successful!", "error": "This concept name already exists."}
             json_response = JsonResponse(response_data)
             return json_response
+        elif request_data.get("isYearFromBibtex", -1) != -1:
+            json_response = get_year_from_bibtex(request_data)
+            return json_response
 
         elif request_data.get('newSave', -1) != 1:
             print("newSave")

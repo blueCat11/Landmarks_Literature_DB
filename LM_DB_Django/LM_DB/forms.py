@@ -23,7 +23,7 @@ class FileForm (forms.ModelForm):
     file_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     file_name = forms.CharField(max_length=50, required=False)
     complete_file_path = forms.FileField(widget=forms.ClearableFileInput, label="file", required=False)
-    year = forms.CharField(max_length = 11)
+    year = forms.CharField(max_length = 12, required=False)
 
     class Meta:
         model = Files
