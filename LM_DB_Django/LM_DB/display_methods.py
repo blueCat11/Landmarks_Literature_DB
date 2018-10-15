@@ -60,7 +60,9 @@ def get_dict_for_enter_data(current_paper_pk):
 # for each column per paper, the data is in String-form
 def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
-    paper_data = paper.values()[0]
+    print(paper.values()[0])
+    paper_data = get_paper_data_for_display(paper)
+    current_paper = paper[0]
 
     current_files = Files.objects.filter(ref_file_to_paper=current_paper_pk)
     file_data = ''
@@ -109,6 +111,12 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
         purposes_data += str(purpose) + "; "
     paper_data['purpose'] = purposes_data
 
+    #get creation and edit dates per paper
+    paper_data['creation'] = get_creation_string(get_user_name(current_paper.creation_user),
+                                                 current_paper.creation_timestamp)
+    paper_data['last_edit'] = get_edit_string(get_user_name(current_paper.last_edit_user),
+                                              current_paper.last_edit_timestamp)
+
     # old version:
     # paper_data = {"paper_id":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command,
     # "title":paper.title, "abstract":paper.abstract}
@@ -120,10 +128,44 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
     included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo",
-                        "concept_name", "core_attributes", "links", "keywords", "categories", "purpose"]
+                        "concept_name", "core_attributes", "links", "keywords", "categories", "purpose",
+                        "creation", "last_edit"]
     return included_columns
 
 
 # Gets the paper which is being currently edited
 def get_current_paper(pk):
     return Papers.objects.get(pk=pk)
+
+
+# Gets username for a given user_id
+def get_user_name(user):
+    return AuthUser.objects.get(id=user.id).username
+
+
+# makes naming of of methods more concise
+def get_creation_string(user_name, time):
+    return get_creation_or_edit_string(user_name, time)
+
+
+# makes naming of methods more concise
+def get_edit_string(user_name, time):
+    return get_creation_or_edit_string(user_name, time)
+
+
+# formats username and time appropriately
+def get_creation_or_edit_string(user_name, time):
+    return "at " + str(time) + ", by " + user_name
+
+
+# gets only those data from a paper that should also be displayed in viewData-View
+def get_paper_data_for_display(paper):
+    paper_data = paper.values()[0]
+    try:
+        paper_data.pop("creation_timestamp")
+        paper_data.pop("creation_user_id")
+        paper_data.pop("last_edit_timestamp")
+        paper_data.pop("last_edit_user_id")
+    except KeyError:
+        print("Key not found")
+    return paper_data
