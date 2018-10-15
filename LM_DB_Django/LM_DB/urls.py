@@ -7,8 +7,8 @@ from . import views
 app_name = 'LM_DB'
 # name nur bei Verwendung von Links aus anderen Seiten relevant
 urlpatterns = [
-    re_path(r'^viewData/$', ViewData.as_view(), name="viewData"),
-    re_path(r'^enterData/$', EnterData.as_view(), name="enterData")
+    re_path(r'^viewData/$', login_required(ViewData.as_view()), name="viewData"),
+    re_path(r'^enterData/$', login_required(EnterData.as_view()), name="enterData")
 
 
 ]
