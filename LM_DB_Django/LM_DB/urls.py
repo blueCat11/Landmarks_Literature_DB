@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path, include, re_path
 
 from LM_DB.views import * # Index, StartSurvey, Interests, Questionnaire, Demographics, InterestValues
