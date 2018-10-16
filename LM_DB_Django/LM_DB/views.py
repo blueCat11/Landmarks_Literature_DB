@@ -1,5 +1,5 @@
 from django.forms import formset_factory
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import render, redirect
 import bibtexparser  # for bibtex
 from datetime import datetime, timezone  # for edit and creation times
@@ -10,14 +10,16 @@ from LM_DB.forms import *
 
 # To-Dos
 
-#DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
-#DONE user permissions # https://docs.djangoproject.com/en/2.1/topics/auth/default/#topic-authorization
-#DONE enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
-#DONE display file as field with "is_file_in_repo", false when empty, path-string when true
-#DONE integrate separate file form -> currently only possible for new papers, not in edit mode
+# DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
+# DONE user permissions # https://docs.djangoproject.com/en/2.1/topics/auth/default/#topic-authorization
+# DONE enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
+# DONE display file as field with "is_file_in_repo", false when empty, path-string when true
+# DONE integrate separate file form -> currently only possible for new papers, not in edit mode
 # DONE change concept name to many-to-many relation
-#DONE empty core attributes and links are added for new papers, should not be (must be something specific to new, because they can be deleted using edit)
-
+# DONE empty core attributes and links are added for new papers, should not be (must be something specific to new,
+# because they can be deleted using edit)
+# TODO add css to make layout better, i.e. navbar: https://getuikit.com/docs/navbar
+# TODO add UI-Kit notification instead of alert https://getuikit.com/docs/notification
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -71,10 +73,17 @@ class EnterData(View):
     # src: https://stackoverflow.com/questions/2770810/multiple-models-in-a-single-django-modelform
     def post(self, request):
         request_data = request.POST
-        user = get_current_auth_user(request.user)
+        user = get_current_auth_user(request.user)  # TODO decomment this for production
+       # user = None  # TODO comment this for productino
         print(request_data)
 
-        if request_data.get('editStart', -1) != -1:
+        if request_data.get('downloadPaper', -1) != -1:
+            # https://stackoverflow.com/questions/1156246/having-django-serve-downloadable-files
+            current_paper_pk = request_data["paper_id"]
+            file = get_file_for_paper(current_paper_pk)
+            return serve_file(file)
+
+        elif request_data.get('editStart', -1) != -1:
             print("editStart")
             # pass data to the template to render the fields with data in them
             # src: https: // docs.djangoproject.com / en / dev / ref / forms / api /  # dynamic-initial-values
@@ -635,7 +644,7 @@ def convert_empty_string_to_none(a_string):
         return a_string
 
 
-# currently not necessary anymore TODO: transfer functionality from this into on upload
+# currently not necessary anymore DONE: transfer functionality from this into on upload
 def handle_uploaded_file(file, bibtex_str, file_name):
     base_destination = MEDIA_ROOT[:-1]  # has wrong side slash at the end, no problem caused, but slicing it off for now
     if file_name is None:
@@ -732,3 +741,19 @@ def get_year_from_bibtex(request_data):
 
     json_response = JsonResponse(response_data)
     return json_response
+
+
+def serve_file(file):
+    with open(file.complete_file_path, 'r') as pdf:
+        response = FileResponse(pdf.read(), mimetype='application/pdf')
+        file_name = file.file_name
+        response['Content-Disposition'] = file_name
+        return response
+
+
+def get_file_for_paper(current_paper_pk):
+    print(current_paper_pk)
+    files =  Files.objects.filter(ref_file_to_paper__paper_id=current_paper_pk)
+    print(files)
+    return files[0]
+

@@ -20,6 +20,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="paper_id" value="{{ paper|lookup:"paper_id"}}">
                             <input class="button" type="submit" name="editStart" value="Edit"/>
+                            <input class="button" type="submit" name="downloadPaper" value="Download"/>
 
                         </form>
 
