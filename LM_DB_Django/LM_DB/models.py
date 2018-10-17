@@ -279,9 +279,9 @@ class PaperKeyword(models.Model):
 
 class Papers(models.Model):
     paper_id = models.AutoField(primary_key=True)
-    doi = models.CharField(max_length=50, blank=True, null=True)
-    bibtex = models.TextField(blank=True, null=True)
-    cite_command = models.CharField(max_length=50, blank=True, null=True)
+    doi = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    bibtex = models.TextField(blank=True, null=True, unique=True)
+    cite_command = models.CharField(max_length=50, blank=True, null=True, unique=True)
     title = models.TextField(blank=True, null=True)
     abstract = models.TextField(blank=True, null=True)
     creation_timestamp = models.DateTimeField(blank=True, null=True)

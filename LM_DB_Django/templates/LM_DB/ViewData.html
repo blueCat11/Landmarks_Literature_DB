@@ -2,7 +2,9 @@
 {% load staticfiles %}
 {% load lmDBExtras %}
 {% block title %}View Data{% endblock %}
+{% block isActiveView %} class="uk-active" {% endblock %}
 
+<!-- TODO: reformat table with UI-Kit: https://getuikit.com/docs/table -->
 {% block body_block %}
     <table>
         <thead>

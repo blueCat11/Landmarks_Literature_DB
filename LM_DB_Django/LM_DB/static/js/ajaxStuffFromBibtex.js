@@ -1,14 +1,22 @@
 // add javascript-call to file-upload field
 $(document).ready( function() {
     $("#id_file-complete_file_path").click( function(event) {
-        sendAjaxToGetInfoFromBibtex();
+        sendAjaxToGetInfoFromBibtex("file_upload");
+    });
+
+});
+
+$(document).ready( function() {
+    $("#id_paper-bibtex").blur( function(event) {
+        sendAjaxToGetInfoFromBibtex("bibtex_enter");
+        console.log("info from bibtex")
     });
 
 });
 
 
 // TODO adjust this to also get the \cite tag and title (possibly abstract, too), then adjust view
-function sendAjaxToGetInfoFromBibtex(){
+function sendAjaxToGetInfoFromBibtex(context){
     let bibtex = $('#id_paper-bibtex').val();
 
 $.ajax({
@@ -17,15 +25,23 @@ $.ajax({
     data : {
         isYearFromBibtex: true,
         bibtex: bibtex,
+        context: context,
     }, // data sent with the post request
 
     // handle a successful response
     success : function(json) {
+        console.log(json);
         $('#id_file-year').val(json.year); // add year into (hidden?) field
+        $('#id_paper-title').val(json.title);
+        $('#id_paper-cite_command').val(json.cite_command);
         if (json.hasOwnProperty('error')){
-            console.log(json.error)
-            alert(json.error)
-            //TODO : Do something more sophisticated here. Alerts are annoying, a short and self-vanishing pop-up would do
+            console.log(json.error);
+            UIkit.notification({
+                message: json.error,
+                status: 'warning',
+                pos: 'bottom-center',
+                timeout: 5000
+            });
         }else{
            console.log("success")
         }

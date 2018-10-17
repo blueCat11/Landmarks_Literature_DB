@@ -1,5 +1,5 @@
 from django.forms import formset_factory
-from django.http import JsonResponse, FileResponse
+from django.http import JsonResponse, FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 import bibtexparser  # for bibtex
 from datetime import datetime, timezone  # for edit and creation times
@@ -19,7 +19,8 @@ from LM_DB.forms import *
 # DONE empty core attributes and links are added for new papers, should not be (must be something specific to new,
 # because they can be deleted using edit)
 # TODO add css to make layout better, i.e. navbar: https://getuikit.com/docs/navbar
-# TODO add UI-Kit notification instead of alert https://getuikit.com/docs/notification
+# DONE add UI-Kit notification instead of alert https://getuikit.com/docs/notification
+# DONE test cite-command + title updates
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -213,7 +214,7 @@ class EnterData(View):
                         data = file_form.cleaned_data
                         #print(file_form['complete_file_path'])
                         if data['complete_file_path'] == False:
-                            print("delete file")#TODO really delete it, from folders as well
+                            print("delete file")#TODO really delete it, from folders as well???
                             current_file = Files.objects.get(file_id=data['file_id'], ref_file_to_paper=current_paper_pk)
                             current_file.delete()
                         else:
@@ -503,7 +504,7 @@ class EnterData(View):
             json_response = JsonResponse(response_data)
             return json_response
         elif request_data.get("isYearFromBibtex", -1) != -1:
-            json_response = get_year_from_bibtex(request_data)
+            json_response = get_info_from_bibtex(request_data)
             return json_response
 
         elif request_data.get('newSave', -1) != 1:
@@ -719,7 +720,7 @@ def get_current_auth_user(current_user):
 
 
 # tries to extract a year from a given bibtex and returns a json response
-def get_year_from_bibtex(request_data):
+'''def get_year_from_bibtex(request_data):
     print("new file upload - bibtex processing")
     bibtex_str = request_data['bibtex']
     error = None
@@ -740,20 +741,86 @@ def get_year_from_bibtex(request_data):
             response_data["error"]=error
 
     json_response = JsonResponse(response_data)
+    return json_response'''  # not necessary anymore
+
+
+def get_info_from_bibtex(request_data):
+    print("new file upload - bibtex processing")
+    bibtex_str = request_data['bibtex']
+    if bibtex_str is None or bibtex_str == "":
+        year = "unknown_year"
+        title = ""
+        cite_command = ""
+        error = "No bibtex is present."
+        response_data = {"result": " ", "year": year, "title": title, "cite_command": cite_command, "error":error}
+    else:
+        context = request_data.get("context", -1)
+        if context == "file_upload":
+            response_data = called_by_file_upload(bibtex_str)
+        elif context == "bibtex_enter":
+            response_data = called_by_bibtex_upload(bibtex_str)
+        else:
+            pass
+    json_response = JsonResponse(response_data)
     return json_response
 
 
+def called_by_file_upload(bibtex_str):
+    error = None
+    try:
+        bib = bibtexparser.loads(bibtex_str)
+        year = str(bib.entries[0]['year'])
+
+    except Exception as e:
+        error = "Something is wrong with the bibtex, could find no year. Will save file to unknown year"
+        year = "unknown_year"
+        print(e)
+
+    response_data = {"result": "year extracted from bibtex! ", "year": year}
+    if error is not None:
+        response_data["error"] = error
+
+    return response_data
+
+
+def called_by_bibtex_upload(bibtex_str):
+    error = ""
+    title = ""
+    cite_command = ""
+    try:
+        bib = bibtexparser.loads(bibtex_str)
+        title = str(bib.entries[0]['title'])
+    except Exception as e:
+        error = "Something is wrong with the bibtex, could find no title."
+        print(e)
+
+    try:
+        bib = bibtexparser.loads(bibtex_str)
+        cite_command = str(bib.entries[0]["ID"])
+    except Exception as e:
+        error += "\n Something is wrong with the bibtex, could find no cite-command"
+
+    response_data = {"result": "year extracted from bibtex! ", "title": title, "cite_command": cite_command}
+    if error != "":
+        response_data["error"] = error
+
+    return response_data
+
+
 def serve_file(file):
-    with open(file.complete_file_path, 'r') as pdf:
-        response = FileResponse(pdf.read(), mimetype='application/pdf')
+    print(file.complete_file_path)
+    file_path = os.path.join(MEDIA_ROOT, str(file.complete_file_path))
+    print(file_path)
+    # file is saved in temporary folder. If downloaded repeatedly, it's name is counted up
+    with open(file_path, 'rb') as pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
         file_name = file.file_name
-        response['Content-Disposition'] = file_name
+        response['Content-Disposition']= "attachment; filename={0}".format(file_name)
         return response
 
 
 def get_file_for_paper(current_paper_pk):
     print(current_paper_pk)
-    files =  Files.objects.filter(ref_file_to_paper__paper_id=current_paper_pk)
+    files = Files.objects.filter(ref_file_to_paper__paper_id=current_paper_pk)
     print(files)
     return files[0]
-

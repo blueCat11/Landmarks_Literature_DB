@@ -10,7 +10,7 @@
 
     <link rel="stylesheet" href="{% static 'css/enterData.css' %}">
 {% endblock %}
-
+{% block isActiveEnter %}class="uk-active" {% endblock %}
 {% block body_block %}
     <h1>{{ type_of_edit }}</h1>
     <form id="lm_data_form" action="/LM_DB/enterData/" enctype="multipart/form-data" method="post">

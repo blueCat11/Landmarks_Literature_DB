@@ -140,7 +140,10 @@ def get_current_paper(pk):
 
 # Gets username for a given user_id
 def get_user_name(user):
-    return AuthUser.objects.get(id=user.id).username
+    if user is not None:
+        return AuthUser.objects.get(id=user.id).username
+    else:
+        return " "
 
 
 # makes naming of of methods more concise
@@ -155,7 +158,8 @@ def get_edit_string(user_name, time):
 
 # formats username and time appropriately
 def get_creation_or_edit_string(user_name, time):
-    return "at " + str(time) + ", by " + user_name
+    time_str = str(time)[:-7]  # shave off milliseconds...
+    return "at " + time_str + ", by " + user_name
 
 
 # gets only those data from a paper that should also be displayed in viewData-View
