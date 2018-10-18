@@ -5,3 +5,7 @@
 .error {
     color:red;
 }
+
+.width_small {
+    width:150px !important;
+}
