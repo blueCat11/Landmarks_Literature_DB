@@ -1,5 +1,5 @@
 .add{
-    color:lightgreen;
+    background-color:lightgreen;
 }
 
 .large_font {
@@ -8,4 +8,8 @@
 
 .bold {
     font-weight:bold;
+}
+
+.blue {
+    background-color:rgb(153, 204, 255) !important;
 }

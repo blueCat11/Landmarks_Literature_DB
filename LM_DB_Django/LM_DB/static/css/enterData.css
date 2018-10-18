@@ -9,3 +9,11 @@
 .width_small {
     width:150px !important;
 }
+
+.uk-form-horizontal .uk-form-controls {
+    margin-left: 0 !important;
+}
+
+.not_saved{
+    background-color: rgb(255, 153, 153);
+}

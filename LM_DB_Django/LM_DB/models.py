@@ -198,7 +198,7 @@ class Files(models.Model):
     ref_file_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_file_to_paper', blank=True, null=True)
     file_name = models.CharField(max_length=50, blank=True, null=True)
     complete_file_path = models.FileField(upload_to=year_directory_path, blank=True, null=True)  # only path saved here, not filename
-    year = models.CharField(max_length=12, blank=True, null=True)#TODO change widget to hidden and prepopulate from bibtex
+    year = models.CharField(max_length=12, blank=True, null=True)#DONE change widget to hidden and prepopulate from bibtex
 
     def filename(self):
         return os.path.basename(self.file.name)
@@ -279,9 +279,9 @@ class PaperKeyword(models.Model):
 
 class Papers(models.Model):
     paper_id = models.AutoField(primary_key=True)
-    doi = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    bibtex = models.TextField(blank=True, null=True, unique=True)
-    cite_command = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    doi = models.CharField(max_length=50, blank=True, null=True)
+    bibtex = models.TextField(blank=True, null=True)
+    cite_command = models.CharField(max_length=50, blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     abstract = models.TextField(blank=True, null=True)
     creation_timestamp = models.DateTimeField(blank=True, null=True)

@@ -3,8 +3,11 @@
 {% load lmDBExtras %}
 {% block title %}View Data{% endblock %}
 {% block isActiveView %} class="uk-active" {% endblock %}
+{% block viewData %}View Data{% endblock %}
+{% block enterData %}Enter/Edit data{% endblock %}
+{% block container-size %}.uk-container-expand{% endblock %}
 
-<!-- TODO: reformat table with UI-Kit: https://getuikit.com/docs/table -->
+<!-- DONE: reformat table with UI-Kit: https://getuikit.com/docs/table -->
 {% block body_block %}
     <p class="uk-margin">
     <div class="uk-overflow-auto">
@@ -45,6 +48,6 @@
     </p>
 
 
-        <a type="button" class="uk-button uk-button-primary uk-button-small large_font bold" href="/LM_DB/enterData/">+</a>
+        <a type="button" class="uk-button uk-button-primary uk-button-small bold" href="/LM_DB/enterData/">add paper</a>
 
 {% endblock %}

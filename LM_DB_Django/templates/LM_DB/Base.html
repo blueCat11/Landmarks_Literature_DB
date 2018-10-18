@@ -21,18 +21,21 @@
 
     <body>
         <header>
-            <nav class="uk-navbar-container uk-navbar .uk-tile-primary">
+            <nav class="uk-navbar-container uk-navbar blue">
+            <div class="uk-margin-left">
+                <h3>{% block heading %}Landmark Database{% endblock %}</h3>
+            </div>
             <div class="uk-navbar-center">
 
                 <ul class="uk-navbar-nav">
-                    <li {% block isActiveEnter %}{% endblock %}><a href="/LM_DB/enterData">Enter Data</a></li>
-                    <li {% block isActiveView %}{% endblock %}><a href="/LM_DB/viewData">View Data</a></li>
+                    <li {% block isActiveEnter %}{% endblock %}><a href="/LM_DB/enterData">{% block enterData %}{% endblock %}</a></li>
+                    <li {% block isActiveView %}{% endblock %}><a href="/LM_DB/viewData">{% block viewData %}{% endblock %}</a></li>
                 </ul>
 
             </div>
             </nav>
         </header>
-        <div class = "content uk-container uk-container-large">
+        <div class = "content uk-container {% block container-size %}uk-container-small{% endblock %}">
             {% block body_block %}{% endblock %}
         </div>
 

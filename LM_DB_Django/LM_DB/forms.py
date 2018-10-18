@@ -9,9 +9,9 @@ from LM_DB.models import *
 class PaperForm (forms.ModelForm):
     paper_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     doi = forms.CharField(max_length=50)
-    bibtex = forms.CharField(widget=forms.Textarea, required=False)
+    bibtex = forms.CharField(widget=forms.Textarea, required=False,)
     cite_command = forms.CharField(max_length=50, required=False)
-    title = forms.CharField(widget=forms.Textarea, required=False)
+    title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
 
     class Meta:
@@ -22,8 +22,8 @@ class PaperForm (forms.ModelForm):
 class FileForm (forms.ModelForm):
     file_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     file_name = forms.CharField(max_length=50, required=False)
-    complete_file_path = forms.FileField(widget=forms.ClearableFileInput, label="file", required=False)
-    year = forms.CharField(max_length = 12, required=False)
+    complete_file_path = forms.FileField(widget=forms.ClearableFileInput, label="File", required=False)
+    year = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = Files
@@ -32,7 +32,7 @@ class FileForm (forms.ModelForm):
 
 class ConceptNameForm (forms.ModelForm):
     concept_name_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    concept_name = forms.CharField(widget=forms.Textarea, required=False)
+    concept_name = forms.CharField(max_length=150, required=False)
 
     class Meta:
         model = ConceptNames

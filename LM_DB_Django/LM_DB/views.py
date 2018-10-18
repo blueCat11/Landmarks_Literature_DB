@@ -18,7 +18,7 @@ from LM_DB.forms import *
 # DONE change concept name to many-to-many relation
 # DONE empty core attributes and links are added for new papers, should not be (must be something specific to new,
 # because they can be deleted using edit)
-# TODO add css to make layout better, i.e. navbar: https://getuikit.com/docs/navbar
+# DONE add css to make layout better, i.e. navbar: https://getuikit.com/docs/navbar
 # DONE add UI-Kit notification instead of alert https://getuikit.com/docs/notification
 # DONE test cite-command + title updates
 
@@ -50,7 +50,7 @@ class EnterData(View):
         file_form = FileForm(prefix="file")
         concept_name_form= ConceptNameForm(prefix="concept_name")
         purpose_formset = self.PurposeFormset(prefix="purpose")
-        paper_concept_name_form = PaperConceptNameForm(prefix="concept_name")
+        paper_concept_name_form = PaperConceptNameForm(prefix="new_concept_name")
         core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute")
         links_formset = self.LinkFormset(prefix="link")
         keyword_form = KeywordForm(prefix="new_keyword")
@@ -74,8 +74,8 @@ class EnterData(View):
     # src: https://stackoverflow.com/questions/2770810/multiple-models-in-a-single-django-modelform
     def post(self, request):
         request_data = request.POST
-        user = get_current_auth_user(request.user)  # TODO decomment this for production
-       # user = None  # TODO comment this for productino
+        user = get_current_auth_user(request.user)
+
         print(request_data)
 
         if request_data.get('downloadPaper', -1) != -1:
@@ -144,6 +144,7 @@ class EnterData(View):
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
+            print(paper_form.is_bound)
 
             file_data = all_table_data["file"]
             file_pk = file_data.get('file_id', None)
@@ -237,7 +238,7 @@ class EnterData(View):
                                 current_file = Files(file_name=file_name, complete_file_path=file, year=year,
                                                      ref_file_to_paper_id=current_paper_pk)
                                 current_file.save()
-                        # TODO implement file_has_changed behavior (delete old file, save new one)
+                        # TODO possibly implement file_has_changed behavior (delete old file, save new one)
                         pass
 
                     if purpose_formset.has_changed():
@@ -422,6 +423,7 @@ class EnterData(View):
 
                             print("valid cleaned paper categories")
                 else:
+                    print("errors")
                     error_dict = {}  # TODO check whether the errors are displayed correctly for each (is the key right)
                     if not paper_form.is_valid():
                         error_dict["paper"] = True
@@ -522,6 +524,9 @@ class EnterData(View):
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords")
             paper_categories_form = PaperCategoryForm(request_data, prefix="paper_categories")
             paper_concept_names_form = PaperConceptNameForm(request_data, prefix="paper_concept_names")
+            keyword_form = KeywordForm(prefix="new_keyword")
+            category_form = CategoryForm(prefix="new_category")
+            concept_name_form = ConceptNameForm(prefix="new_concept_name")
 
             # check if all forms are valid, add further forms to the if-clause later
             if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and\
@@ -537,6 +542,27 @@ class EnterData(View):
                     cite_command = convert_empty_string_to_none(data.get('cite_command', None))
                     title = convert_empty_string_to_none(data.get('title', None))
                     abstract = convert_empty_string_to_none(data.get('abstract', None))
+
+                    are_errors = uniqueness_check(bibtex=bibtex, doi=doi, cite_command=cite_command)
+                    if not are_errors.get("is_unique", False):
+
+                        context_dict = {"original_form_name": "newSave", "type_of_edit": "New Entry",
+                                        "uniqueness_errors": are_errors}
+                        context_dict = add_forms_to_context_dict(context_dict, paper=paper_form,
+                                                                 file=file_form,
+                                                                 concept_name=concept_name_form,
+                                                                 paper_concept_name=paper_concept_names_form,
+                                                                 purpose=purpose_formset,
+                                                                 core_attribute=core_attribute_formset,
+                                                                 links=link_formset,
+                                                                 keyword=keyword_form,
+                                                                 paper_keywords=paper_keywords_form,
+                                                                 category=category_form,
+                                                                 paper_categories=paper_categories_form)
+
+                        return render(request, "LM_DB/enterData.html", context_dict)
+
+
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract)
                     set_creation_meta_data(current_paper, user)
@@ -824,3 +850,54 @@ def get_file_for_paper(current_paper_pk):
     files = Files.objects.filter(ref_file_to_paper__paper_id=current_paper_pk)
     print(files)
     return files[0]
+
+
+def uniqueness_check(bibtex, doi, cite_command):
+    bibtex_unique = is_bibtex_unique(bibtex)
+    doi_unique = is_doi_unique(doi)
+    cite_command_unique = is_cite_command_unique(cite_command)
+    context_dict = {}
+    if bibtex_unique and doi_unique and cite_command_unique:
+        context_dict["is_unique"] = True
+    else:
+        context_dict["is_unique"] = False
+        if not bibtex_unique:
+            context_dict["bibtex_unique"] = "Bibtex not unique. A paper with this bibtex is already in the database."
+        if not cite_command_unique:
+            context_dict["cite_command_unique"] = "Cite-command not unique. A paper with this cite-command is already in the database."
+        if not doi_unique:
+            context_dict["doi_unique"] = "Doi not unique. A paper with this doi is already in the database."
+
+    return context_dict
+
+
+
+def is_bibtex_unique(bibtex_str):
+    if bibtex_str == "" or bibtex_str is None:
+        return True
+    poss_other_bibtex = Papers.objects.filter(bibtex=bibtex_str)
+    if len(poss_other_bibtex) == 0:
+        return True
+    else:
+        return False
+
+
+def is_doi_unique(doi_str):
+    if doi_str == "" or doi_str is None:
+        return True
+    poss_other_doi = Papers.objects.filter(doi=doi_str)
+    if len(poss_other_doi) == 0:
+        return True
+    else:
+        return False
+
+
+def is_cite_command_unique(cite_command_str):
+    if cite_command_str == "" or cite_command_str is None:
+        return True
+    poss_other_cite_command = Papers.objects.filter(cite_command=cite_command_str)
+    if len(poss_other_cite_command) == 0:
+        return True
+    else:
+        return False
+

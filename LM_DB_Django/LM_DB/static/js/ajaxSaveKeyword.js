@@ -61,7 +61,7 @@ $.ajax({
             $('#id_new_category-category_name').val('');
             $('#id_new_category-shortcut').val('');
             $('#id_new_category-description').val('');
-            $('input[name=new_category-super_category]:checked', '#id_new_category-super_category').prop('checked', false); //TODO this might be cause for trouble... not tested yet
+            $('input[name=new_category-super_category]:checked', '#id_new_category-super_category').prop('checked', false);
 
             //add the new category to the list
             let category_pk = json.category_id;
@@ -125,6 +125,7 @@ $.ajax({
     });
 
 }
+
 
 
 

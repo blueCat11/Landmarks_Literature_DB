@@ -8,13 +8,13 @@ from . import views
 app_name = 'LM_DB'
 # name nur bei Verwendung von Links aus anderen Seiten relevant
 
-# TODO decomment this for production, it restricts access to views
+# DONE decomment this for production, it restricts access to views
 urlpatterns = [
     re_path(r'^viewData/$', login_required(ViewData.as_view()), name="viewData"),
     re_path(r'^enterData/$', login_required(EnterData.as_view()), name="enterData")
 
 ]
-#urlpatterns = [  # TODO leave this commented for production
+#urlpatterns = [  # DONE leave this commented for production
 #    re_path(r'^viewData/$', ViewData.as_view(), name="viewData"),
 #    re_path(r'^enterData/$', EnterData.as_view(), name="enterData")
 

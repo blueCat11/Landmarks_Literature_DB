@@ -24,7 +24,7 @@ $(document).ready( function() {
     });
 
     $("#add_purpose").click( function(event) {
-        checkIfNeedsClone('div.concept_name_form:last', 'purpose');
+        checkIfNeedsClone('div.purpose_form:last', 'purpose');
     });
 
 });

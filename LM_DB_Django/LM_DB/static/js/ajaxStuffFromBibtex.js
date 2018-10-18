@@ -15,7 +15,6 @@ $(document).ready( function() {
 });
 
 
-// TODO adjust this to also get the \cite tag and title (possibly abstract, too), then adjust view
 function sendAjaxToGetInfoFromBibtex(context){
     let bibtex = $('#id_paper-bibtex').val();
 
