@@ -15,7 +15,7 @@
 {% block isActiveEnter %}class="uk-active" {% endblock %}
 {% block body_block %}
     <h1>{{ type_of_edit }}</h1>
-    <form id="lm_data_form" action="/LM_DB/enterData/" enctype="multipart/form-data" method="post" class=".uk-form-horizontal">
+    <form id="lm_data_form" action="/LM_DB/enterData/" enctype="multipart/form-data" method="post" class="uk-form-horizontal uk-margin-small">
         {% csrf_token %}
         <!-- <ul> -->
             <h2>Paper</h2>
@@ -23,14 +23,14 @@
                 {% for field in paper_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ paper_form.as_ul }}
+                {{ paper_form.as_p }}
             {% endif %}
 
             {% if file_form %}
                 {% for field in file_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ file_form.as_ul }}
+                {{ file_form.as_p }}
             {% endif %}
 
             {% if paper_concept_names_form %}
@@ -39,7 +39,7 @@
                 {% for field in paper_concept_names_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ paper_concept_names_form.as_ul }}
+                {{ paper_concept_names_form.as_p }}
                 </div>
             {% endif %}
 
@@ -48,7 +48,7 @@
                 {% for field in concept_name_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ concept_name_form.as_ul }}
+                {{ concept_name_form.as_p }}
                 <input type="button" name="new_concept_name" value="add new concept name" onclick="saveNewConceptName()"/>
             {% endif %}
 
@@ -61,7 +61,7 @@
                         {% for field in purpose_form.hidden_fields %}
                             {{ field }}
                         {% endfor %}
-                    {{ purpose_form.as_ul }}
+                    {{ purpose_form.as_p }}
                    {% if forloop.last %}</div>{% endif%}
                 {% endfor %}
                 <input type="button" value="Add" id="add_purpose">
@@ -76,7 +76,7 @@
                     {% for field in core_attribute_form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
-                    {{ core_attribute_form.as_ul }}
+                    {{ core_attribute_form.as_p }}
                      {% if forloop.last %}</div>{% endif %}
                 {% endfor %}
                 <input type="button" value="Add" id="add_core_attribute">
@@ -91,7 +91,7 @@
                         {% for field in link_form.hidden_fields %}
                             {{ field }}
                         {% endfor %}
-                    {{ link_form.as_ul }}
+                    {{ link_form.as_p }}
                    {% if forloop.last %}</div>{% endif%}
                 {% endfor %}
                 <input type="button" value="Add" id="add_link">
@@ -103,7 +103,7 @@
                 {% for field in paper_keywords_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ paper_keywords_form.as_ul }}
+                {{ paper_keywords_form.as_p }}
                 </div>
             {% endif %}
 
@@ -112,7 +112,7 @@
                 {% for field in keyword_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ keyword_form.as_ul }}
+                {{ keyword_form.as_p }}
                 <input type="button" name="new_keyword" value="add new keyword" onclick="saveNewKeyword()"/>
             {% endif %}
 
@@ -122,7 +122,7 @@
                 {% for field in paper_categories_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ paper_categories_form.as_ul }}
+                {{ paper_categories_form.as_p }}
                 </div>
             {% endif %}
 
@@ -131,7 +131,7 @@
                 {% for field in category_form.hidden_fields %}
                     {{ field }}
                 {% endfor %}
-                {{ category_form.as_ul }}
+                {{ category_form.as_p }}
                 <input type="button" class="uk-button uk-button-primary add" name="new_category" value="add new category" onclick="saveNewCategory()"/>
             {% endif %}
         <!--</ul>-->
