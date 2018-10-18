@@ -7,15 +7,17 @@
     <script src="{% static 'js/addFormToFormsetDynamically.js' %}"></script>
     <script src="{% static 'js/ajaxSaveKeyword.js' %}"></script>
     <script src="{% static 'js/ajaxStuffFromBibtex.js' %}"></script>
+    <script src="{% static 'js/addUikitStuffToForms.js' %}"></script>
+    <script src="{% static 'js/distinguish_deleted_forms.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'css/enterData.css' %}">
 {% endblock %}
 {% block isActiveEnter %}class="uk-active" {% endblock %}
 {% block body_block %}
     <h1>{{ type_of_edit }}</h1>
-    <form id="lm_data_form" action="/LM_DB/enterData/" enctype="multipart/form-data" method="post">
+    <form id="lm_data_form" action="/LM_DB/enterData/" enctype="multipart/form-data" method="post" class=".uk-form-horizontal">
         {% csrf_token %}
-        <ul>
+        <!-- <ul> -->
             <h2>Paper</h2>
             {% if paper_form %}
                 {% for field in paper_form.hidden_fields %}
@@ -130,10 +132,10 @@
                     {{ field }}
                 {% endfor %}
                 {{ category_form.as_ul }}
-                <input type="button" name="new_category" value="add new category" onclick="saveNewCategory()"/>
+                <input type="button" class="uk-button uk-button-primary add" name="new_category" value="add new category" onclick="saveNewCategory()"/>
             {% endif %}
-        </ul>
-        <input class="button" type="submit" name="{{ original_form_name }}" value="Submit"/>
+        <!--</ul>-->
+        <input class="button uk-button uk-button-primary" type="submit" name="{{ original_form_name }}" value="Submit"/>
     </form>
 
 

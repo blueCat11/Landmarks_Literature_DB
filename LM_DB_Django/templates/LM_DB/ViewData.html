@@ -6,38 +6,45 @@
 
 <!-- TODO: reformat table with UI-Kit: https://getuikit.com/docs/table -->
 {% block body_block %}
-    <table>
-        <thead>
-            <tr>
-                {% for heading in included_columns %}
-                    <th>{{ heading }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for paper in papers %}
+    <p class="uk-margin">
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-striped">
+            <thead>
                 <tr>
-                    <td>
-                        <form action="/LM_DB/enterData/" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="paper_id" value="{{ paper|lookup:"paper_id"}}">
-                            <input class="button" type="submit" name="editStart" value="Edit"/>
-                            <input class="button" type="submit" name="downloadPaper" value="Download"/>
-
-                        </form>
-
-                    </td>
-                    {% for attribute in paper %}
-                        {% with paper|lookup:attribute as cell_value  %}
-                            <td>{{ cell_value}}</td>
-                        {% endwith %}
+                    {% for heading in included_columns %}
+                        <th>{{ heading }}</th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for paper in papers %}
+                    <tr>
+                        <td>
+                            <form action="/LM_DB/enterData/" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="paper_id" value="{{ paper|lookup:"paper_id"}}">
+                                <p uk-margin>
+                                    <input class="button uk-button uk-button-primary uk-button-small" type="submit" name="editStart" value="Edit"/>
+                                </p>
+                                <p uk-margin>
+                                    <input class="button uk-button uk-button-primary uk-button-small" type="submit" name="downloadPaper" value="Download"/>
+                                </p>
+                            </form>
+
+                        </td>
+                        {% for attribute in paper %}
+                            {% with paper|lookup:attribute as cell_value  %}
+                                <td>{{ cell_value}}</td>
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </p>
 
 
-        <a type="button" href="/LM_DB/enterData/">+</a>
+        <a type="button" class="uk-button uk-button-primary uk-button-small large_font bold" href="/LM_DB/enterData/">+</a>
 
 {% endblock %}
