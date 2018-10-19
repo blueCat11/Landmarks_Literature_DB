@@ -62,48 +62,55 @@
 
             <hr class="uk-divider-small">
             {% if purpose_forms %}
-                <h3>Purpose</h3>
-                {{ purpose_forms.management_form }}
-                {% for purpose_form in purpose_forms %}
-                    {% if forloop.last and not errors|lookup:purpose_forms %}<div class="purpose_form hidden single_form" id="purpose_form">
-                    {% elif forloop.last %}<div class="purpose_form">{% endif%}
-                        {% for field in purpose_form.hidden_fields %}
-                            {{ field }}
-                        {% endfor %}
-                    {{ purpose_form.as_p }}
-                   {% if forloop.last %}</div>{% endif%}
-                {% endfor %}
-                <input type="button" class="uk-button uk-button-secondary" value="+" id="add_purpose">
+                <div class="purpose_related">
+                    <h3>Purpose</h3>
+                    {{ purpose_forms.management_form }}
+                    {% for purpose_form in purpose_forms %}
+                        {% if forloop.last and not errors|lookup:purpose_forms %}<div class="purpose_form hidden single_form" id="purpose_form">
+                        {% elif forloop.last %}<div class="purpose_form">{% endif%}
+                            {% for field in purpose_form.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+                        {{ purpose_form.as_p }}
+                       {% if forloop.last %}</div>{% endif%}
+                    {% endfor %}
+                    <input type="button" class="uk-button uk-button-secondary" value="+" id="add_purpose">
+                </div>
             {% endif %}
+
             <hr class="uk-divider-small">
             {% if core_attribute_forms %}
-                <h3>Core attributes</h3>
-                {{ core_attribute_forms.management_form }}
-                {% for core_attribute_form in core_attribute_forms %}
-                    {% if forloop.last and not errors|lookup:core_attribute_forms %}<div class="core_attribute_form hidden single_form" id="core_attribute_form">
-                    {% elif forloop.last%}<div class="core_attribute_form">{% endif %}
-                    {% for field in core_attribute_form.hidden_fields %}
-                        {{ field }}
+                <div class="core_attribute_related">
+                    <h3>Core attributes</h3>
+                    {{ core_attribute_forms.management_form }}
+                    {% for core_attribute_form in core_attribute_forms %}
+                        {% if forloop.last and not errors|lookup:core_attribute_forms %}<div class="core_attribute_form hidden single_form" id="core_attribute_form">
+                        {% elif forloop.last%}<div class="core_attribute_form">{% endif %}
+                        {% for field in core_attribute_form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+                        {{ core_attribute_form.as_p }}
+                         {% if forloop.last %}</div>{% endif %}
                     {% endfor %}
-                    {{ core_attribute_form.as_p }}
-                     {% if forloop.last %}</div>{% endif %}
-                {% endfor %}
-                <input type="button" class="uk-button uk-button-secondary" value="+" id="add_core_attribute">
+                    <input type="button" class="uk-button uk-button-secondary" value="+" id="add_core_attribute">
+                </div>
             {% endif %}
             <hr class="uk-divider-small">
             {% if link_forms %}
-                <h3>Links</h3>
-                {{ link_forms.management_form }}
-                {% for link_form in link_forms %}
-                    {% if forloop.last and not errors|lookup:link_forms %}<div class="link_form hidden single_form" id="link_form">
-                    {% elif forloop.last %}<div class="link_form">{% endif%}
-                        {% for field in link_form.hidden_fields %}
-                            {{ field }}
-                        {% endfor %}
-                    {{ link_form.as_p }}
-                   {% if forloop.last %}</div>{% endif%}
-                {% endfor %}
-                <input type="button" class="uk-button uk-button-secondary" value="+" id="add_link">
+                <div class="link_related">
+                    <h3>Links</h3>
+                    {{ link_forms.management_form }}
+                    {% for link_form in link_forms %}
+                        {% if forloop.last and not errors|lookup:link_forms %}<div class="link_form hidden single_form" id="link_form">
+                        {% elif forloop.last %}<div class="link_form">{% endif%}
+                            {% for field in link_form.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+                        {{ link_form.as_p }}
+                       {% if forloop.last %}</div>{% endif%}
+                    {% endfor %}
+                    <input type="button" class="uk-button uk-button-secondary" value="+" id="add_link">
+                </div>
             {% endif %}
             <hr class="uk-divider-small">
             {% if paper_keywords_form %}

@@ -15,5 +15,5 @@
 }
 
 .not_saved{
-    background-color: rgb(255, 153, 153);
+    border: 5px solid rgb(255, 153, 153);
 }
