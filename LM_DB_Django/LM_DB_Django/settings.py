@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'django_tables2',
     'LM_DB.apps.LmDbConfig',
     'registration',  # for registration app
     # 'mod_wsgi.server', # leave this line commented when running on local host

@@ -63,15 +63,18 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     print(paper.values()[0])
     paper_data = get_paper_data_for_display(paper)
     current_paper = paper[0]
-
+    paper_data["actions"] = current_paper.pk
     current_files = Files.objects.filter(ref_file_to_paper=current_paper_pk)
     file_data = ''
+    year = ''
     if len(current_files) < 1:
         file_data += "False"
     else:
         for file in current_files:
             file_data += str(file)
+            year = file.year
     paper_data["is_fulltext_in_repo"] = file_data
+    paper_data["year"] = year
 
     current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = ''

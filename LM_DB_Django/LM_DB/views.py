@@ -3,8 +3,13 @@ from django.http import JsonResponse, FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 import bibtexparser  # for bibtex
 from datetime import datetime, timezone  # for edit and creation times
+
+from django_tables2 import RequestConfig
+
 from LM_DB.display_methods import *
 from django.views import View
+
+from LM_DB.tables import PaperTable
 from LM_DB_Django.settings import MEDIA_ROOT
 from LM_DB.forms import *
 
@@ -21,6 +26,8 @@ from LM_DB.forms import *
 # DONE add css to make layout better, i.e. navbar: https://getuikit.com/docs/navbar
 # DONE add UI-Kit notification instead of alert https://getuikit.com/docs/notification
 # DONE test cite-command + title updates
+# TODO update author from bibtex
+# TODO update keywords from bibtex
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -33,7 +40,9 @@ class ViewData(View):
             paper_list.append(paper_data)
 
         columns = get_list_of_included_columns()
-        context_dict = {"papers": paper_list, "included_columns": columns}
+        table = PaperTable(paper_list)
+        RequestConfig(request).configure(table)
+        context_dict = {"papers": paper_list, "included_columns": columns, 'table': table}
         return render(request, "LM_DB/ViewData.html", context_dict)
 
 
@@ -329,7 +338,6 @@ class EnterData(View):
                                     if data.get("core_attribute_id", None) is not None:
                                         current_core_attribute_id = data["core_attribute_id"]
                                         current_core_attribute = CoreAttributes.objects.get(core_attribute_id= current_core_attribute_id)
-                                        print(core_attribute_form.changed_data)
                                         is_to_be_deleted=False
                                         for entry in core_attribute_form.changed_data:
                                             if entry == "delete_this_core_attribute":
@@ -352,7 +360,7 @@ class EnterData(View):
                                         if data.get("delete_this_core_attribute", "None") == False:
                                             core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
                                             is_literal_quotation = data.get("is_literal_quotation", None)
-                                            page_num = data.get("page_num", None)
+                                            page_num = convert_empty_string_to_none(data.get("page_num", None))
                                             CoreAttributes.objects.create(core_attribute=core_attribute,
                                                                               is_literal_quotation=is_literal_quotation,
                                                                               page_num=page_num,
@@ -493,6 +501,7 @@ class EnterData(View):
 
         elif request_data.get("isNewConceptName", -1) != -1 :
             print("isNewConceptName")
+            print(request_data)
             concept_name = request_data['concept_name']
             is_not_unique = ConceptNames.objects.filter(concept_name=concept_name).exists()
             if not is_not_unique:
@@ -502,7 +511,8 @@ class EnterData(View):
                 response_data = {"result": "Create concept name successful!", "concept_name": concept_name,
                                  "concept_name_id": new_concept_name.pk}
             else:
-                response_data = {"result": "Creating concept name not successful!", "error": "This concept name already exists."}
+                response_data = {"result": "Creating concept name not successful!",
+                                 "error": "This concept name already exists."}
             json_response = JsonResponse(response_data)
             return json_response
         elif request_data.get("isYearFromBibtex", -1) != -1:

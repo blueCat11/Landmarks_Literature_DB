@@ -1,4 +1,5 @@
 {% extends 'LM_DB/Base.html' %}
+{% load render_table from django_tables2 %}
 {% load staticfiles %}
 {% load lmDBExtras %}
 {% block title %}View Data{% endblock %}
@@ -6,44 +7,16 @@
 {% block viewData %}View Data{% endblock %}
 {% block enterData %}Enter/Edit data{% endblock %}
 {% block container-size %}.uk-container-expand{% endblock %}
+{% block head_block %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{% static 'js/CSRF.js' %}"></script>
+{% endblock %}
 
 <!-- DONE: reformat table with UI-Kit: https://getuikit.com/docs/table -->
 {% block body_block %}
     <p class="uk-margin">
     <div class="uk-overflow-auto">
-        <table class="uk-table uk-table-striped">
-            <thead>
-                <tr>
-                    {% for heading in included_columns %}
-                        <th>{{ heading }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for paper in papers %}
-                    <tr>
-                        <td>
-                            <form action="/LM_DB/enterData/" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="paper_id" value="{{ paper|lookup:"paper_id"}}">
-                                <p uk-margin>
-                                    <input class="button uk-button uk-button-primary uk-button-small" type="submit" name="editStart" value="Edit"/>
-                                </p>
-                                <p uk-margin>
-                                    <input class="button uk-button uk-button-primary uk-button-small" type="submit" name="downloadPaper" value="Download"/>
-                                </p>
-                            </form>
-
-                        </td>
-                        {% for attribute in paper %}
-                            {% with paper|lookup:attribute as cell_value  %}
-                                <td>{{ cell_value}}</td>
-                            {% endwith %}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% render_table table %}
     </div>
     </p>
 

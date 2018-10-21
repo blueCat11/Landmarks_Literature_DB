@@ -1,4 +1,6 @@
 
+
+
 function saveNewConceptName(){
     let conceptName = $('#id_concept_name-concept_name').val();
 
@@ -186,6 +188,12 @@ $(function() {
             }
         }
     });
+
+    function addCSRFTokens(){
+        element = '<input name="csrfmiddlewaretoken" value="'+csrftoken+'" type="hidden">';
+
+
+    }
 
 
 });

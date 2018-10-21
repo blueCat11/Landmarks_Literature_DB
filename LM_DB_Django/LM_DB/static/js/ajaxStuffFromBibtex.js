@@ -1,3 +1,5 @@
+//TODO change to one method fits all: in every case, all possible data should be retrieved from bibtex and entered into appropriate fields
+// possible data: title, cite_command, year, author(s), keyword(s)
 // add javascript-call to file-upload field
 $(document).ready( function() {
     $("#id_file-complete_file_path").click( function(event) {

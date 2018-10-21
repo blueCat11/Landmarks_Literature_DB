@@ -55,6 +55,9 @@ class AuthUser(models.Model):
         managed = False
         db_table = 'auth_user'
 
+    def __str__(self):
+        return self.username
+
 
 class AuthUserGroups(models.Model):
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
@@ -133,7 +136,8 @@ class CoreAttributes(models.Model):
         else:
             string += str(self.core_attribute)
         if self.page_num is not None:
-                string += ', p. ' + str(self.page_num)
+            string += ', p. ' + str(self.page_num)
+            print(self.page_num)
         return string
 
 
