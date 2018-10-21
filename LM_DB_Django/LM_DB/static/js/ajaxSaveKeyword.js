@@ -12,16 +12,18 @@ $.ajax({
 
     // handle a successful response
     success : function(json) {
+        console.log(json);
         if(json.hasOwnProperty('concept_name_id')) {
             $('#id_concept_name-concept_name').val(''); // remove the value from the input
             let concept_name_pk = json.concept_name_id;
-            let new_concept_name_element = '<li><label for="id_concept_name-paper_concept_name_' +
-                concept_name_pk + '"><input name="concept-name-paper_concept_name" value="' +
-                concept_name_pk + '" id="id_concept_name-paper_concept_name_' +
-                concept_name_pk + '" type="checkbox"> ' +
-                String(conceptName) + '</label> </li>';
+            let new_concept_name_element = '<li><div class=".uk-form-controls uk-form-controls-text">' +
+                '<label for="id_new_concept_name-paper_concept_name_' +
+                concept_name_pk + '"><input name="new_concept-name-paper_concept_name" value="' +
+                concept_name_pk + '" id="id_new_concept_name-paper_concept_name_' +
+                concept_name_pk + '" type="checkbox" class="uk-checkbox"> ' +
+                String(conceptName) + '</label></div></li>';
 
-            $("#id_concept_name-paper_concept_name").append(new_concept_name_element);
+            $("#id_new_concept_name-paper_concept_name").append(new_concept_name_element);
         }else if (json.hasOwnProperty('error')){
             $('#add_concept_name').after('<div class="error">'+json.error+'</div>')
         }
@@ -65,11 +67,11 @@ $.ajax({
 
             //add the new category to the list
             let category_pk = json.category_id;
-            let new_category_element = '<li><label for="id_paper_categories-paper_categories_' +
+            let new_category_element = '<li><div class=".uk-form-controls uk-form-controls-text"><label for="id_paper_categories-paper_categories_' +
                 category_pk + '"><input name="paper_categories-paper_categories" value="' +
                 category_pk + '" id="id_paper_categories-paper_categories_' +
-                category_pk + '" type="checkbox"> ' +
-                String(category_name) + '</label> </li>';
+                category_pk + '" type="checkbox" class="uk-checkbox"> ' +
+                String(category_name) + '</label></div></li>';
 
             $("#id_paper_categories-paper_categories").append(new_category_element);
         }else if (json.hasOwnProperty('error')){
@@ -103,14 +105,15 @@ $.ajax({
         if(json.hasOwnProperty('keyword_id')) {
             $('#id_new_keyword-keyword').val(''); // remove the value from the input
             let keyword_pk = json.keyword_id;
-            let new_keyword_element = '<li><label for="id_paper_keywords-paper_keywords_' +
+            let new_keyword_element = '<li><div class=".uk-form-controls uk-form-controls-text">' +
+                '<label for="id_paper_keywords-paper_keywords_' +
                 keyword_pk + '"><input name="paper_keywords-paper_keywords" value="' +
                 keyword_pk + '" id="id_paper_keywords-paper_keywords_' +
-                keyword_pk + '" type="checkbox"> ' +
-                String(keyword) + '</label> </li>';
+                keyword_pk + '" type="checkbox" class="uk-checkbox"> ' +
+                String(keyword) + '</label></div></li>';
 
             $("#id_paper_keywords-paper_keywords").append(new_keyword_element);
-            console.log(new_keyword_element)
+            console.log(new_keyword_element);
             console.log("new keyword element")
         }else if (json.hasOwnProperty('error')){
             $('#add_keywords').after('<div class="error">'+json.error+'</div>')
