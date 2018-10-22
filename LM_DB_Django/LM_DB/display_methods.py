@@ -128,6 +128,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
 
 # This method gets a list of the columns which should be displayed in ViewData-View,
 # currently they are generated hard-coded :(
+# not in use anymore, see instead tables.py
 def get_list_of_included_columns():
     # first column empty because in table, the edit button should not have a heading
     included_columns = ["", "pk", "doi", "bibtex", "cite_command", "title", "abstract", "is_fulltext_in_repo",

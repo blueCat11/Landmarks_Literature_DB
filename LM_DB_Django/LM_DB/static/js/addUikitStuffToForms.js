@@ -59,7 +59,12 @@ function addFormControlsClass(){
                 $current_input.classList.add("uk-radio");
                 $current_label.wrap("<div class='.uk-form-controls uk-form-controls-text'></div>");
                 break;
+            case "number":
+                $current_label.addClass("uk-form-label width_small");
+                $current_input.classList.add("uk-form-controls");
+                break;
             default:
+
 
         }
 

@@ -204,6 +204,7 @@ class Files(models.Model):
     complete_file_path = models.FileField(upload_to=year_directory_path, blank=True, null=True)  # only path saved here, not filename
     year = models.CharField(max_length=12, blank=True, null=True)#DONE change widget to hidden and prepopulate from bibtex
 
+
     def filename(self):
         return os.path.basename(self.file.name)
 
@@ -294,6 +295,8 @@ class Papers(models.Model):
     last_edit_timestamp = models.DateTimeField(blank=True, null=True)
     last_edit_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='last_edit_user', blank=True, null=True,
                                        related_name="last_edit_user")
+    authors = models.TextField(blank=True, null=True)
+    year = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

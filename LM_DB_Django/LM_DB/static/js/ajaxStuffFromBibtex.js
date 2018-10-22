@@ -32,9 +32,27 @@ $.ajax({
     // handle a successful response
     success : function(json) {
         console.log(json);
-        $('#id_file-year').val(json.year); // add year into (hidden?) field
+        $('#id_file-year').val(json.year_for_file); // add year into (hidden) field (in file model)
         $('#id_paper-title').val(json.title);
         $('#id_paper-cite_command').val(json.cite_command);
+        $('#id_paper-year').val(json.year);
+        $('#id_paper-authors').val(json.author);
+        $('#id_paper-doi').val(json.doi);
+        $('#id_paper-abstract').val(json.abstract);
+        let keywords = json.keywords;
+        let $keywords_list_in_ui = $("#id_paper_keywords-paper_keywords");
+        for (let index = 0; index < keywords.length; ++index){
+            let current_keyword = keywords[index];
+            //let $keyword_in_list = $("label:contains("+current_keyword+")" ).attr('for');
+            let $keyword_in_list = $("label").filter(function() {return $.trim($(this).text()) === current_keyword;}).attr('for');
+            console.log($keyword_in_list);
+            if ($keyword_in_list !== undefined && $keyword_in_list !== "") {
+                document.getElementById(String($keyword_in_list)).checked = true
+            }else{
+            // TODO if necessary, add keyword to db
+            }
+        }
+        console.log(keywords);
         if (json.hasOwnProperty('error')){
             console.log(json.error);
             UIkit.notification({

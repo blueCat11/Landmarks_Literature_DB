@@ -13,10 +13,12 @@ class PaperForm (forms.ModelForm):
     cite_command = forms.CharField(max_length=50, required=False)
     title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
+    authors = forms.CharField(widget=forms.Textarea, required=False)
+    year = forms.IntegerField(required=False)
 
     class Meta:
         model = Papers
-        fields = ('paper_id', 'doi', 'bibtex', 'cite_command', 'title', 'abstract')
+        fields = ('paper_id', 'doi', 'bibtex', 'cite_command', 'title', 'abstract', "authors", "year")
 
 
 class FileForm (forms.ModelForm):

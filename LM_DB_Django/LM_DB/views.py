@@ -755,31 +755,7 @@ def get_current_auth_user(current_user):
     return AuthUser.objects.get(id=current_user.id)
 
 
-# tries to extract a year from a given bibtex and returns a json response
-'''def get_year_from_bibtex(request_data):
-    print("new file upload - bibtex processing")
-    bibtex_str = request_data['bibtex']
-    error = None
-    if bibtex_str is None or bibtex_str == "":
-        year = "unknown_year"
-    else:
-        try:
-            bib = bibtexparser.loads(bibtex_str)
-            year = str(bib.entries[0]['year'])
-            print(bib.entries)
-        except Exception as e:
-            error = "Something is wrong with the bibtex, could find no year. Will save file to unknown year"
-            year = "unknown_year"
-            print(e)
-
-    response_data = {"result": "year extracted from bibtex! ", "year": year}
-    if error is not None:
-            response_data["error"]=error
-
-    json_response = JsonResponse(response_data)
-    return json_response'''  # not necessary anymore
-
-
+# tries to extract stuff from a given bibtex and returns a json response
 def get_info_from_bibtex(request_data):
     print("new file upload - bibtex processing")
     bibtex_str = request_data['bibtex']
@@ -787,56 +763,81 @@ def get_info_from_bibtex(request_data):
         year = "unknown_year"
         title = ""
         cite_command = ""
+        authors = ""
+        keywords = ""
+        doi = ""
+
         error = "No bibtex is present."
-        response_data = {"result": " ", "year": year, "title": title, "cite_command": cite_command, "error":error}
+        response_data = {"result": " ", "year": "", "year_for_file": year, "title": title, "cite_command": cite_command, "author": authors,
+                         "doi": doi, "keywords": keywords, "error": error}
     else:
         context = request_data.get("context", -1)
-        if context == "file_upload":
-            response_data = called_by_file_upload(bibtex_str)
-        elif context == "bibtex_enter":
-            response_data = called_by_bibtex_upload(bibtex_str)
-        else:
-            pass
+        response_data = called_by_bibtex_upload(bibtex_str, context)
     json_response = JsonResponse(response_data)
     return json_response
 
-
-def called_by_file_upload(bibtex_str):
-    error = None
-    try:
-        bib = bibtexparser.loads(bibtex_str)
-        year = str(bib.entries[0]['year'])
-
-    except Exception as e:
-        error = "Something is wrong with the bibtex, could find no year. Will save file to unknown year"
-        year = "unknown_year"
-        print(e)
-
-    response_data = {"result": "year extracted from bibtex! ", "year": year}
-    if error is not None:
-        response_data["error"] = error
-
-    return response_data
-
-
-def called_by_bibtex_upload(bibtex_str):
+# extracts stuff from bibtex
+def called_by_bibtex_upload(bibtex_str, context):
     error = ""
     title = ""
     cite_command = ""
+    year = ""
+    authors = ""
+    keywords = ""
+    doi = ""
+    year_for_file = ""
+
     try:
         bib = bibtexparser.loads(bibtex_str)
+        paper = bib.entries[0]
         title = str(bib.entries[0]['title'])
-    except Exception as e:
-        error = "Something is wrong with the bibtex, could find no title."
+    except IndexError as e:
+        error = "No bibtex-present"
         print(e)
 
     try:
-        bib = bibtexparser.loads(bibtex_str)
-        cite_command = str(bib.entries[0]["ID"])
-    except Exception as e:
-        error += "\n Something is wrong with the bibtex, could find no cite-command"
+        title = paper['title']
+    except KeyError as e:
+        error += "\n Could not find title. "
+        print(e)
 
-    response_data = {"result": "year extracted from bibtex! ", "title": title, "cite_command": cite_command}
+    try:
+        authors = reformat_authors(paper['author'], "db")
+    except KeyError as e:
+        error += "\n Could not find authors. "
+        print(e)
+
+    try:
+        cite_command = str(paper["ID"])
+    except KeyError as e:
+        error += "\n Could not find cite-command. "
+        print(e)
+
+    try:
+        keywords = get_keywords_list(str(paper["keywords"]))
+    except KeyError as e:
+        error += "\n Could not find keywords. "
+        print(e)
+
+    try:
+        doi = str(paper["doi"])
+    except KeyError as e:
+        error += "\n Could not find doi. "
+        print(e)
+
+    try:
+        year = paper["year"]
+    except KeyError as e:
+        if context == "file_upload":
+            error = "\n Could not find year. Saving to folder 'unknown_year' instead. "
+            year_for_file = "unknown_year"
+        else:
+            error += "\n Could not find year. "
+            year_for_file = "unknown_year"
+        print(e)
+
+    response_data = {"result": "year extracted from bibtex! ", "title": title, "cite_command": cite_command,
+                     "year": year, "year_for_file": year_for_file, "author": authors, "doi": doi, "keywords": keywords}
     if error != "":
         response_data["error"] = error
 
@@ -881,7 +882,6 @@ def uniqueness_check(bibtex, doi, cite_command):
     return context_dict
 
 
-
 def is_bibtex_unique(bibtex_str):
     if bibtex_str == "" or bibtex_str is None:
         return True
@@ -911,3 +911,26 @@ def is_cite_command_unique(cite_command_str):
     else:
         return False
 
+
+def reformat_authors(authors, context):
+    author_list = authors.split(" and ")
+    index = 0
+    many_authors_string = ""
+    authors_string = ""
+    for author in author_list:
+        if index == 0:
+            many_authors_string += author + " et al."
+        authors_string += author + " & "
+        index +=1
+    authors_string = authors_string[:-2]
+    if context == "db":
+        return authors_string
+    elif context == "view":
+        if index > 2:
+            return many_authors_string
+        else:
+            return authors_string
+
+
+def get_keywords_list(keywords_from_bibtex):
+    return keywords_from_bibtex.split(", ")

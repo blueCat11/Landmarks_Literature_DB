@@ -26,7 +26,7 @@ class PaperTable(tables.Table):
     cite_command = tables.Column()
     title = tables.Column()
     year = tables.Column()
-    #authors = tables.Column()  # TODO uncomment this until autors have been added through pgadmin
+    authors = tables.Column()
     abstract = tables.Column()
     is_fulltext_in_repo = tables.Column()
     concept_name = tables.Column()
