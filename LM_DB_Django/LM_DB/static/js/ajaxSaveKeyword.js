@@ -14,7 +14,6 @@ $.ajax({
 
     // handle a successful response
     success : function(json) {
-        console.log(json);
         if(json.hasOwnProperty('concept_name_id')) {
             $('#id_concept_name-concept_name').val(''); // remove the value from the input
             let concept_name_pk = json.concept_name_id;
@@ -29,7 +28,7 @@ $.ajax({
         }else if (json.hasOwnProperty('error')){
             $('#add_concept_name').after('<div class="error">'+json.error+'</div>')
         }
-        console.log("success"); // another sanity check
+        //console.log("success"); // another sanity check
     },
 
     // handle a non-successful response
@@ -79,7 +78,7 @@ $.ajax({
         }else if (json.hasOwnProperty('error')){
             $('#add_categories').after('<div class="error">'+json.error+'</div>')
         }
-        console.log("success"); // another sanity check
+        //console.log("success"); // another sanity check
     },
 
     // handle a non-successful response
@@ -115,12 +114,10 @@ $.ajax({
                 String(keyword) + '</label></div></li>';
 
             $("#id_paper_keywords-paper_keywords").append(new_keyword_element);
-            console.log(new_keyword_element);
-            console.log("new keyword element")
         }else if (json.hasOwnProperty('error')){
             $('#add_keywords').after('<div class="error">'+json.error+'</div>')
         }
-        console.log("success"); // another sanity check
+        //console.log("success"); // another sanity check
     },
 
     // handle a non-successful response

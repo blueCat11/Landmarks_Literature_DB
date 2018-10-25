@@ -26,8 +26,8 @@ from LM_DB.forms import *
 # DONE add css to make layout better, i.e. navbar: https://getuikit.com/docs/navbar
 # DONE add UI-Kit notification instead of alert https://getuikit.com/docs/notification
 # DONE test cite-command + title updates
-# TODO update author from bibtex
-# TODO update keywords from bibtex
+# DONE update author from bibtex
+# DONE update keywords from bibtex
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -84,8 +84,6 @@ class EnterData(View):
     def post(self, request):
         request_data = request.POST
         user = get_current_auth_user(request.user)
-
-        print(request_data)
 
         if request_data.get('downloadPaper', -1) != -1:
             # https://stackoverflow.com/questions/1156246/having-django-serve-downloadable-files
@@ -153,7 +151,6 @@ class EnterData(View):
             all_table_data = get_dict_for_enter_data(current_paper_pk)
             paper_data = all_table_data["paper"]
             paper_form = PaperForm(request_data, prefix="paper", initial=paper_data)
-            print(paper_form.is_bound)
 
             file_data = all_table_data["file"]
             file_pk = file_data.get('file_id', None)
@@ -220,15 +217,12 @@ class EnterData(View):
                             # error display is managed in outside else-clause, all have to be valid to get here
                             pass
                     if file_form.has_changed():
-                        print("clear?")
                         data = file_form.cleaned_data
-                        #print(file_form['complete_file_path'])
                         if data['complete_file_path'] == False:
-                            print("delete file")#TODO really delete it, from folders as well???
+                            print("delete file")  # Done (No) really delete it, from folders as well?
                             current_file = Files.objects.get(file_id=data['file_id'], ref_file_to_paper=current_paper_pk)
                             current_file.delete()
                         else:
-                            print(request.FILES)
                             data = file_form.cleaned_data
                             if data.get('file_id', None) is not None:#changing old file
                                 current_file = Files.objects.get(file_id=data['file_id'])
@@ -247,7 +241,6 @@ class EnterData(View):
                                 current_file = Files(file_name=file_name, complete_file_path=file, year=year,
                                                      ref_file_to_paper_id=current_paper_pk)
                                 current_file.save()
-                        # TODO possibly implement file_has_changed behavior (delete old file, save new one)
                         pass
 
                     if purpose_formset.has_changed():
@@ -258,8 +251,6 @@ class EnterData(View):
                                 if purpose_form.is_valid():
                                     print("purpose form valid")
                                     data = purpose_form.cleaned_data
-                                    print("data")
-                                    print(data)
                                     if data.get("purpose_id", None) is not None:
                                         current_purpose_id = data["purpose_id"]
                                         current_purpose = Purposes.objects.get(purpose_id=current_purpose_id)
@@ -278,7 +269,6 @@ class EnterData(View):
                                     else:
                                         # what happens, when adding a new concept name
                                         print("new purpose")
-                                        print(data)
                                         if data.get("delete_this_purpose", "none") == False:
                                             purpose = convert_empty_string_to_none(data.get("purpose", None))
                                             Purposes.objects.create(purpose=purpose,
@@ -314,7 +304,6 @@ class EnterData(View):
                                         print("link saved")
                                     else:
                                         #handles cases, when there's no link-id yet (= new links)
-                                        print(data)
                                         if data.get("delete_this_link", "none") == False:
                                             link_text = convert_empty_string_to_none(data.get("link_text", None))
                                             is_local_link = data.get("is_local_link", None)
@@ -354,8 +343,6 @@ class EnterData(View):
                                         else:
                                             current_core_attribute.save()
                                     else:
-                                        print("core attribute data, new")
-                                        print (data)
                                         #handles cases in which id was not given yet (= new core attributes)
                                         if data.get("delete_this_core_attribute", "None") == False:
                                             core_attribute = convert_empty_string_to_none(data.get("core_attribute", None))
@@ -468,7 +455,6 @@ class EnterData(View):
 
         elif request_data.get("isNewKeyword", -1) != -1:
             print("isNewKeyword")
-            #print(request_data)
             keyword = request_data['keyword']
             is_not_unique = Keywords.objects.filter(keyword=keyword).exists()
             if not is_not_unique:
@@ -501,7 +487,6 @@ class EnterData(View):
 
         elif request_data.get("isNewConceptName", -1) != -1 :
             print("isNewConceptName")
-            print(request_data)
             concept_name = request_data['concept_name']
             is_not_unique = ConceptNames.objects.filter(concept_name=concept_name).exists()
             if not is_not_unique:
@@ -524,9 +509,6 @@ class EnterData(View):
             # make new object(s) and save those to DB
             # construct forms from data here
             paper_form = PaperForm(request_data, prefix="paper")
-            print(request_data)
-            print("request.FILES")
-            print(request.FILES)
             file_form = FileForm(request_data, request.FILES, prefix="file")
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose")
             link_formset = self.LinkFormset(request_data, prefix="link")
@@ -546,7 +528,6 @@ class EnterData(View):
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
-                    #print(data)
                     doi = data['doi']
                     bibtex = convert_empty_string_to_none(data.get('bibtex', None))
                     cite_command = convert_empty_string_to_none(data.get('cite_command', None))
@@ -579,7 +560,6 @@ class EnterData(View):
                     current_paper.save()
 
                     if file_form.is_valid():
-                        print(request.FILES)
                         data = file_form.cleaned_data
                         file_name = convert_empty_string_to_none(data.get('file_name', None))
                         file = request.FILES.get("file-complete_file_path", None)
@@ -631,7 +611,6 @@ class EnterData(View):
                     if paper_keywords_form.is_valid():
                         data = paper_keywords_form.cleaned_data
                         print("paper keywords")
-                        print(data)
                         ref_paper = current_paper
                         for keyword in data.get("paper_keywords", None):
                             current_paper_keyword = PaperKeyword(ref_paper_keyword_to_paper=ref_paper,
@@ -656,7 +635,6 @@ class EnterData(View):
                                                                           ref_paper_concept_name_to_concept_name=concept_name)
                             current_paper_concept_name.save()
 
-
                 else:
                     # paper form is not valid
                     print("paper form not valid")
@@ -679,37 +657,6 @@ def convert_empty_string_to_none(a_string):
         return None
     else:
         return a_string
-
-
-# currently not necessary anymore DONE: transfer functionality from this into on upload
-def handle_uploaded_file(file, bibtex_str, file_name):
-    base_destination = MEDIA_ROOT[:-1]  # has wrong side slash at the end, no problem caused, but slicing it off for now
-    if file_name is None:
-        filename = file.name
-    else:
-        filename = file_name
-        file.name = file_name  # change name
-    if bibtex_str is not None:
-        bib = bibtexparser.loads(bibtex_str)
-        print(bib.entries)
-        year = str(bib.entries[0]['year'])
-    else:
-        year = "unknown_year"
-    current_location = os.path.join(base_destination, year)
-    print(current_location)
-    if not os.path.isdir(current_location) and not os.path.exists(current_location):
-        os.makedirs(current_location)
-        print("making dir")
-    path_and_paper = os.path.join(current_location, filename)
-    print(path_and_paper)
-
-    with open(path_and_paper, 'wb+') as destination:
-        for chunk in file.chunks():
-            destination.write(chunk)
-            print("writing")
-
-    file_dict = {"complete_file_path": year, "file_name": filename}
-    return file_dict
 
 
 def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_concept_name, core_attribute,
@@ -775,6 +722,7 @@ def get_info_from_bibtex(request_data):
         response_data = called_by_bibtex_upload(bibtex_str, context)
     json_response = JsonResponse(response_data)
     return json_response
+
 
 # extracts stuff from bibtex
 def called_by_bibtex_upload(bibtex_str, context):
@@ -844,10 +792,9 @@ def called_by_bibtex_upload(bibtex_str, context):
     return response_data
 
 
+# make files available for download (are automatically saved in temp folder)
 def serve_file(file):
-    print(file.complete_file_path)
     file_path = os.path.join(MEDIA_ROOT, str(file.complete_file_path))
-    print(file_path)
     # file is saved in temporary folder. If downloaded repeatedly, it's name is counted up
     with open(file_path, 'rb') as pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
@@ -857,12 +804,11 @@ def serve_file(file):
 
 
 def get_file_for_paper(current_paper_pk):
-    print(current_paper_pk)
     files = Files.objects.filter(ref_file_to_paper__paper_id=current_paper_pk)
-    print(files)
     return files[0]
 
 
+# db unique-constraints don't work (none values should be possible for bibtex and cite-command), so checking myself
 def uniqueness_check(bibtex, doi, cite_command):
     bibtex_unique = is_bibtex_unique(bibtex)
     doi_unique = is_doi_unique(doi)
@@ -912,6 +858,8 @@ def is_cite_command_unique(cite_command_str):
         return False
 
 
+# authors are saved as string
+# different representation in db and view for more than three authors
 def reformat_authors(authors, context):
     author_list = authors.split(" and ")
     index = 0

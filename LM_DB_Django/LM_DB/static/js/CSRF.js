@@ -53,16 +53,10 @@ $(function() {
     });
 
     function addCSRFTokens(){
-        console.log("Tokens !!!");
-        //let element = document.createRange().createContextualFragment('<input name="csrfmiddlewaretoken" value="'+csrftoken+'" type="hidden">');
-       // console.log(element);
         let action_forms = document.getElementsByClassName("action_form");
-        console.log(action_forms);
-        console.log(csrftoken);
         for (let index = 0; index < action_forms.length; ++index){
             let element = document.createRange().createContextualFragment('<input name="csrfmiddlewaretoken" value="'+csrftoken+'" type="hidden">');
             let action_form = action_forms[index];
-            console.log(action_form);
             action_form.insertBefore(element, action_form.firstChild);
         }
 

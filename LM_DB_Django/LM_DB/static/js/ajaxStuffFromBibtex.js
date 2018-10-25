@@ -1,4 +1,4 @@
-//TODO change to one method fits all: in every case, all possible data should be retrieved from bibtex and entered into appropriate fields
+//Done change to one method fits all: in every case, all possible data should be retrieved from bibtex and entered into appropriate fields
 // possible data: title, cite_command, year, author(s), keyword(s)
 // add javascript-call to file-upload field
 $(document).ready( function() {
@@ -11,7 +11,6 @@ $(document).ready( function() {
 $(document).ready( function() {
     $("#id_paper-bibtex").blur( function(event) {
         sendAjaxToGetInfoFromBibtex("bibtex_enter");
-        console.log("info from bibtex")
     });
 
 });
@@ -32,7 +31,6 @@ $.ajax({
     //TODO: don't overwrite stuff after first time
     // handle a successful response
     success : function(json) {
-        console.log(json);
         $('#id_file-year').val(json.year_for_file); // add year into (hidden) field (in file model)
         $('#id_paper-title').val(json.title);
         $('#id_paper-cite_command').val(json.cite_command);
@@ -45,20 +43,17 @@ $.ajax({
         for (let index = 0; index < keywords.length; ++index){
             let current_keyword = keywords[index];
             let $keyword_in_list = $("label").filter(function() {return $.trim($(this).text()) === current_keyword;}).attr('for');
-            console.log($keyword_in_list);
             if ($keyword_in_list !== undefined && $keyword_in_list !== "") {
                 document.getElementById(String($keyword_in_list)).checked = true
             }else{
-                console.log("new Keyword");
-                console.log(current_keyword);
+                //console.log("new Keyword");
                 document.getElementById("id_new_keyword-keyword").value = current_keyword;
                 document.getElementById("id_new_keyword_button").click();
                 // checkmark is always added to newly added elements in ajaxSaveKeyword.js
             }
         }
-        console.log(keywords);
         if (json.hasOwnProperty('error')){
-            console.log(json.error);
+            //console.log(json.error);
             UIkit.notification({
                 message: json.error,
                 status: 'warning',
@@ -66,7 +61,7 @@ $.ajax({
                 timeout: 5000
             });
         }else{
-           console.log("success")
+           //console.log("success")
         }
 
     },

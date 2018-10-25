@@ -19,7 +19,6 @@ function handleVisualizeDeletion(type_of_form){
         let delete_els = form.querySelectorAll("[id*='"+delete_id_part+"'");
         for (let j = 0; j < delete_els.length; ++j ){
             let delete_el = delete_els[j];
-            //console.log(delete_el);
             delete_el.onchange = function() {setVisualizeDeletion(this, type_of_form)};
             if(delete_el.checked){
                 single_forms[index].classList.add("not_saved"); //turn background red
@@ -33,7 +32,6 @@ function handleVisualizeDeletion(type_of_form){
 
 function setVisualizeDeletion(element, type_of_form){
     let form_class = type_of_form + "_form";
-    console.log(element);
     let id = element.id;
     if(element.checked){
         $("#"+id).parents( "."+form_class ).addClass( "not_saved" );

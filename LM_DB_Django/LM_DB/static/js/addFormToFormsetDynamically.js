@@ -38,7 +38,6 @@ function checkIfNeedsClone(selector, type){
 
 function setVisualizeDeletion(element, type_of_form){
     let form_class = type_of_form + "_form";
-    console.log(element);
     let id = element.id;
     if(element.checked){
         $("#"+id).parents( "."+form_class ).addClass( "not_saved" );
@@ -56,7 +55,6 @@ function cloneMore(selector, type) {
         let name = $(this).attr('name').replace('-' + (total-1) + '-','-' + total + '-');
         let id = 'id_' + name;
         let id_str = String(id);
-        console.log(id);
         if ($(this).attr('type')==="button"){
              $(this).attr({'name': name, 'id': id});
         }else {

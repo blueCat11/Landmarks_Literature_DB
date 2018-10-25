@@ -20,7 +20,7 @@ def get_dict_for_enter_data(current_paper_pk):
         file_data = {}
     print("file data in method: ")
     print(file_data)
-    all_table_data["file"] = file_data  # TODO: possibly add possibility to delete files
+    all_table_data["file"] = file_data  # Done (file field inherent): possibly add possibility to delete files
 
     current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = current_concept_name.values_list('concept_name_id', flat=True)

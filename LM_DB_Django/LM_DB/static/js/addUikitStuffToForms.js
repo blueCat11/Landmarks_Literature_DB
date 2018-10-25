@@ -42,10 +42,6 @@ function addFormControlsClass(){
 
                 break;
             case "checkbox":
-                //$current_label.addClass("keep_left");
-                //console.log(current_label)
-                //current_label.classList.add("keep_left"); //cancels out the "float left"
-                //current_label.className += ".keep_left";
                 $current_input.classList.add("uk-checkbox");
                 if ($current_input.id !== "file-complete_file_path-clear_id"){
                     $current_label.wrap("<div class='.uk-form-controls uk-form-controls-text'></div>"); // makes clear text be next to checkbox
