@@ -58,10 +58,16 @@ function cloneMore(selector, type) {
         if ($(this).attr('type')==="button"){
              $(this).attr({'name': name, 'id': id});
         }else {
-            $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            $(this).attr({'name': name, 'id': id}).val('')//.removeAttr('checked'); //TODO leave off the removeAttr
+            // $(this).prop( "checked", false ); // TODO instead add this
 
             if (id_str.includes('delete_this')){
+                $(this).attr({'name': name, 'id': id});
+                $(this).removeAttr("value"); // original checkbox doesn't have value-Attribute, and for some reason, this seems to confound the deletion process if left in
+                $(this).prop( "checked", false );
                 delete_id = id_str;
+            }else{
+                $(this).attr({'name': name, 'id': id}).val('');
             }
         }
 
