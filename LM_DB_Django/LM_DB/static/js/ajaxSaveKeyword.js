@@ -22,7 +22,7 @@ $.ajax({
                 '<label for="id_new_concept_name-paper_concept_name_' +
                 concept_name_pk + '"><input name="new_concept-name-paper_concept_name" value="' +
                 concept_name_pk + '" id="id_new_concept_name-paper_concept_name_' +
-                concept_name_pk + '" type="checkbox" class="uk-checkbox"> ' +
+                concept_name_pk + '" type="checkbox" class="uk-checkbox" checked="checked"> ' +
                 String(conceptName) + '</label></div></li>';
 
             $("#id_new_concept_name-paper_concept_name").append(new_concept_name_element);
@@ -72,7 +72,7 @@ $.ajax({
             let new_category_element = '<li><div class=".uk-form-controls uk-form-controls-text"><label for="id_paper_categories-paper_categories_' +
                 category_pk + '"><input name="paper_categories-paper_categories" value="' +
                 category_pk + '" id="id_paper_categories-paper_categories_' +
-                category_pk + '" type="checkbox" class="uk-checkbox"> ' +
+                category_pk + '" type="checkbox" class="uk-checkbox" checked="checked"> ' +
                 String(category_name) + '</label></div></li>';
 
             $("#id_paper_categories-paper_categories").append(new_category_element);
@@ -111,7 +111,7 @@ $.ajax({
                 '<label for="id_paper_keywords-paper_keywords_' +
                 keyword_pk + '"><input name="paper_keywords-paper_keywords" value="' +
                 keyword_pk + '" id="id_paper_keywords-paper_keywords_' +
-                keyword_pk + '" type="checkbox" class="uk-checkbox"> ' +
+                keyword_pk + '" type="checkbox" class="uk-checkbox" checked="checked"> ' +
                 String(keyword) + '</label></div></li>';
 
             $("#id_paper_keywords-paper_keywords").append(new_keyword_element);

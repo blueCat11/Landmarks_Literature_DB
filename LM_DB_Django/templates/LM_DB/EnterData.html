@@ -129,7 +129,7 @@
                     {{ field }}
                 {% endfor %}
                 {{ keyword_form.as_p }}
-                <input type="button" class="uk-button uk-button-primary" name="new_keyword" value="add new keyword" onclick="saveNewKeyword()"/>
+                <input type="button" id="id_new_keyword_button" class="uk-button uk-button-primary" name="new_keyword" value="add new keyword" onclick="saveNewKeyword()"/>
             {% endif %}
             <hr class="uk-divider-small">
              {% if paper_categories_form %}

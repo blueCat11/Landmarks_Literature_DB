@@ -29,6 +29,7 @@ $.ajax({
         context: context,
     }, // data sent with the post request
 
+    //TODO: don't overwrite stuff after first time
     // handle a successful response
     success : function(json) {
         console.log(json);
@@ -43,13 +44,16 @@ $.ajax({
         let $keywords_list_in_ui = $("#id_paper_keywords-paper_keywords");
         for (let index = 0; index < keywords.length; ++index){
             let current_keyword = keywords[index];
-            //let $keyword_in_list = $("label:contains("+current_keyword+")" ).attr('for');
             let $keyword_in_list = $("label").filter(function() {return $.trim($(this).text()) === current_keyword;}).attr('for');
             console.log($keyword_in_list);
             if ($keyword_in_list !== undefined && $keyword_in_list !== "") {
                 document.getElementById(String($keyword_in_list)).checked = true
             }else{
-            // TODO if necessary, add keyword to db
+                console.log("new Keyword");
+                console.log(current_keyword);
+                document.getElementById("id_new_keyword-keyword").value = current_keyword;
+                document.getElementById("id_new_keyword_button").click();
+                // checkmark is always added to newly added elements in ajaxSaveKeyword.js
             }
         }
         console.log(keywords);
