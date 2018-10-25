@@ -128,12 +128,13 @@
                     {{ link_forms.management_form }}
                     {% for link_form in link_forms %}
                         {% if forloop.last and not errors|lookup:link_forms %}<div class="link_form hidden single_form" id="link_form">
-                        {% elif forloop.last %}<div class="link_form">{% endif%}
+                        {% elif forloop.last %}<div class="link_form">
+                        {% else %}<div class="link_form">{% endif%}
                             {% for field in link_form.hidden_fields %}
                                 {{ field }}
                             {% endfor %}
                         {{ link_form.as_p }}
-                       {% if forloop.last %}</div>{% endif%}
+                       </div>
                     {% endfor %}
                     <input type="button" class="uk-button uk-button-secondary" value="+" id="add_link">
                 </div>

@@ -10,16 +10,18 @@
 {% block head_block %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="{% static 'js/CSRF.js' %}"></script>
+    <script src="{% static 'js/addUiKitStuffToTable.js' %}"></script>
 {% endblock %}
 
 <!-- DONE: reformat table with UI-Kit: https://getuikit.com/docs/table -->
 {% block body_block %}
-    <p class="uk-margin">
-    <div class="uk-overflow-auto">
-        {% render_table table %}
-    </div>
-    </p>
+    <div class="uk-margin">
 
+            <div class="uk-overflow-auto">
+                {% render_table table %}
+            </div>
+
+    </div>
 
         <a type="button" class="uk-button uk-button-primary uk-button-small bold" href="/LM_DB/enterData/">add paper</a>
 

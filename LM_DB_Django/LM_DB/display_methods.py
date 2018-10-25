@@ -13,13 +13,10 @@ def get_dict_for_enter_data(current_paper_pk):
     all_table_data["paper"] = paper_data
 
     current_file = Files.objects.filter(ref_file_to_paper=current_paper_pk)
-    print(len(current_file))
     if len(current_file) > 0:
         file_data = current_file.values()[0]
     else:
         file_data = {}
-    print("file data in method: ")
-    print(file_data)
     all_table_data["file"] = file_data  # Done (file field inherent): possibly add possibility to delete files
 
     current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
@@ -60,7 +57,6 @@ def get_dict_for_enter_data(current_paper_pk):
 # for each column per paper, the data is in String-form
 def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
-    print(paper.values()[0])
     paper_data = get_paper_data_for_display(paper)
     current_paper = paper[0]
     paper_data["actions"] = current_paper.pk
@@ -74,7 +70,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
             file_data += str(file)
             year = file.year
     paper_data["is_fulltext_in_repo"] = file_data
-    paper_data["year"] = year
+    # paper_data["year"] = year
 
     current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = ''

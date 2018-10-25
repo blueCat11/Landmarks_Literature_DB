@@ -28,6 +28,7 @@ from LM_DB.forms import *
 # DONE test cite-command + title updates
 # DONE update author from bibtex
 # DONE update keywords from bibtex
+# TODO check where files are uploaded
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -112,6 +113,7 @@ class EnterData(View):
             purpose_formset = self.PurposeFormset(prefix="purpose", initial=purpose_data)
 
             link_data = all_table_data["link"]
+            print("link initial data")
             link_formset = self.LinkFormset(prefix="link", initial=link_data)
 
             core_attribute_data = all_table_data["core_attribute"]
@@ -164,6 +166,7 @@ class EnterData(View):
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose", initial=purpose_data)
 
             link_data = all_table_data["link"]
+            print("initital link while edit")
             link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
 
             core_attribute_data = all_table_data["core_attribute"]
@@ -212,6 +215,10 @@ class EnterData(View):
                                     current_paper.title =  convert_empty_string_to_none(data.get('title', None))
                                 elif entry == "abstract":
                                     current_paper.abstract = convert_empty_string_to_none(data.get('abstract', None))
+                                elif entry == "authors":
+                                    current_paper.authors = convert_empty_string_to_none(data.get('authors', None))
+                                elif entry == "year":
+                                    current_paper.year = data.get('year', None)
                             current_paper.save()
                         else:
                             # error display is managed in outside else-clause, all have to be valid to get here
@@ -299,6 +306,7 @@ class EnterData(View):
                                                 current_link.is_local_link = data['is_local_link']
                                         if is_to_be_deleted:
                                             current_link.delete()
+                                            print("link deleted")
                                         else:
                                             current_link.save()
                                         print("link saved")
@@ -317,7 +325,6 @@ class EnterData(View):
                                     pass
                         else:
                             print("link_formset_not_valid")
-                            print(link_formset.errors)
                     if core_attribute_formset.has_changed():
                         if core_attribute_formset.is_valid():
                             current_paper = get_current_paper(current_paper_pk)
@@ -533,6 +540,8 @@ class EnterData(View):
                     cite_command = convert_empty_string_to_none(data.get('cite_command', None))
                     title = convert_empty_string_to_none(data.get('title', None))
                     abstract = convert_empty_string_to_none(data.get('abstract', None))
+                    authors = convert_empty_string_to_none(data.get('authors', None))
+                    year = data.get('year', None)
 
                     are_errors = uniqueness_check(bibtex=bibtex, doi=doi, cite_command=cite_command)
                     if not are_errors.get("is_unique", False):
@@ -555,7 +564,7 @@ class EnterData(View):
 
 
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
-                                           abstract=abstract)
+                                           abstract=abstract, authors=authors, year=year)
                     set_creation_meta_data(current_paper, user)
                     current_paper.save()
 

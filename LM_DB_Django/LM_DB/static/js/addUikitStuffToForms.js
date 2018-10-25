@@ -68,18 +68,3 @@ function addFormControlsClass(){
 
 
 }
-
-function fixjsf(tag){
-    let parent = document.getElementsByClassName("af-button-group-justified");
-    let elementsCount = parent.length;
-    for(let i=0; i<elementsCount; i++){
-        let children = parent[i].getElementsByTagName("button");
-        for(let j=0; j < children.length; j++){
-            let child = parent[i].removeChild(children[0]);
-            let wrap = document.createElement("div");
-            wrap.className = "gp";
-            wrap.appendChild(child);
-            parent[i].appendChild(wrap);
-        }
-    }
-}

@@ -41,12 +41,3 @@ function setVisualizeDeletion(element, type_of_form){
           //      single_forms[index].classList.remove("not_saved") //delete red class, make background default again
     }
 }
-/*
-function setVisualizeDeletion(id_of_input, id_of_parent){
-    if ($("#"+id_of_input).checked){
-        document.getElementById(id_of_parent).classList.add("not_saved")
-    }else{
-        document.getElementById(id_of_parent).classList.remove("not_saved")
-    }
-}
-*/
