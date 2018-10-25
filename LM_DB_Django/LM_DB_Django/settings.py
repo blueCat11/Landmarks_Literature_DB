@@ -107,9 +107,11 @@ DATABASES = {
         'PASSWORD': 'VEHmE7s6',                  # Not used with sqlite3.
         'HOST': '132.199.143.90',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+
     }
 }
-
+USE_TZ = True
+TIME_ZONE = 'Europe/Berlin'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

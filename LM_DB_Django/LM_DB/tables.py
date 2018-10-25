@@ -19,10 +19,12 @@ class ActionColumn(tables.Column):
         return format_html(form, value)
 
 
+# displays info in table in viewData,
+# commented out columns were previously displayed (also in excel file), but are not desired anymore
 class PaperTable(tables.Table):
     actions = ActionColumn()
-    doi = tables.Column()
-    bibtex = tables.Column()
+    # doi = tables.Column()
+    # bibtex = tables.Column()
     cite_command = tables.Column()
     title = tables.Column()
     year = tables.Column()
