@@ -13,6 +13,10 @@ from LM_DB.tables import PaperTable
 from LM_DB_Django.settings import MEDIA_ROOT
 from LM_DB.forms import *
 
+CONTEXT_NEW_SAVE = "newSave"
+CONTEXT_EDIT = "editSave"
+CONTEXT_FOR_DB = "db"
+CONTEXT_FOR_VIEW = "view"
 # To-Dos
 
 # DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
@@ -29,6 +33,7 @@ from LM_DB.forms import *
 # DONE update author from bibtex
 # DONE update keywords from bibtex
 # TODO check where files are uploaded
+# TODO sticky table header https://tympanus.net/codrops/2014/01/09/sticky-table-headers-columns/
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -210,16 +215,38 @@ class EnterData(View):
                                 elif entry == "bibtex":
                                     current_paper.bibtex = convert_empty_string_to_none(data.get('bibtex', None))
                                 elif entry == "cite_command":
+                                    print(data.get('cite_command', "none"))
                                     current_paper.cite_command = convert_empty_string_to_none(data.get('cite_command', None))
                                 elif entry == "title":
-                                    current_paper.title =  convert_empty_string_to_none(data.get('title', None))
+                                    current_paper.title = convert_empty_string_to_none(data.get('title', None))
                                 elif entry == "abstract":
                                     current_paper.abstract = convert_empty_string_to_none(data.get('abstract', None))
                                 elif entry == "authors":
                                     current_paper.authors = convert_empty_string_to_none(data.get('authors', None))
                                 elif entry == "year":
                                     current_paper.year = data.get('year', None)
-                            current_paper.save()
+
+                            are_errors = uniqueness_check(bibtex=current_paper.bibtex, doi=current_paper.doi,
+                                                              cite_command=current_paper.cite_command,
+                                                              context=CONTEXT_EDIT, current_paper=current_paper)
+                            if not are_errors.get("is_unique", False):
+                                context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
+                                                "uniqueness_errors": are_errors}
+                                context_dict = add_forms_to_context_dict(context_dict, paper=paper_form,
+                                                                         file=file_form,
+                                                                         concept_name=concept_name_form,
+                                                                         paper_concept_name=paper_concept_names_form,
+                                                                         purpose=purpose_formset,
+                                                                         core_attribute=core_attribute_formset,
+                                                                         links=link_formset,
+                                                                         keyword=keyword_form,
+                                                                         paper_keywords=paper_keywords_form,
+                                                                         category=category_form,
+                                                                         paper_categories=paper_categories_form)
+
+                                return render(request, "LM_DB/enterData.html", context_dict)
+                            else:
+                                current_paper.save()
                         else:
                             # error display is managed in outside else-clause, all have to be valid to get here
                             pass
@@ -543,7 +570,8 @@ class EnterData(View):
                     authors = convert_empty_string_to_none(data.get('authors', None))
                     year = data.get('year', None)
 
-                    are_errors = uniqueness_check(bibtex=bibtex, doi=doi, cite_command=cite_command)
+                    are_errors = uniqueness_check(bibtex=bibtex, doi=doi, cite_command=cite_command,
+                                                  context=CONTEXT_NEW_SAVE, current_paper=None)
                     if not are_errors.get("is_unique", False):
 
                         context_dict = {"original_form_name": "newSave", "type_of_edit": "New Entry",
@@ -784,6 +812,7 @@ def called_by_bibtex_upload(bibtex_str, context):
 
     try:
         year = paper["year"]
+        year_for_file = str(year)
     except KeyError as e:
         if context == "file_upload":
             error = "\n Could not find year. Saving to folder 'unknown_year' instead. "
@@ -818,54 +847,80 @@ def get_file_for_paper(current_paper_pk):
 
 
 # db unique-constraints don't work (none values should be possible for bibtex and cite-command), so checking myself
-def uniqueness_check(bibtex, doi, cite_command):
-    bibtex_unique = is_bibtex_unique(bibtex)
-    doi_unique = is_doi_unique(doi)
-    cite_command_unique = is_cite_command_unique(cite_command)
+def uniqueness_check(bibtex, doi, cite_command, context, current_paper):
+    bibtex_unique = is_bibtex_unique(bibtex, context, current_paper)
+    doi_unique = is_doi_unique(doi, context, current_paper)
+    cite_command_unique = is_cite_command_unique(cite_command, context, current_paper)
     context_dict = {}
     if bibtex_unique and doi_unique and cite_command_unique:
         context_dict["is_unique"] = True
     else:
         context_dict["is_unique"] = False
         if not bibtex_unique:
+            print("bibtex not")
             context_dict["bibtex_unique"] = "Bibtex not unique. A paper with this bibtex is already in the database."
         if not cite_command_unique:
+            print("cite_command not")
             context_dict["cite_command_unique"] = "Cite-command not unique. A paper with this cite-command is already in the database."
         if not doi_unique:
+            print("doi not")
             context_dict["doi_unique"] = "Doi not unique. A paper with this doi is already in the database."
 
     return context_dict
 
 
-def is_bibtex_unique(bibtex_str):
+def is_bibtex_unique(bibtex_str, context, current_paper):
     if bibtex_str == "" or bibtex_str is None:
         return True
     poss_other_bibtex = Papers.objects.filter(bibtex=bibtex_str)
-    if len(poss_other_bibtex) == 0:
-        return True
+    print(poss_other_bibtex)
+    if context == CONTEXT_NEW_SAVE:
+        return is_unique_for_new_data(poss_other_bibtex)
     else:
-        return False
+        return is_unique_for_edit_data(poss_other_bibtex, current_paper)
 
 
-def is_doi_unique(doi_str):
+def is_doi_unique(doi_str, context, current_paper):
     if doi_str == "" or doi_str is None:
         return True
     poss_other_doi = Papers.objects.filter(doi=doi_str)
-    if len(poss_other_doi) == 0:
-        return True
+    print(poss_other_doi)
+    if context == CONTEXT_NEW_SAVE:
+        return is_unique_for_new_data(poss_other_doi)
     else:
-        return False
+        return is_unique_for_edit_data(poss_other_doi, current_paper)
 
 
-def is_cite_command_unique(cite_command_str):
+def is_cite_command_unique(cite_command_str, context, current_paper):
+    print("inside cite_command")
+    print(cite_command_str)
     if cite_command_str == "" or cite_command_str is None:
         return True
     poss_other_cite_command = Papers.objects.filter(cite_command=cite_command_str)
-    if len(poss_other_cite_command) == 0:
+    print(poss_other_cite_command)
+    if context == CONTEXT_NEW_SAVE:
+        return is_unique_for_new_data(poss_other_cite_command)
+    else:
+        return is_unique_for_edit_data(poss_other_cite_command, current_paper)
+
+
+def is_unique_for_edit_data(queryset, current_paper):
+    if len(queryset) == 0:
         return True
+    elif len(queryset) == 1:
+        if queryset[0] == current_paper:
+            return True
+        else:
+            return False
     else:
         return False
 
+
+def is_unique_for_new_data(queryset):
+    if len(queryset) == 0:
+        return True
+    else:
+        return False
 
 # authors are saved as string
 # different representation in db and view for more than three authors
