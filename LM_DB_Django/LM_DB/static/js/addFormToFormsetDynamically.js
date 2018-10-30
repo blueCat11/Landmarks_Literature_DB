@@ -58,8 +58,8 @@ function cloneMore(selector, type) {
         if ($(this).attr('type')==="button"){
              $(this).attr({'name': name, 'id': id});
         }else {
-            $(this).attr({'name': name, 'id': id}).val('')//.removeAttr('checked'); //TODO leave off the removeAttr
-            // $(this).prop( "checked", false ); // TODO instead add this
+            $(this).attr({'name': name, 'id': id}).val(''); //.removeAttr('checked');
+            // $(this).prop( "checked", false ); // possibly  instead add this
 
             if (id_str.includes('delete_this')){
                 $(this).attr({'name': name, 'id': id});

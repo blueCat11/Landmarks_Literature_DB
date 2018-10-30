@@ -17,3 +17,11 @@
 .not_saved{
     border: 5px solid rgb(255, 153, 153);
 }
+
+.paper_concept_names, .paper_categories, .paper_keywords {
+    display:none;
+}
+
+/*
+TODO: add icon chevron-up and chevron-down to button
+*/

@@ -9,6 +9,7 @@
     <script src="{% static 'js/ajaxStuffFromBibtex.js' %}"></script>
     <script src="{% static 'js/addUikitStuffToForms.js' %}"></script>
     <script src="{% static 'js/distinguish_deleted_forms.js' %}"></script>
+    <script src="{% static 'js/showAndHideFormStuff.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'css/enterData.css' %}">
 {% endblock %}
@@ -40,9 +41,7 @@
 
             {% if paper_keywords_form %}
                 <h3>Keywords</h3>
-                <input class="button uk-button uk-button-default" type="button" name="toggle_keywords_button"
-                       value="toggle keyword-list visibility"
-                       onclick="$('.paper_keywords').toggle();"/>
+                <a class="uk-icon-button" uk-icon="chevron-down" id="toggle_keywords_button" onclick="toggleVisibility(this.id, '.paper_keywords')"></a>
                 <div class="paper_keywords uk-form">
                 {% for field in paper_keywords_form.hidden_fields %}
                     {{ field }}
@@ -63,9 +62,7 @@
 
             {% if paper_concept_names_form %}
                 <h3>Concept Names</h3>
-                <input class="button uk-button uk-button-default" type="button" name="toggle_concept_names_button"
-                       value="toggle concept-names-list visibility"
-                       onclick="$('.paper_concept_names').toggle();"/>
+                <a class="uk-icon-button" uk-icon="chevron-down" id="toggle_concept_names_button" onclick="toggleVisibility(this.id, '.paper_concept_names')"></a>
                 <div class="paper_concept_names uk-form">
                 {% for field in paper_concept_names_form.hidden_fields %}
                     {{ field }}
@@ -139,9 +136,7 @@
             <hr class="uk-divider-small">
             {% if paper_categories_form %}
                 <h3>Categories</h3>
-                <input class="button uk-button uk-button-default" type="button" name="toggle_categories_button"
-                       value="toggle category-list visibility"
-                       onclick="$('.paper_categories').toggle();"/>
+                <a class="uk-icon-button" uk-icon="chevron-down" id="toggle_categories_button" onclick="toggleVisibility(this.id, '.paper_categories')"></a>
                 <div class="paper_categories">
                 {% for field in paper_categories_form.hidden_fields %}
                     {{ field }}
