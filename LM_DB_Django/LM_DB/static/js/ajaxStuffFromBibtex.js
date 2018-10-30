@@ -19,58 +19,70 @@ $(document).ready( function() {
 function sendAjaxToGetInfoFromBibtex(context){
     let bibtex = $('#id_paper-bibtex').val();
 
-$.ajax({
-    url : "/LM_DB/enterData/", // the endpoint
-    type : "POST", // http method
-    data : {
-        isYearFromBibtex: true,
-        bibtex: bibtex,
-        context: context,
-    }, // data sent with the post request
-
-    //TODO: don't overwrite stuff after first time
-    // handle a successful response
-    success : function(json) {
-        $('#id_file-year').val(json.year_for_file); // add year into (hidden) field (in file model)
-        $('#id_paper-title').val(json.title);
-        $('#id_paper-cite_command').val(json.cite_command);
-        $('#id_paper-year').val(json.year);
-        $('#id_paper-authors').val(json.author);
-        $('#id_paper-doi').val(json.doi);
-        $('#id_paper-abstract').val(json.abstract);
-        let keywords = json.keywords;
-        let $keywords_list_in_ui = $("#id_paper_keywords-paper_keywords");
-        for (let index = 0; index < keywords.length; ++index){
-            let current_keyword = keywords[index];
-            let $keyword_in_list = $("label").filter(function() {return $.trim($(this).text()) === current_keyword;}).attr('for');
-            if ($keyword_in_list !== undefined && $keyword_in_list !== "") {
-                document.getElementById(String($keyword_in_list)).checked = true
-            }else{
-                //console.log("new Keyword");
-                document.getElementById("id_new_keyword-keyword").value = current_keyword;
-                document.getElementById("id_new_keyword_button").click();
-                // checkmark is always added to newly added elements in ajaxSaveKeyword.js
-            }
-        }
-        if (json.hasOwnProperty('error')){
-            //console.log(json.error);
-            UIkit.notification({
-                message: json.error,
+    let dontSendFlag = $("#id_paper-don_t_overwrite").is(':checked');
+    console.log(dontSendFlag);
+    if (dontSendFlag) {
+        UIkit.notification({
+                message: "Fields not updated from Bibtex.",
                 status: 'warning',
                 pos: 'bottom-center',
-                timeout: 5000
+                timeout: 2500
             });
-        }else{
-           //console.log("success")
-        }
+    }else {
 
-    },
+        $.ajax({
+            url : "/LM_DB/enterData/", // the endpoint
+            type : "POST", // http method
+            data : {
+                isYearFromBibtex: true,
+                bibtex: bibtex,
+                context: context,
+            }, // data sent with the post request
 
-    // handle a non-successful response
-    error : function(xhr,errmsg,err) {
-        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            //Done: don't overwrite stuff after first time
+            // handle a successful response
+            success : function(json) {
+                $('#id_file-year').val(json.year_for_file); // add year into (hidden) field (in file model)
+                $('#id_paper-title').val(json.title);
+                $('#id_paper-cite_command').val(json.cite_command);
+                $('#id_paper-year').val(json.year);
+                $('#id_paper-authors').val(json.author);
+                $('#id_paper-doi').val(json.doi);
+                $('#id_paper-abstract').val(json.abstract);
+                let keywords = json.keywords;
+                let $keywords_list_in_ui = $("#id_paper_keywords-paper_keywords");
+                for (let index = 0; index < keywords.length; ++index){
+                    let current_keyword = keywords[index];
+                    let $keyword_in_list = $("label").filter(function() {return $.trim($(this).text()) === current_keyword;}).attr('for');
+                    if ($keyword_in_list !== undefined && $keyword_in_list !== "") {
+                        document.getElementById(String($keyword_in_list)).checked = true
+                    }else{
+                        //console.log("new Keyword");
+                        document.getElementById("id_new_keyword-keyword").value = current_keyword;
+                        document.getElementById("id_new_keyword_button").click();
+                        // checkmark is always added to newly added elements in ajaxSaveKeyword.js
+                    }
+                }
+                if (json.hasOwnProperty('error')){
+                    //console.log(json.error);
+                    UIkit.notification({
+                        message: json.error,
+                        status: 'warning',
+                        pos: 'bottom-center',
+                        timeout: 2500
+                    });
+                }else{
+                   //console.log("success")
+                }
+
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+            });
     }
-    });
 }
 
 

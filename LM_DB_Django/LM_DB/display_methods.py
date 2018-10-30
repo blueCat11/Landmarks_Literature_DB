@@ -10,6 +10,7 @@ def get_dict_for_enter_data(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     all_table_data = {}
     paper_data = paper.values()[0]
+    paper_data["don_t_overwrite"]=True
     all_table_data["paper"] = paper_data
 
     current_file = Files.objects.filter(ref_file_to_paper=current_paper_pk)
