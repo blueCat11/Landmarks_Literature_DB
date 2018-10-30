@@ -1,6 +1,7 @@
+from django.contrib import messages
 from django.forms import formset_factory
 from django.http import JsonResponse, FileResponse, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 import bibtexparser  # for bibtex
 from datetime import datetime, timezone  # for edit and creation times
 
@@ -33,7 +34,7 @@ CONTEXT_FOR_VIEW = "view"
 # DONE update author from bibtex
 # DONE update keywords from bibtex
 # DONE check where files are uploaded
-# TODO sticky table header https://tympanus.net/codrops/2014/01/09/sticky-table-headers-columns/
+# DONE sticky table header
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -95,7 +96,7 @@ class EnterData(View):
             # https://stackoverflow.com/questions/1156246/having-django-serve-downloadable-files
             current_paper_pk = request_data["paper_id"]
             file = get_file_for_paper(current_paper_pk)
-            return serve_file(file)
+            return serve_file(file, request)
 
         elif request_data.get('editStart', -1) != -1:
             print("editStart")
@@ -838,19 +839,28 @@ def called_by_bibtex_upload(bibtex_str, context):
 
 
 # make files available for download (are automatically saved in temp folder)
-def serve_file(file):
-    file_path = os.path.join(MEDIA_ROOT, str(file.complete_file_path))
-    # file is saved in temporary folder. If downloaded repeatedly, it's name is counted up
-    with open(file_path, 'rb') as pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        file_name = file.file_name
-        response['Content-Disposition']= "attachment; filename={0}".format(file_name)
-        return response
+def serve_file(file, request):
+    if not file:
+        #handle case when file = False, that is to say the given paper doesn't have a file
+        #return render_to_response('LM_DB/EnterData.html', message='This paper does not have an associated file.')
+        messages.error(request, 'This paper does not have an associated file.')
+        return redirect(request.META['HTTP_REFERER'])
+    else:
+        file_path = os.path.join(MEDIA_ROOT, str(file.complete_file_path))
+        # file is saved in temporary folder. If downloaded repeatedly, it's name is counted up
+        with open(file_path, 'rb') as pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            file_name = file.file_name
+            response['Content-Disposition']= "attachment; filename={0}".format(file_name)
+            return response
 
 
 def get_file_for_paper(current_paper_pk):
     files = Files.objects.filter(ref_file_to_paper__paper_id=current_paper_pk)
-    return files[0]
+    if len(files) > 0:
+        return files[0]
+    else:
+        return False
 
 
 # db unique-constraints don't work (none values should be possible for bibtex and cite-command), so checking myself

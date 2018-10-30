@@ -17,7 +17,18 @@
 
 <!-- DONE: reformat table with UI-Kit: https://getuikit.com/docs/table -->
 {% block body_block %}
+    {% if messages %}
+            {% for message in messages %}
+                <script>UIkit.notification({
+                        message: '{{ message }}',
+                        status: 'danger',
+                        pos: 'bottom-center',
+                        timeout: 2500
+                    });</script>
+            {% endfor %}
+    {% endif %}
     <div class="uk-margin">
+
 
             <div class="overflow">
                 {% render_table table %}
