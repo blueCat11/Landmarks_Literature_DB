@@ -192,10 +192,12 @@ class Files(models.Model):
         # in case user did not enter data for file_name, use default of previous name of file
         if instance.file_name != "" or instance.file_name is not None:
             filename = instance.file_name
+        year = instance.year
+        print(year)
         if instance.year is None or instance.year == "":
-            instance.year = "unknown_year"
+            year = "unknown_year"
 
-        path = os.path.join(instance.year, filename)
+        path = os.path.join(year, filename)
         return path
 
     file_id = models.AutoField(primary_key=True)

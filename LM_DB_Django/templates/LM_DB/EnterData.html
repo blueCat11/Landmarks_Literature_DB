@@ -34,9 +34,6 @@
             {% endif %}
 
             {% if file_form %}
-                {% for field in file_form.hidden_fields %}
-                    {{ field }}
-                {% endfor %}
                 {{ file_form.as_p }}
             {% endif %}
             <hr class="uk-divider-small">

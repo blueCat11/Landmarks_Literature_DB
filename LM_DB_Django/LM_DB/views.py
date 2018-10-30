@@ -259,19 +259,26 @@ class EnterData(View):
                         else:
                             data = file_form.cleaned_data
                             if data.get('file_id', None) is not None:#changing old file
+                                print(data)
                                 current_file = Files.objects.get(file_id=data['file_id'])
                                 for entry in file_form.changed_data:
+                                    print(entry)
                                     if entry == "year":
                                         current_file.year = convert_empty_string_to_none(data['year'])
                                     elif entry == "file_name":
                                         current_file.file_name = convert_empty_string_to_none(data['file_name'])
                                     elif entry == "complete_file_path":
                                         current_file.complete_file_path = request.FILES["file-complete_file_path"]
-                                    current_file.save()
+                                current_file.save()
                             else:# new file
                                 file_name = convert_empty_string_to_none(data.get('file_name', None))
                                 file = request.FILES["file-complete_file_path"]
+                                if file_name is None:
+                                    file_name = file.name
                                 year = data["year"]
+                                print(data)
+                                print("year: ")
+                                print(year)
                                 current_file = Files(file_name=file_name, complete_file_path=file, year=year,
                                                      ref_file_to_paper_id=current_paper_pk)
                                 current_file.save()
