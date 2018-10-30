@@ -31,7 +31,6 @@ $.ajax({
     //TODO: don't overwrite stuff after first time
     // handle a successful response
     success : function(json) {
-        console.log(json.year_for_file);
         $('#id_file-year').val(json.year_for_file); // add year into (hidden) field (in file model)
         $('#id_paper-title').val(json.title);
         $('#id_paper-cite_command').val(json.cite_command);

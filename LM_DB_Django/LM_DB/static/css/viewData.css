@@ -1,0 +1,17 @@
+table thead {
+    margin: 0;
+    top:0;
+    padding: 0;
+    width: 100%;
+    background-color: white;
+    position: -webkit-sticky;
+    position: sticky;
+}
+
+.overflow {
+    overflow: scroll;
+}
+
+.table-container {
+    height: 100vh;
+}

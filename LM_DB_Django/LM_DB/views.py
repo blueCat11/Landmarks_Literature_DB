@@ -32,7 +32,7 @@ CONTEXT_FOR_VIEW = "view"
 # DONE test cite-command + title updates
 # DONE update author from bibtex
 # DONE update keywords from bibtex
-# TODO check where files are uploaded
+# DONE check where files are uploaded
 # TODO sticky table header https://tympanus.net/codrops/2014/01/09/sticky-table-headers-columns/
 
 # This View displays all current database entries in a table format

@@ -2,6 +2,7 @@ $(document).ready( function() {
     //pinTableHeader();
 });
 
+
 function pinTableHeader(){
     let window_height = $(window).height();
     let $original_heading = $(".uk-table > thead:nth-child(1)");
