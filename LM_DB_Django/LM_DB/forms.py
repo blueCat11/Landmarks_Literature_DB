@@ -1,6 +1,6 @@
 
 from django import forms
-from django.forms import ClearableFileInput
+from django.forms import ClearableFileInput, Textarea
 
 from LM_DB.models import *
 
@@ -14,14 +14,13 @@ class PaperForm (forms.ModelForm):
     cite_command = forms.CharField(max_length=50, required=False)
     title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
-    authors = forms.CharField(widget=forms.Textarea, required=False)
+    authors = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
     year = forms.IntegerField(required=False)
 
 
     class Meta:
         model = Papers
         fields = ('paper_id', 'doi', 'bibtex', 'don_t_overwrite', 'cite_command', 'title', 'abstract', "authors", "year")
-
 
 
 
@@ -53,7 +52,7 @@ class PaperConceptNameForm (forms.Form):
 
 class CoreAttributeForm (forms.ModelForm):
     core_attribute_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    core_attribute = forms.CharField(widget=forms.Textarea, required=False)
+    core_attribute = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
     is_literal_quotation = forms.BooleanField(required=False)
     page_num = forms.CharField(required=False)
     delete_this_core_attribute = forms.BooleanField(required=False, initial=True)
@@ -72,6 +71,9 @@ class LinkForm (forms.ModelForm):
     class Meta:
         model = Links
         fields = ('link_id', 'link_text', 'is_local_link')
+        widgets = {
+            'link_text': Textarea(attrs={'cols': 40, 'rows': 1}),
+        }
 
 
 class KeywordForm(forms.ModelForm):
@@ -92,7 +94,7 @@ class CategoryForm(forms.ModelForm):
     category_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     category_name = forms.CharField(max_length=50, required=False)
     shortcut = forms.CharField(max_length=10, required=False)
-    description = forms.CharField(widget=forms.Textarea, required=False)
+    description = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 2}), required=False)
     super_category = forms.ModelChoiceField(queryset=SuperCategories.objects.all().order_by('name'),
                                             widget=forms.RadioSelect, required=False)
 
@@ -109,7 +111,7 @@ class PaperCategoryForm(forms.Form):
 
 class PurposeForm(forms.ModelForm):
     purpose_id = models.AutoField(primary_key=True)
-    purpose = forms.CharField(widget=forms.Textarea, required=False)
+    purpose = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
     delete_this_purpose = forms.BooleanField(required=False, initial=True)
 
     class Meta:
