@@ -45,6 +45,10 @@ def get_dict_for_enter_data(current_paper_pk):
     paper_categories_data = current_paper_categories.values_list('category_id', flat=True)
     all_table_data["paper_category"] = paper_categories_data
 
+    current_paper_authors = Authors.objects.filter(paperauthor__ref_paper_author_to_paper=current_paper_pk)
+    paper_authors_data = current_paper_authors.values_list('author_id', flat=True)
+    all_table_data["paper_author"] = paper_authors_data
+
     current_purposes = Purposes.objects.filter(ref_purpose_to_paper=current_paper_pk)
     purposes_data = current_purposes.values()
     for purpose in purposes_data:
@@ -111,7 +115,10 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
         purposes_data += str(purpose) + "; "
     paper_data['purpose'] = purposes_data
 
-    #get creation and edit dates per paper
+    current_authors = Authors.objects.filter(paperauthor__ref_paper_author_to_paper=current_paper_pk).order_by("paperauthor__author_order_on_paper")
+    paper_data["authors"] = reformat_authors(current_authors, "view", context="database")
+
+    # get creation and edit dates per paper
     paper_data['creation'] = get_creation_string(get_user_name(current_paper.creation_user),
                                                  current_paper.creation_timestamp)
     paper_data['last_edit'] = get_edit_string(get_user_name(current_paper.last_edit_user),
@@ -174,3 +181,28 @@ def get_paper_data_for_display(paper):
     except KeyError:
         print("Key not found")
     return paper_data
+
+
+# authors are saved as string
+# different representation in db and view for more than three authors
+def reformat_authors(authors, destination_context, context):
+    if context == "bibtex":
+        author_list = authors.split(" and ")
+    else:
+        author_list = authors
+    index = 0
+    many_authors_string = ""
+    authors_string = ""
+    for author in author_list:
+        if index == 0:
+            many_authors_string += author + " et al."
+        authors_string += author + " & "
+        index += 1
+    authors_string = authors_string[:-2]
+    if destination_context == "db":
+        return authors_string
+    elif destination_context == "view":
+        if index > 2:
+            return many_authors_string
+        else:
+            return authors_string

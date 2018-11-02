@@ -79,6 +79,27 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
+class Authors(models.Model):
+    author_id = models.AutoField(primary_key=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'authors'
+
+    def __str__(self):
+        author_string = ""
+        if self.first_name is not None:
+            author_string += self.first_name
+        if self.last_name is not None:
+            author_string += self.last_name
+        if len(author_string) > 0:
+            return author_string
+        else:
+            return "no author name given"
+
+
 class Categories(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=50, blank=True, null=True)
@@ -252,6 +273,17 @@ class Links(models.Model):
         string += str(self.link_text)
         return string
 
+
+class PaperAuthor(models.Model):
+    paper_author_id = models.AutoField(primary_key=True)
+    ref_paper_author_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_paper_author_to_paper', blank=True, null=True)
+    ref_paper_author_to_author = models.ForeignKey(Authors, models.DO_NOTHING, db_column='ref_paper_author_to_author', blank=True, null=True)
+    author_order_on_paper = models.SmallIntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'paper_author'
+        ordering = ('author_order_on_paper',)#TODO check if this is really solution to ordering authors according to it
 
 
 class PaperCategory(models.Model):

@@ -117,3 +117,24 @@ class PurposeForm(forms.ModelForm):
     class Meta:
         model = Purposes
         fields = ('purpose_id', 'purpose',)
+
+
+class PaperAuthorForm(forms.Form):
+    paper_authors = forms.ModelMultipleChoiceField(label="", queryset=Authors.objects.all().order_by('last_name'),
+                                                   widget=forms.CheckboxSelectMultiple, required=False)
+
+
+class AuthorOrderForm(forms.Form):
+    author_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    author_name = forms.CharField(max_length=200, required=False)
+    order_for_paper = forms.IntegerField(required=False)
+
+
+class AuthorForm(forms.ModelForm):
+    author_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    last_name = forms.CharField(max_length=100, required=False)
+    first_name = forms.CharField(max_length=100, required=False)
+
+    class Meta:
+        model = Authors
+        fields = ('author_id', 'last_name', 'first_name')

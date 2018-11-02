@@ -35,6 +35,11 @@ CONTEXT_FOR_VIEW = "view"
 # DONE update keywords from bibtex
 # DONE check where files are uploaded
 # DONE sticky table header
+# TODO: set checkmark (bibtex) automatically, after first bibtex update
+# DONE make new Author relation Paper_Author mediator table
+# TODO incorporate author-paper many-to-many relationship into code
+# TODO add possibility to specify order of author for given paper
+# TODO add field "verified by" to paper
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -73,6 +78,9 @@ class EnterData(View):
         paper_keywords_form = PaperKeywordForm(prefix="paper_keywords")
         category_form = CategoryForm(prefix="new_category")
         paper_categories_forms = PaperCategoryForm(prefix="paper_categories")
+        author_form = AuthorForm(prefix="new_author")
+        author_order_form = AuthorOrderForm(prefix="author_order")
+        paper_author_form = PaperAuthorForm(prefix="paper_authors")
 
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry"}
@@ -82,7 +90,9 @@ class EnterData(View):
                                                  purpose=purpose_formset, core_attribute=core_attribute_formset,
                                                  links=links_formset,
                                                  keyword=keyword_form, paper_keywords=paper_keywords_form,
-                                                 category=category_form, paper_categories=paper_categories_forms)
+                                                 category=category_form, paper_categories=paper_categories_forms,
+                                                 author=author_form, author_order=author_order_form,
+                                                 paper_authors=paper_author_form)
 
         return render(request, "LM_DB/EnterData.html", context_dict)
 
@@ -140,6 +150,11 @@ class EnterData(View):
             paper_concept_names_form = PaperConceptNameForm(prefix="paper_concept_names", initial={
                 'paper_concept_names': paper_concept_name_data})
 
+            author_form = AuthorForm(prefix="new_author")
+            author_order_form = AuthorOrderForm(prefix="author_order")#TODO need Formset for these
+            paper_author_data = all_table_data["paper_author"]
+            paper_author_form = PaperAuthorForm(prefix="paper_authors", initial={'paper_authors': paper_author_data})
+
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry"}
             context_dict = add_forms_to_context_dict(context_dict, paper=paper_form, file=file_form,
                                                      concept_name=concept_name_form,
@@ -147,7 +162,10 @@ class EnterData(View):
                                                      purpose=purpose_formset, core_attribute=core_attribute_formset,
                                                      links=link_formset,
                                                      keyword=keyword_form, paper_keywords=paper_keywords_form,
-                                                     category=category_form, paper_categories=paper_categories_form)
+                                                     category=category_form, paper_categories=paper_categories_form,
+                                                     author=author_form, author_order=author_order_form,
+                                                     paper_authors=paper_author_form
+                                                     )
             return render(request, "LM_DB/EnterData.html", context_dict)
 
         elif request_data.get('editSave', -1)!=-1:
@@ -182,7 +200,6 @@ class EnterData(View):
             paper_keywords_form = PaperKeywordForm(request_data, prefix="paper_keywords", initial={
                 'paper_keywords': paper_keyword_data})
 
-            # DONE: decomment the following (category stuff)
             paper_category_data = all_table_data["paper_category"]
             paper_categories_form = PaperCategoryForm(request_data, prefix="paper_categories",
                                                     initial={'paper_categories': paper_category_data})
@@ -194,6 +211,12 @@ class EnterData(View):
             keyword_form = KeywordForm(prefix="new_keyword")
             category_form = CategoryForm(prefix="new_category")
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
+
+            author_form = AuthorForm(prefix="new_author")
+            author_order_form = AuthorOrderForm(prefix="author_order")
+            paper_author_data = all_table_data["paper_author"]
+            paper_author_form = PaperAuthorForm(request_data, prefix="paper_authors",
+                                                initial={'paper_authors': paper_author_data})
 
             if paper_form.has_changed() or file_form.has_changed() or link_formset.has_changed() or\
                     core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or \
@@ -243,7 +266,11 @@ class EnterData(View):
                                                                          keyword=keyword_form,
                                                                          paper_keywords=paper_keywords_form,
                                                                          category=category_form,
-                                                                         paper_categories=paper_categories_form)
+                                                                         paper_categories=paper_categories_form,
+                                                                         author=author_form,
+                                                                         author_order=author_order_form,
+                                                                         paper_authors=paper_author_form
+                                                                         )
 
                                 return render(request, "LM_DB/enterData.html", context_dict)
                             else:
@@ -490,7 +517,11 @@ class EnterData(View):
                                                              keyword=keyword_form,
                                                              paper_keywords=paper_keywords_form,
                                                              category=category_form,
-                                                             paper_categories=paper_categories_form)
+                                                             paper_categories=paper_categories_form,
+                                                             author = author_form,
+                                                             author_order = author_order_form,
+                                                             paper_authors = paper_author_form
+                                                             )
 
                     return render(request, "LM_DB/enterData.html", context_dict)
             return redirect("LM_DB:viewData")
@@ -561,6 +592,9 @@ class EnterData(View):
             keyword_form = KeywordForm(prefix="new_keyword")
             category_form = CategoryForm(prefix="new_category")
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
+            author_form = AuthorForm(prefix="new_author")
+            author_order_form = AuthorOrderForm(request_data, prefix="author_order") # TODO need formset
+            paper_author_form = PaperAuthorForm(request_data, prefix="paper_authors")
 
             # check if all forms are valid, add further forms to the if-clause later
             if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and\
@@ -594,7 +628,11 @@ class EnterData(View):
                                                                  keyword=keyword_form,
                                                                  paper_keywords=paper_keywords_form,
                                                                  category=category_form,
-                                                                 paper_categories=paper_categories_form)
+                                                                 paper_categories=paper_categories_form,
+                                                                 author=author_form,
+                                                                 author_order=author_order_form,
+                                                                 paper_authors=paper_author_form
+                                                                 )
 
                         return render(request, "LM_DB/enterData.html", context_dict)
 
@@ -705,7 +743,8 @@ def convert_empty_string_to_none(a_string):
 
 
 def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_concept_name, core_attribute,
-                             links, paper_keywords, paper_categories, purpose, keyword, category):
+                             links, paper_keywords, paper_categories, purpose, keyword, category, author, paper_authors,
+                              author_order):
     context_dict["paper_form"] = paper
     context_dict["file_form"] = file
     context_dict["concept_name_form"] = concept_name
@@ -717,7 +756,9 @@ def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_con
     context_dict["category_form"] = category
     context_dict["paper_categories_form"] = paper_categories
     context_dict["purpose_forms"] = purpose
-
+    context_dict["author_form"] = author
+    context_dict["paper_authors_form"] = paper_authors
+    context_dict["author_order"] = author_order
     return context_dict
 
 
@@ -795,7 +836,7 @@ def called_by_bibtex_upload(bibtex_str, context):
         print(e)
 
     try:
-        authors = reformat_authors(paper['author'], "db")
+        authors = reformat_authors(paper['author'], "db", context="bibtex")
     except KeyError as e:
         error += "\n Could not find authors. "
         print(e)
@@ -938,27 +979,6 @@ def is_unique_for_new_data(queryset):
         return True
     else:
         return False
-
-# authors are saved as string
-# different representation in db and view for more than three authors
-def reformat_authors(authors, context):
-    author_list = authors.split(" and ")
-    index = 0
-    many_authors_string = ""
-    authors_string = ""
-    for author in author_list:
-        if index == 0:
-            many_authors_string += author + " et al."
-        authors_string += author + " & "
-        index +=1
-    authors_string = authors_string[:-2]
-    if context == "db":
-        return authors_string
-    elif context == "view":
-        if index > 2:
-            return many_authors_string
-        else:
-            return authors_string
 
 
 def get_keywords_list(keywords_from_bibtex):
