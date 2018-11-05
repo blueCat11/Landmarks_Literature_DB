@@ -26,6 +26,10 @@ $(document).ready( function() {
         checkIfNeedsClone('div.purpose_form:last', 'purpose');
     });
 
+    $("#add_author").click( function(event) {
+        checkIfNeedsClone('div.author_form:last', 'author');
+    });
+
 });
 
 function checkIfNeedsClone(selector, type){
@@ -66,6 +70,7 @@ function cloneMore(selector, type) {
                 $(this).removeAttr("value"); // original checkbox doesn't have value-Attribute, and for some reason, this seems to confound the deletion process if left in
                 $(this).prop( "checked", false );
                 delete_id = id_str;
+                console.log(id_str);
             }else{
                 $(this).attr({'name': name, 'id': id}).val('');
             }

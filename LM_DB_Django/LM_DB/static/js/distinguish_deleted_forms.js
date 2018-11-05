@@ -2,6 +2,7 @@ $(document).ready( function() {
     handleVisualizeDeletion("purpose");
     handleVisualizeDeletion("core_attribute");
     handleVisualizeDeletion("link");
+    handleVisualizeDeletion("author");
     //DONE (see addFormToFormsetDynamically.js:
     // when a clear-checkbox looses focus (blur) check whether it is set or not and adjust color accordingly
 

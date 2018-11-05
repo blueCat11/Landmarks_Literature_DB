@@ -42,10 +42,12 @@ function sendAjaxToGetInfoFromBibtex(context){
             //Done: don't overwrite stuff after first time
             // handle a successful response
             success : function(json) {
+                console.log(json.author);
                 $('#id_file-year').val(json.year_for_file); // add year into (hidden) field (in file model)
                 $('#id_paper-title').val(json.title);
                 $('#id_paper-cite_command').val(json.cite_command);
                 $('#id_paper-year').val(json.year);
+                add_authors(json);
                 $('#id_paper-authors').val(json.author);
                 $('#id_paper-doi').val(json.doi);
                 $('#id_paper-abstract').val(json.abstract);
@@ -86,6 +88,24 @@ function sendAjaxToGetInfoFromBibtex(context){
 }
 
 
+function add_authors(json){
+    let authors = json.author;
+    for (let i = 0; i < authors.length; ++i){
+        let id_part = "id_author-" + i + "-";
+        if (i > 0) {
+            $("#add_author").click(); //click on + button
+
+        }else{
+            // "delete this" is previously checked for first form, the click unchecks (and triggers the non-red-outline)
+            $("#"+id_part+"delete_this_author").click()
+        }
+        let author = authors[i];
+        $("#"+id_part+"first_name").val(author.first_name);
+        $("#"+id_part+"last_name").val(author.last_name);
+        $("#"+id_part+"author_order_on_paper").val(author.order_on_paper);
+
+    }
+}
 
 
 // add csrf-token to form

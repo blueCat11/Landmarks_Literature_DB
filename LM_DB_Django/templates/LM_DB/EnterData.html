@@ -38,6 +38,26 @@
                 {{ file_form.as_p }}
             {% endif %}
             <hr class="uk-divider-small">
+            {% if author_order_forms %}
+                <div class="author_related">
+                    <h3>Authors</h3>
+                    {{ author_order_forms.management_form }}
+                    {% for author_form in author_order_forms %}
+                        {% if forloop.last and not errors|lookup:author_order_forms %}<div class="author_form hidden single_form" id="author_form">
+                        {% elif forloop.last %}<div class="author_form">
+                        {% else %}<div class="author_form">{% endif%}
+                            {% for field in author_form.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+                        {{ author_form.as_p }}
+                       </div>
+                    {% endfor %}
+                    <input type="button" class="uk-button uk-button-secondary" value="+" id="add_author">
+                </div>
+            {% endif %}
+
+            <hr class="uk-divider-small">
+
 
             {% if paper_keywords_form %}
                 <h3>Keywords</h3>

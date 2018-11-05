@@ -90,10 +90,10 @@ class Authors(models.Model):
 
     def __str__(self):
         author_string = ""
+        if self.last_name is not None:
+            author_string += self.last_name + ", "
         if self.first_name is not None:
             author_string += self.first_name
-        if self.last_name is not None:
-            author_string += self.last_name
         if len(author_string) > 0:
             return author_string
         else:

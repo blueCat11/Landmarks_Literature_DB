@@ -65,6 +65,7 @@ class EnterData(View):
     CoreAttributeFormset = formset_factory(CoreAttributeForm)
     LinkFormset = formset_factory(LinkForm)
     PurposeFormset = formset_factory(PurposeForm)
+    AuthorOrderFormset = formset_factory(AuthorOrderForm)
 
     def get(self, request):
         paper_form = PaperForm(prefix="paper")
@@ -78,9 +79,9 @@ class EnterData(View):
         paper_keywords_form = PaperKeywordForm(prefix="paper_keywords")
         category_form = CategoryForm(prefix="new_category")
         paper_categories_forms = PaperCategoryForm(prefix="paper_categories")
-        author_form = AuthorForm(prefix="new_author")
-        author_order_form = AuthorOrderForm(prefix="author_order")
-        paper_author_form = PaperAuthorForm(prefix="paper_authors")
+       # author_form = AuthorForm(prefix="new_author")
+        author_order_formset = self.AuthorOrderFormset(prefix="author")
+        #paper_author_form = PaperAuthorForm(prefix="paper_authors")
 
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry"}
@@ -91,8 +92,8 @@ class EnterData(View):
                                                  links=links_formset,
                                                  keyword=keyword_form, paper_keywords=paper_keywords_form,
                                                  category=category_form, paper_categories=paper_categories_forms,
-                                                 author=author_form, author_order=author_order_form,
-                                                 paper_authors=paper_author_form)
+                                                 author_order=author_order_formset,
+                                                 )
 
         return render(request, "LM_DB/EnterData.html", context_dict)
 
@@ -133,6 +134,7 @@ class EnterData(View):
             link_formset = self.LinkFormset(prefix="link", initial=link_data)
 
             core_attribute_data = all_table_data["core_attribute"]
+            print(core_attribute_data)
             core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute", initial=core_attribute_data)
 
             keyword_form = KeywordForm(prefix="new_keyword")
@@ -150,10 +152,12 @@ class EnterData(View):
             paper_concept_names_form = PaperConceptNameForm(prefix="paper_concept_names", initial={
                 'paper_concept_names': paper_concept_name_data})
 
-            author_form = AuthorForm(prefix="new_author")
-            author_order_form = AuthorOrderForm(prefix="author_order")#TODO need Formset for these
-            paper_author_data = all_table_data["paper_author"]
-            paper_author_form = PaperAuthorForm(prefix="paper_authors", initial={'paper_authors': paper_author_data})
+            #author_form = AuthorForm(prefix="new_author")
+            author_data = all_table_data["author"]
+            print(author_data)
+            author_order_formset = self.AuthorOrderFormset(prefix="author", initial=author_data)
+            #paper_author_data = all_table_data["paper_author"]
+            #paper_author_form = PaperAuthorForm(prefix="paper_authors", initial={'paper_authors': paper_author_data})
 
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry"}
             context_dict = add_forms_to_context_dict(context_dict, paper=paper_form, file=file_form,
@@ -163,8 +167,7 @@ class EnterData(View):
                                                      links=link_formset,
                                                      keyword=keyword_form, paper_keywords=paper_keywords_form,
                                                      category=category_form, paper_categories=paper_categories_form,
-                                                     author=author_form, author_order=author_order_form,
-                                                     paper_authors=paper_author_form
+                                                     author_order=author_order_formset,
                                                      )
             return render(request, "LM_DB/EnterData.html", context_dict)
 
@@ -190,7 +193,6 @@ class EnterData(View):
             purpose_formset = self.PurposeFormset(request_data, prefix="purpose", initial=purpose_data)
 
             link_data = all_table_data["link"]
-            print("initital link while edit")
             link_formset = self.LinkFormset(request_data, prefix="link", initial=link_data)
 
             core_attribute_data = all_table_data["core_attribute"]
@@ -212,21 +214,22 @@ class EnterData(View):
             category_form = CategoryForm(prefix="new_category")
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
 
-            author_form = AuthorForm(prefix="new_author")
-            author_order_form = AuthorOrderForm(prefix="author_order")
-            paper_author_data = all_table_data["paper_author"]
-            paper_author_form = PaperAuthorForm(request_data, prefix="paper_authors",
-                                                initial={'paper_authors': paper_author_data})
+            #author_form = AuthorForm(prefix="new_author")
+            author_order_data = all_table_data["author"]
+            author_order_formset = self.AuthorOrderFormset(request_data, prefix="author", initial=author_order_data)
+            #paper_author_data = all_table_data["paper_author"]
+            #paper_author_form = PaperAuthorForm(request_data, prefix="paper_authors",
+            #                                   initial={'paper_authors': paper_author_data})
 
             if paper_form.has_changed() or file_form.has_changed() or link_formset.has_changed() or\
                     core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or \
                     purpose_formset.has_changed() or paper_categories_form.has_changed() or \
-                    paper_concept_names_form.has_changed():
+                    paper_concept_names_form.has_changed() or author_order_formset.has_changed():
                 # add other forms into this if-clause with or later
                 if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and \
                         core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and \
                         purpose_formset.is_valid() and paper_categories_form.is_valid() and \
-                        paper_concept_names_form.is_valid():
+                        paper_concept_names_form.is_valid() and author_order_formset.is_valid():
                     print("everything valid")
                     current_paper = get_current_paper(current_paper_pk)
                     update_last_edit(current_paper, user)
@@ -267,9 +270,7 @@ class EnterData(View):
                                                                          paper_keywords=paper_keywords_form,
                                                                          category=category_form,
                                                                          paper_categories=paper_categories_form,
-                                                                         author=author_form,
-                                                                         author_order=author_order_form,
-                                                                         paper_authors=paper_author_form
+                                                                         author_order=author_order_formset,
                                                                          )
 
                                 return render(request, "LM_DB/enterData.html", context_dict)
@@ -311,6 +312,40 @@ class EnterData(View):
                                                      ref_file_to_paper_id=current_paper_pk)
                                 current_file.save()
                         pass
+                    if author_order_formset.has_changed():
+                        print("author changed")
+                        if author_order_formset.is_valid():
+                            print("author order formset valid")
+                            for author_form in author_order_formset.forms:
+                                if author_form.is_valid():
+                                    print("author form valid")
+                                    data = author_form.cleaned_data
+                                    if data.get("paper_author_id", None) is not None:
+                                        current_paper_author_id = data["paper_author_id"]
+                                        current_paper_author = PaperAuthor.objects.get(paper_author_id=current_paper_author_id)
+                                        is_to_be_deleted = False
+                                        for entry in author_form.changed_data:
+                                            if entry == "delete_this_author":
+                                                is_to_be_deleted = data["delete_this_author"]
+                                            elif entry == "order_for_paper":
+                                                current_paper_author.author_order_on_paper = data["order_for_paper"]
+                                            elif entry == "first_name" or entry == "last_name":
+                                                current_paper_author = save_authors_information(data, current_paper_author, current_paper)
+                                        if is_to_be_deleted:
+                                            current_paper_author.delete()
+                                            print("paper_author deleted")
+                                        else:
+                                            current_paper_author.save()
+                                            print("paper_author saved")
+                                    else:
+                                        # what happens, when adding a new paper_author
+                                        print("new paper_author")
+                                        if data.get("delete_this_author", "none") == False:
+                                            current_paper_author = save_authors_information(data, None, current_paper)
+                                            current_paper_author.save()
+                                            print("paper author saved")
+                                        else:
+                                            print("paper author not saved")
 
                     if purpose_formset.has_changed():
                         print("purpose changed")
@@ -518,9 +553,8 @@ class EnterData(View):
                                                              paper_keywords=paper_keywords_form,
                                                              category=category_form,
                                                              paper_categories=paper_categories_form,
-                                                             author = author_form,
-                                                             author_order = author_order_form,
-                                                             paper_authors = paper_author_form
+                                                             author_order = author_order_formset,
+
                                                              )
 
                     return render(request, "LM_DB/enterData.html", context_dict)
@@ -573,6 +607,24 @@ class EnterData(View):
                                  "error": "This concept name already exists."}
             json_response = JsonResponse(response_data)
             return json_response
+
+        elif request_data.get("isNewAuthor", -1) != -1:
+            print("isNewAuthor")
+            first_name = request_data["first_name"]
+            last_name = request_data["last_name"]
+            is_not_unique = Authors.objects.filter(first_name=first_name, last_name=last_name)
+            if not is_not_unique:
+                new_author = Authors(first_name=first_name, last_name=last_name)
+                new_author.save()
+                print("author saved")
+                response_data = {"result": "Create author sucessful!", "last_name": last_name, "first_name":first_name,
+                                 "author_id":new_author.pk}
+            else:
+                response_data = {"result": "Creating author not sucessful!", "error": "This author already exists."}
+            json_response = JsonResponse(response_data)
+            return json_response
+
+
         elif request_data.get("isYearFromBibtex", -1) != -1:
             json_response = get_info_from_bibtex(request_data)
             return json_response
@@ -593,14 +645,14 @@ class EnterData(View):
             category_form = CategoryForm(prefix="new_category")
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
             author_form = AuthorForm(prefix="new_author")
-            author_order_form = AuthorOrderForm(request_data, prefix="author_order") # TODO need formset
+            author_order_formset = self.AuthorOrderFormset(request_data, prefix="author")
             paper_author_form = PaperAuthorForm(request_data, prefix="paper_authors")
 
             # check if all forms are valid, add further forms to the if-clause later
             if paper_form.is_valid() and file_form.is_valid() and link_formset.is_valid() and\
                     core_attribute_formset.is_valid() and paper_keywords_form.is_valid() and \
                     purpose_formset.is_valid and paper_categories_form.is_valid() and \
-                    paper_concept_names_form.is_valid():
+                    paper_concept_names_form.is_valid() and author_order_formset.is_valid:
                 # save data from the forms here
                 if paper_form.is_valid():
                     data = paper_form.cleaned_data
@@ -629,13 +681,12 @@ class EnterData(View):
                                                                  paper_keywords=paper_keywords_form,
                                                                  category=category_form,
                                                                  paper_categories=paper_categories_form,
-                                                                 author=author_form,
-                                                                 author_order=author_order_form,
-                                                                 paper_authors=paper_author_form
+
+                                                                 author_order=author_order_formset,
+
                                                                  )
 
                         return render(request, "LM_DB/enterData.html", context_dict)
-
 
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
                                            abstract=abstract, authors=authors, year=year)
@@ -653,6 +704,14 @@ class EnterData(View):
                             current_file = Files(file_name=file_name, complete_file_path=file, year=year,
                                                  ref_file_to_paper=current_paper)
                             current_file.save()
+
+                    if author_order_formset.is_valid():
+                        for author_form in author_order_formset:
+                            if author_form.is_valid():
+                                data = author_form.cleaned_data
+                                if data.get("delete_this_author", "None") == False:
+                                    current_paper_author = save_authors_information(data, None, current_paper)
+                                    current_paper_author.save()
 
                     if purpose_formset.is_valid():
                         for purpose_form in purpose_formset:
@@ -693,7 +752,6 @@ class EnterData(View):
 
                     if paper_keywords_form.is_valid():
                         data = paper_keywords_form.cleaned_data
-                        print("paper keywords")
                         ref_paper = current_paper
                         for keyword in data.get("paper_keywords", None):
                             current_paper_keyword = PaperKeyword(ref_paper_keyword_to_paper=ref_paper,
@@ -711,14 +769,6 @@ class EnterData(View):
                     else:
                         print("paper categories not valid")
 
-                    if paper_concept_names_form.is_valid():
-                        data = paper_concept_names_form.cleaned_data
-                        for concept_name in data.get("paper_concept_name", None):
-                            current_paper_concept_name = PaperConceptName(ref_paper_concept_name_to_paper=current_paper,
-                                                                          ref_paper_concept_name_to_concept_name=concept_name)
-                            current_paper_concept_name.save()
-
-                else:
                     # paper form is not valid
                     print("paper form not valid")
 
@@ -743,7 +793,7 @@ def convert_empty_string_to_none(a_string):
 
 
 def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_concept_name, core_attribute,
-                             links, paper_keywords, paper_categories, purpose, keyword, category, author, paper_authors,
+                             links, paper_keywords, paper_categories, purpose, keyword, category,
                               author_order):
     context_dict["paper_form"] = paper
     context_dict["file_form"] = file
@@ -756,9 +806,7 @@ def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_con
     context_dict["category_form"] = category
     context_dict["paper_categories_form"] = paper_categories
     context_dict["purpose_forms"] = purpose
-    context_dict["author_form"] = author
-    context_dict["paper_authors_form"] = paper_authors
-    context_dict["author_order"] = author_order
+    context_dict["author_order_forms"] = author_order
     return context_dict
 
 
@@ -836,7 +884,7 @@ def called_by_bibtex_upload(bibtex_str, context):
         print(e)
 
     try:
-        authors = reformat_authors(paper['author'], "db", context="bibtex")
+        authors = get_authors_from_bibtex(paper['author'])
     except KeyError as e:
         error += "\n Could not find authors. "
         print(e)
@@ -983,3 +1031,30 @@ def is_unique_for_new_data(queryset):
 
 def get_keywords_list(keywords_from_bibtex):
     return keywords_from_bibtex.split(", ")
+
+
+# gets authors info from form and if no author for that info is in db, creates a new author
+# otherwise references an old one
+# returns an instance of the through table, PaperAuthors, which then still needs to be saved
+def save_authors_information(data, current_paper_author, current_paper):
+    first_name = convert_empty_string_to_none(data.get("first_name", None))
+    last_name = convert_empty_string_to_none(data.get("last_name", None))
+    order = data.get("order_for_paper", None)
+
+    authors = Authors.objects.filter(first_name=first_name, last_name=last_name)
+    if len(authors) !=0:  # author is in database
+        # if yes, change ref_paper_author_to_author
+        current_author = authors[0]
+        return update_current_paper_author(current_paper_author, current_author, current_paper, order)
+    else:  # author is not in database
+        current_author = Authors.objects.create(first_name=first_name, last_name=last_name)
+        return update_current_paper_author(current_paper_author, current_author, current_paper, order)
+
+
+def update_current_paper_author(current_paper_author, current_author, current_paper, order):
+    if current_paper_author is not None:
+        current_paper_author.ref_paper_author_to_author = current_author
+    else:
+        current_paper_author = PaperAuthor(ref_paper_author_to_paper=current_paper, author_order_on_paper=order,
+                                       ref_paper_author_to_author=current_author)
+    return current_paper_author

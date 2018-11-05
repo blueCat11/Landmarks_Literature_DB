@@ -1,4 +1,46 @@
+function saveNewAuthor(){
+    //TODO test/look whether ids are actually this
+    let firstName = $('#id_author-first_name').val();
+    let lastName = $('#id_author-last_name').val();
 
+    $.ajax({
+    url : "/LM_DB/enterData/", // the endpoint
+    type : "POST", // http method
+    data : {
+        isNewAuthor: true,
+        first_name: firstName,
+        last_name: lastName,
+    }, // data sent with the post request
+
+    // handle a successful response
+    success : function(json) {
+        if(json.hasOwnProperty('author_id')) {
+            $('#id_author-first_name').val('');
+            $('#id_author-last_name').val('');// remove the value from the input
+            let author_string = String(lastName) + ", " + String(firstName);
+
+            let author_pk = json.concept_name_id;
+            let new_author_element = '<li><div class=".uk-form-controls uk-form-controls-text">' +
+                '<label for="id_new_concept_name-paper_concept_name_' +
+                author_pk + '"><input name="new_concept-name-paper_concept_name" value="' +
+                author_pk + '" id="id_new_concept_name-paper_concept_name_' +
+                author_pk + '" type="checkbox" class="uk-checkbox" checked="checked"> ' +
+                author_string + '</label></div></li>';
+
+            $("#id_new_author-paper_author").append(new_author_element);
+        }else if (json.hasOwnProperty('error')){
+            $('#add_author').after('<div class="error">'+json.error+'</div>')
+        }
+        console.log("success"); // another sanity check
+    },
+
+    // handle a non-successful response
+    error : function(xhr,errmsg,err) {
+        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+    }
+    });
+
+}
 
 
 function saveNewConceptName(){

@@ -1,5 +1,6 @@
 from LM_DB.models import *
 
+
 # This file contains methods used to get data in a form suited for handling in the templates
 
 
@@ -10,7 +11,7 @@ def get_dict_for_enter_data(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     all_table_data = {}
     paper_data = paper.values()[0]
-    paper_data["don_t_overwrite"]=True
+    paper_data["don_t_overwrite"] = True
     all_table_data["paper"] = paper_data
 
     current_file = Files.objects.filter(ref_file_to_paper=current_paper_pk)
@@ -20,8 +21,10 @@ def get_dict_for_enter_data(current_paper_pk):
         file_data = {}
     all_table_data["file"] = file_data  # Done (file field inherent): possibly add possibility to delete files
 
-    current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
+    current_concept_name = ConceptNames.objects.filter(
+        paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = current_concept_name.values_list('concept_name_id', flat=True)
+    print(concept_name_data)
     # priorly empty forms are automatically set to be deleted
     all_table_data["paper_concept_name"] = concept_name_data
 
@@ -36,6 +39,7 @@ def get_dict_for_enter_data(current_paper_pk):
     for link in links_data:
         link['delete_this_link'] = False  # makes default for already there data not deleted automatically
     all_table_data["link"] = links_data
+    print(links_data)
 
     current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
     paper_keywords_data = current_paper_keywords.values_list('keyword_id', flat=True)
@@ -45,9 +49,19 @@ def get_dict_for_enter_data(current_paper_pk):
     paper_categories_data = current_paper_categories.values_list('category_id', flat=True)
     all_table_data["paper_category"] = paper_categories_data
 
-    current_paper_authors = Authors.objects.filter(paperauthor__ref_paper_author_to_paper=current_paper_pk)
-    paper_authors_data = current_paper_authors.values_list('author_id', flat=True)
-    all_table_data["paper_author"] = paper_authors_data
+    current_paper_authors_order = PaperAuthor.objects.filter(ref_paper_author_to_paper=current_paper_pk).order_by("author_order_on_paper")
+    paper_authors_order_data = current_paper_authors_order.values()
+    for i, paper_author in enumerate(paper_authors_order_data):
+        data_object = current_paper_authors_order[i]
+        author = Authors.objects.get(author_id=data_object.ref_paper_author_to_author_id)
+        paper_authors_order_data[i]['first_name'] = author.first_name
+        print(author.first_name)
+        paper_authors_order_data[i]['last_name'] = author.last_name
+        paper_authors_order_data[i]['author_id'] = author.author_id
+        paper_authors_order_data[i]["delete_this_author"] = False
+
+    all_table_data["author"] = paper_authors_order_data
+
 
     current_purposes = Purposes.objects.filter(ref_purpose_to_paper=current_paper_pk)
     purposes_data = current_purposes.values()
@@ -77,10 +91,11 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper_data["is_fulltext_in_repo"] = file_data
     # paper_data["year"] = year
 
-    current_concept_name = ConceptNames.objects.filter(paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
+    current_concept_name = ConceptNames.objects.filter(
+        paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = ''
     for concept_name in current_concept_name:
-        concept_name_data += str(concept_name)+", "
+        concept_name_data += str(concept_name) + ", "
     paper_data["concept_name"] = concept_name_data
 
     current_core_attributes = CoreAttributes.objects.filter(ref_core_attribute_to_paper=current_paper_pk)
@@ -115,8 +130,9 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
         purposes_data += str(purpose) + "; "
     paper_data['purpose'] = purposes_data
 
-    current_authors = Authors.objects.filter(paperauthor__ref_paper_author_to_paper=current_paper_pk).order_by("paperauthor__author_order_on_paper")
-    paper_data["authors"] = reformat_authors(current_authors, "view", context="database")
+    current_authors = Authors.objects.filter(paperauthor__ref_paper_author_to_paper=current_paper_pk).order_by(
+        "paperauthor__author_order_on_paper")
+    paper_data["authors"] = reformat_authors(current_authors)
 
     # get creation and edit dates per paper
     paper_data['creation'] = get_creation_string(get_user_name(current_paper.creation_user),
@@ -183,26 +199,46 @@ def get_paper_data_for_display(paper):
     return paper_data
 
 
-# authors are saved as string
-# different representation in db and view for more than three authors
-def reformat_authors(authors, destination_context, context):
-    if context == "bibtex":
-        author_list = authors.split(" and ")
-    else:
-        author_list = authors
+# returns string representation of a list of authors (for more than three, first author et al)
+def reformat_authors(authors):
     index = 0
     many_authors_string = ""
     authors_string = ""
-    for author in author_list:
+    for author in authors:
         if index == 0:
-            many_authors_string += author + " et al."
-        authors_string += author + " & "
+            many_authors_string += str(author) + " et al."
+        authors_string += str(author) + " & "
         index += 1
     authors_string = authors_string[:-2]
-    if destination_context == "db":
+    if index > 2:
+        return many_authors_string
+    else:
         return authors_string
-    elif destination_context == "view":
-        if index > 2:
-            return many_authors_string
+
+
+# TODO need to test this method
+def get_authors_from_bibtex(authors):
+    author_list = authors.split(" and ")
+    i = 1
+    author_dict_list = []
+    for author in author_list:
+        author_num = i
+        comma_separated = author.split(",")
+        print("one author: ")
+        print(comma_separated)
+        if len(comma_separated) == 2:
+            last_name = comma_separated[0].strip()
+            first_name = comma_separated[1].strip()
         else:
-            return authors_string
+            first_last = author.split(" ")
+            last_name = first_last[-1]
+            index = 1
+            first_name = ""
+            for name_part in first_last:
+                if index < len(first_last):
+                    first_name += name_part + " "
+                index += 1
+        author_dict = {"first_name": first_name.strip(), "last_name":last_name, "order_on_paper":author_num}
+        author_dict_list.append(author_dict)
+        i += 1
+    return author_dict_list

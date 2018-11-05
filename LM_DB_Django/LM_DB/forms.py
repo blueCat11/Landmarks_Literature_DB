@@ -14,14 +14,13 @@ class PaperForm (forms.ModelForm):
     cite_command = forms.CharField(max_length=50, required=False)
     title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
-    authors = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
+    # authors = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
     year = forms.IntegerField(required=False)
 
 
     class Meta:
         model = Papers
-        fields = ('paper_id', 'doi', 'bibtex', 'don_t_overwrite', 'cite_command', 'title', 'abstract', "authors", "year")
-
+        fields = ('paper_id', 'doi', 'bibtex', 'don_t_overwrite', 'cite_command', 'title', 'abstract', "year")
 
 
 class FileForm (forms.ModelForm):
@@ -119,17 +118,21 @@ class PurposeForm(forms.ModelForm):
         fields = ('purpose_id', 'purpose',)
 
 
+# TODO delete PaperAuthorForm where used
 class PaperAuthorForm(forms.Form):
     paper_authors = forms.ModelMultipleChoiceField(label="", queryset=Authors.objects.all().order_by('last_name'),
                                                    widget=forms.CheckboxSelectMultiple, required=False)
 
 
 class AuthorOrderForm(forms.Form):
-    author_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    author_name = forms.CharField(max_length=200, required=False)
-    order_for_paper = forms.IntegerField(required=False)
+    paper_author_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    first_name = forms.CharField(max_length=100, required=False)
+    last_name = forms.CharField(max_length =100, required=False)
+    author_order_on_paper = forms.IntegerField(label="order for paper", required=False)
+    delete_this_author = forms.BooleanField(required=False, initial=True)
 
 
+# TODO delete AuthorForm where used
 class AuthorForm(forms.ModelForm):
     author_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     last_name = forms.CharField(max_length=100, required=False)
