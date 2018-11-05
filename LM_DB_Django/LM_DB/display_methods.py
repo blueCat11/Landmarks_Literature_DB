@@ -78,7 +78,8 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper = Papers.objects.filter(pk=current_paper_pk)
     paper_data = get_paper_data_for_display(paper)
     current_paper = paper[0]
-    paper_data["actions"] = current_paper.pk
+    paper_data["actions"] = current_paper.pk  # value is passed to Column in tables.py for form in table
+    paper_data["checking"] = current_paper.pk  # value is passed to Column in tables.py for form in table
     current_files = Files.objects.filter(ref_file_to_paper=current_paper_pk)
     file_data = ''
     year = ''

@@ -14,7 +14,6 @@ class PaperForm (forms.ModelForm):
     cite_command = forms.CharField(max_length=50, required=False)
     title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
-    # authors = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
     year = forms.IntegerField(required=False)
 
 

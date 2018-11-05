@@ -37,9 +37,10 @@ CONTEXT_FOR_VIEW = "view"
 # DONE sticky table header
 # TODO: set checkmark (bibtex) automatically, after first bibtex update
 # DONE make new Author relation Paper_Author mediator table
-# TODO incorporate author-paper many-to-many relationship into code
-# TODO add possibility to specify order of author for given paper
-# TODO add field "verified by" to paper
+# DONE incorporate author-paper many-to-many relationship into code
+# DONE add possibility to specify order of author for given paper
+# TODO add field "verified by" to paper (needs to be different user than created)
+# TODO add boolean field "need for discussion" to paper
 
 # This View displays all current database entries in a table format
 class ViewData(View):

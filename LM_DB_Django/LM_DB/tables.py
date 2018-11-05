@@ -9,12 +9,26 @@ class ActionColumn(tables.Column):
     def render(self, value):
         form = '<form action="/LM_DB/enterData/" method="post" class="action_form">' \
                ' <input type="hidden" name="paper_id" value="{}">' \
-               '<p uk-margin>' \
+               '<div class="uk-margin-small">' \
                '<input class="button uk-button uk-button-primary uk-button-small" type="submit" name="editStart" value="Edit"/>' \
-               '</p>' \
-               '<p uk-margin>' \
+               '</div>' \
+               '<div class="uk-margin-small">' \
                '<input class="button uk-button uk-button-primary uk-button-small" type="submit" name="downloadPaper" value="Download"/>' \
-               '</p>' \
+               '</div>' \
+               '</form>'
+        return format_html(form, value)
+
+
+class ActionDiscussionColumn(tables.Column):
+    def render(self, value):
+        form = '<form action="/LM_DB/enterData/" method="post" class="action_form">' \
+               ' <input type="hidden" name="paper_id" value="{}">' \
+               '<div class="uk-margin-small">' \
+               '<input class="button uk-button uk-button-primary uk-button-small" type="submit" name="verifyPaper" value="Verify"/>' \
+               '</div>' \
+               '<div class"uk-margin-small">' \
+               '<input class="button uk-button uk-button-primary uk-button-small" type="submit" name="needForDiscussion" value="toggle need for discussion"/>' \
+               '</div>' \
                '</form>'
         return format_html(form, value)
 
@@ -39,6 +53,7 @@ class PaperTable(tables.Table):
     purpose = tables.Column()
     creation = tables.Column()
     last_edit = tables.Column()
+    checking = ActionDiscussionColumn()
 
     class Meta:
         template_name = 'django_tables2/table.html'
