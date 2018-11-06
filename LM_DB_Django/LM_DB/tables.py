@@ -53,6 +53,8 @@ class PaperTable(tables.Table):
     purpose = tables.Column()
     creation = tables.Column()
     last_edit = tables.Column()
+    verification = tables.Column()
+    need_for_discussion = tables.Column()
     checking = ActionDiscussionColumn()
 
     class Meta:

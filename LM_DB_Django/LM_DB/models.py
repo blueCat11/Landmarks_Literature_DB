@@ -331,6 +331,9 @@ class Papers(models.Model):
                                        related_name="last_edit_user")
     authors = models.TextField(blank=True, null=True)
     year = models.SmallIntegerField(blank=True, null=True)
+    verified_timestamp = models.DateTimeField(blank=True, null=True)
+    verified_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='verified_user', blank=True, null=True)
+    is_need_for_discussion = models.NullBooleanField()
 
     class Meta:
         managed = False

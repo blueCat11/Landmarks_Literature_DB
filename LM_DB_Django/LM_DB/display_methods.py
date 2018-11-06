@@ -136,10 +136,13 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     paper_data["authors"] = reformat_authors(current_authors)
 
     # get creation and edit dates per paper
-    paper_data['creation'] = get_creation_string(get_user_name(current_paper.creation_user),
+    paper_data['creation'] = get_user_name_time_string(get_user_name(current_paper.creation_user),
                                                  current_paper.creation_timestamp)
-    paper_data['last_edit'] = get_edit_string(get_user_name(current_paper.last_edit_user),
+    paper_data['last_edit'] = get_user_name_time_string(get_user_name(current_paper.last_edit_user),
                                               current_paper.last_edit_timestamp)
+    paper_data['verification'] = get_user_name_time_string(get_user_name(current_paper.verified_user),
+                                                         current_paper.verified_timestamp)
+    paper_data['need_for_discussion'] = current_paper.is_need_for_discussion
 
     # old version:
     # paper_data = {"paper_id":paper.pk, "doi":paper.doi, "bibtex":paper.bibtex, "cite_command":paper.cite_command,
@@ -170,21 +173,13 @@ def get_user_name(user):
     else:
         return " "
 
-
-# makes naming of of methods more concise
-def get_creation_string(user_name, time):
-    return get_creation_or_edit_string(user_name, time)
-
-
-# makes naming of methods more concise
-def get_edit_string(user_name, time):
-    return get_creation_or_edit_string(user_name, time)
-
-
 # formats username and time appropriately
-def get_creation_or_edit_string(user_name, time):
+def get_user_name_time_string(user_name, time):
     time_str = str(time)[:-7]  # shave off milliseconds...
-    return "at " + time_str + ", by " + user_name
+    if len(user_name)<2: # empty string, that is to say no user
+        return None
+    else:
+        return "at " + time_str + ", by " + user_name
 
 
 # gets only those data from a paper that should also be displayed in viewData-View

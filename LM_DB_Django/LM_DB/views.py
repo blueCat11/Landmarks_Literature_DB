@@ -39,8 +39,8 @@ CONTEXT_FOR_VIEW = "view"
 # DONE make new Author relation Paper_Author mediator table
 # DONE incorporate author-paper many-to-many relationship into code
 # DONE add possibility to specify order of author for given paper
-# TODO add field "verified by" to paper (needs to be different user than created)
-# TODO add boolean field "need for discussion" to paper
+# Done add field "verified by" to paper (needs to be different user than created)
+# Done add boolean field "need for discussion" to paper
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -103,12 +103,39 @@ class EnterData(View):
     def post(self, request):
         request_data = request.POST
         user = get_current_auth_user(request.user)
+        print(request_data)
 
         if request_data.get('downloadPaper', -1) != -1:
             # https://stackoverflow.com/questions/1156246/having-django-serve-downloadable-files
             current_paper_pk = request_data["paper_id"]
             file = get_file_for_paper(current_paper_pk)
             return serve_file(file, request)
+
+        elif request_data.get('needForDiscussion', -1) != -1:
+            current_paper = get_current_paper(request_data["paper_id"])
+            isNeedForDiscussion = current_paper.is_need_for_discussion
+            if isNeedForDiscussion:
+                current_paper.is_need_for_discussion = None
+            elif isNeedForDiscussion is None:
+                current_paper.is_need_for_discussion = True
+            print(current_paper)
+            current_paper.save()
+            messages.success(request, 'Need for discussion saved.')
+            return redirect(request.META['HTTP_REFERER'])
+
+        elif request_data.get('verifyPaper', -1) != -1:
+            current_paper = get_current_paper(request_data["paper_id"])
+            creation_user = current_paper.creation_user
+            if user == creation_user:
+                messages.error(request, 'The user who verifies a paper cannot be the same user who created this paper. '
+                                        '\nAsk a differnt user to verify this paper.')
+                return redirect(request.META['HTTP_REFERER'])
+            else:
+                current_paper.verified_user = user
+                current_paper.verified_timestamp = datetime.now(timezone.utc).astimezone()
+                current_paper.save()
+                messages.success(request, 'Paper verified.')
+                return redirect(request.META['HTTP_REFERER'])
 
         elif request_data.get('editStart', -1) != -1:
             print("editStart")
@@ -155,10 +182,7 @@ class EnterData(View):
 
             #author_form = AuthorForm(prefix="new_author")
             author_data = all_table_data["author"]
-            print(author_data)
             author_order_formset = self.AuthorOrderFormset(prefix="author", initial=author_data)
-            #paper_author_data = all_table_data["paper_author"]
-            #paper_author_form = PaperAuthorForm(prefix="paper_authors", initial={'paper_authors': paper_author_data})
 
             context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry"}
             context_dict = add_forms_to_context_dict(context_dict, paper=paper_form, file=file_form,
@@ -172,7 +196,7 @@ class EnterData(View):
                                                      )
             return render(request, "LM_DB/EnterData.html", context_dict)
 
-        elif request_data.get('editSave', -1)!=-1:
+        elif request_data.get('editSave', -1) != -1:
             print("editSave")
 
             # get corresponding data-object(s) from DB, make changes to it and save changes
@@ -215,12 +239,9 @@ class EnterData(View):
             category_form = CategoryForm(prefix="new_category")
             concept_name_form = ConceptNameForm(prefix="new_concept_name")
 
-            #author_form = AuthorForm(prefix="new_author")
             author_order_data = all_table_data["author"]
             author_order_formset = self.AuthorOrderFormset(request_data, prefix="author", initial=author_order_data)
-            #paper_author_data = all_table_data["paper_author"]
-            #paper_author_form = PaperAuthorForm(request_data, prefix="paper_authors",
-            #                                   initial={'paper_authors': paper_author_data})
+
 
             if paper_form.has_changed() or file_form.has_changed() or link_formset.has_changed() or\
                     core_attribute_formset.has_changed() or paper_keywords_form.has_changed() or \
