@@ -1,5 +1,4 @@
 function saveNewAuthor(){
-    //TODO test/look whether ids are actually this
     let firstName = $('#id_author-first_name').val();
     let lastName = $('#id_author-last_name').val();
 

@@ -20,8 +20,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LM_DB/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="87">
-              <caret line="105" column="26" selection-start-line="105" selection-start-column="26" selection-end-line="105" selection-end-column="26" />
+            <state relative-caret-position="257">
+              <caret line="119" column="71" selection-start-line="119" selection-start-column="71" selection-end-line="119" selection-end-column="71" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -32,8 +32,17 @@
       <file leaf-file-name="ViewData.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/LM_DB/ViewData.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="24" column="45" selection-start-line="24" selection-start-column="45" selection-end-line="24" selection-end-column="45" />
+            <state relative-caret-position="292">
+              <caret line="34" column="40" selection-start-line="34" selection-start-column="40" selection-end-line="34" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="displayDjangoMessages.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LM_DB/static/js/displayDjangoMessages.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="4" selection-start-line="1" selection-start-column="4" selection-end-line="6" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -47,29 +56,29 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="display_methods.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/LM_DB/display_methods.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="179" column="19" selection-start-line="179" selection-start-column="19" selection-end-line="179" selection-end-column="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ajaxStuffFromBibtex.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LM_DB/static/js/ajaxStuffFromBibtex.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1632">
-              <caret line="98" column="28" selection-start-line="98" selection-start-column="28" selection-end-line="98" selection-end-column="28" />
+            <state relative-caret-position="-389">
+              <caret line="69" column="30" selection-start-line="69" selection-start-column="20" selection-end-line="69" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EnterData.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/LM_DB/EnterData.html">
+      <file leaf-file-name="display_methods.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LM_DB/display_methods.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="918">
-              <caret line="54" column="103" selection-start-line="54" selection-start-column="103" selection-end-line="54" selection-end-column="103" />
+            <state relative-caret-position="497">
+              <caret line="80" column="104" selection-start-line="80" selection-start-column="104" selection-end-line="80" selection-end-column="104" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Base.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/LM_DB/Base.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -77,40 +86,10 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LM_DB/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="248">
-              <caret line="336" selection-start-line="336" selection-end-line="336" />
+            <state relative-caret-position="108">
+              <caret line="285" column="46" selection-start-line="285" selection-start-column="46" selection-end-line="285" selection-end-column="46" />
               <folding>
                 <element signature="e#468#477#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ajaxSaveKeyword.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/LM_DB/static/js/ajaxSaveKeyword.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="15" selection-start-line="11" selection-start-column="15" selection-end-line="11" selection-end-column="15" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="distinguish_deleted_forms.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/LM_DB/static/js/distinguish_deleted_forms.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/LM_DB/forms.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="15" column="69" selection-start-line="15" selection-start-column="69" selection-end-line="15" selection-end-column="69" />
-              <folding>
-                <element signature="e#1#25#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -130,10 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>serve</find>
-      <find>AuthUserU</find>
-      <find>add_forms_to_context_dict</find>
-      <find>login</find>
       <find>add_forms_to_context</find>
       <find>get_list_of</find>
       <find>colu</find>
@@ -154,12 +129,16 @@
       <find>all_table_data[&quot;author</find>
       <find>bibtex</find>
       <find>actions</find>
-      <find>papers</find>
       <find>creat</find>
       <find>get_creation_String</find>
-      <find>get_use</find>
       <find>paper.sav</find>
       <find>set_creation</find>
+      <find>needForD</find>
+      <find>get_use</find>
+      <find>verify</find>
+      <find>papers</find>
+      <find>messages</find>
+      <find>uikit.noti</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -191,11 +170,9 @@
         <option value="$PROJECT_DIR$/LM_DB/static/js/stickyTableHeader.js" />
         <option value="$PROJECT_DIR$/LM_DB/static/js/addUiKitStuffToTable.js" />
         <option value="$PROJECT_DIR$/LM_DB/static/css/viewData.css" />
-        <option value="$PROJECT_DIR$/templates/LM_DB/ViewData.html" />
         <option value="$PROJECT_DIR$/LM_DB/static/css/enterData.css" />
         <option value="$PROJECT_DIR$/LM_DB/static/js/showAndHideFormStuff.js" />
         <option value="$PROJECT_DIR$/LM_DB_Django/settings.py" />
-        <option value="$PROJECT_DIR$/LM_DB/static/js/ajaxSaveKeyword.js" />
         <option value="$PROJECT_DIR$/templates/LM_DB/EnterData.html" />
         <option value="$PROJECT_DIR$/LM_DB/static/js/distinguish_deleted_forms.js" />
         <option value="$PROJECT_DIR$/LM_DB/static/js/addFormToFormsetDynamically.js" />
@@ -204,6 +181,9 @@
         <option value="$PROJECT_DIR$/LM_DB/models.py" />
         <option value="$PROJECT_DIR$/LM_DB/tables.py" />
         <option value="$PROJECT_DIR$/LM_DB/display_methods.py" />
+        <option value="$PROJECT_DIR$/LM_DB/static/js/ajaxSaveKeyword.js" />
+        <option value="$PROJECT_DIR$/LM_DB/static/js/displayDjangoMessages.js" />
+        <option value="$PROJECT_DIR$/templates/LM_DB/ViewData.html" />
         <option value="$PROJECT_DIR$/LM_DB/views.py" />
       </list>
     </option>
@@ -245,6 +225,13 @@
               <item name="LM_DB_Django" type="462c0819:PsiDirectoryNode" />
               <item name="LM_DB" type="462c0819:PsiDirectoryNode" />
               <item name="static" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="LM_DB_Django" type="b2602c69:ProjectViewProjectNode" />
+              <item name="LM_DB_Django" type="462c0819:PsiDirectoryNode" />
+              <item name="LM_DB" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="LM_DB_Django" type="b2602c69:ProjectViewProjectNode" />
@@ -384,16 +371,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3382353" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32843137" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.27287582" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.27287582" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.32843137" />
-      <window_info content_ui="combo" id="Project" order="0" weight="0.2322239" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2322239" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32843137" />
@@ -420,11 +406,11 @@
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3382353" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.27287582" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.27287582" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32843137" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32843137" />
       <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="bottom" id="Terminal" order="12" visible="true" weight="0.32843137" />
+      <window_info anchor="bottom" id="Terminal" order="12" weight="0.32843137" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="SciView" order="3" />
@@ -489,13 +475,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/LM_DB/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="18" column="79" selection-start-line="18" selection-start-column="79" selection-end-line="18" selection-end-column="79" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB_Django/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2227">
@@ -604,13 +583,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/addUikitStuffToForms.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="4" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/static/css/base.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -649,13 +621,6 @@
     <entry file="file://$PROJECT_DIR$/LM_DB_Django/wsgi.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/addUiKitStuffToTable.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/static/js/stickyTableHeader.js" />
     <entry file="file://$PROJECT_DIR$/LM_DB/static/css/viewData.css">
       <provider selected="true" editor-type-id="text-editor">
@@ -668,13 +633,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
           <caret line="25" column="52" selection-start-line="25" selection-start-column="52" selection-end-line="25" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/showAndHideFormStuff.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="52" selection-start-line="9" selection-start-column="52" selection-end-line="9" selection-end-column="52" />
         </state>
       </provider>
     </entry>
@@ -722,45 +680,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/LM_DB/Base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/LM_DB/EnterData.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="918">
           <caret line="54" column="103" selection-start-line="54" selection-start-column="103" selection-end-line="54" selection-end-column="103" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/addFormToFormsetDynamically.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="86" column="95" selection-start-line="86" selection-start-column="95" selection-end-line="86" selection-end-column="95" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/distinguish_deleted_forms.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/ajaxSaveKeyword.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="15" selection-start-line="11" selection-start-column="15" selection-end-line="11" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/ajaxStuffFromBibtex.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1632">
-          <caret line="98" column="28" selection-start-line="98" selection-start-column="28" selection-end-line="98" selection-end-column="28" />
         </state>
       </provider>
     </entry>
@@ -774,16 +697,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LM_DB/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="336" selection-start-line="336" selection-end-line="336" />
-          <folding>
-            <element signature="e#468#477#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/tables.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -791,24 +704,97 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/LM_DB/ViewData.html">
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/showAndHideFormStuff.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="24" column="45" selection-start-line="24" selection-start-column="45" selection-end-line="24" selection-end-column="45" />
+        <state relative-caret-position="153">
+          <caret line="9" column="52" selection-start-line="9" selection-start-column="52" selection-end-line="9" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/addUiKitStuffToTable.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/addFormToFormsetDynamically.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="86" column="95" selection-start-line="86" selection-start-column="95" selection-end-line="86" selection-end-column="95" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/addUikitStuffToForms.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="4" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/distinguish_deleted_forms.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/ajaxSaveKeyword.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="142">
+          <caret line="215" column="41" selection-start-line="215" selection-start-column="41" selection-end-line="215" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="285" column="46" selection-start-line="285" selection-start-column="46" selection-end-line="285" selection-end-column="46" />
+          <folding>
+            <element signature="e#468#477#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/LM_DB/Base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/ajaxStuffFromBibtex.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-389">
+          <caret line="69" column="30" selection-start-line="69" selection-start-column="20" selection-end-line="69" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/static/js/displayDjangoMessages.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="4" selection-start-line="1" selection-start-column="4" selection-end-line="6" selection-end-column="7" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/display_methods.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="179" column="19" selection-start-line="179" selection-start-column="19" selection-end-line="179" selection-end-column="19" />
+        <state relative-caret-position="497">
+          <caret line="80" column="104" selection-start-line="80" selection-start-column="104" selection-end-line="80" selection-end-column="104" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/LM_DB/ViewData.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="292">
+          <caret line="34" column="40" selection-start-line="34" selection-start-column="40" selection-end-line="34" selection-end-column="40" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="87">
-          <caret line="105" column="26" selection-start-line="105" selection-start-column="26" selection-end-line="105" selection-end-column="26" />
+        <state relative-caret-position="257">
+          <caret line="119" column="71" selection-start-line="119" selection-start-column="71" selection-end-line="119" selection-end-column="71" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>

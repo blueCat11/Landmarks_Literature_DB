@@ -19,12 +19,25 @@
 {% block body_block %}
     {% if messages %}
             {% for message in messages %}
-                <script>UIkit.notification({
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                <script>
+                    UIkit.notification({
                         message: '{{ message }}',
                         status: 'danger',
                         pos: 'bottom-center',
                         timeout: 2500
-                    });</script>
+                    });
+                </script>
+                {% else %}
+                    <script>
+                    UIkit.notification({
+                        message: '{{ message }}',
+                        status: 'primary',
+                        pos: 'bottom-center',
+                        timeout: 2500
+                    });
+                </script>
+                {% endif %}
             {% endfor %}
     {% endif %}
     <div class="uk-margin">

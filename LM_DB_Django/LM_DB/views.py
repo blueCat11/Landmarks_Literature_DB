@@ -80,9 +80,7 @@ class EnterData(View):
         paper_keywords_form = PaperKeywordForm(prefix="paper_keywords")
         category_form = CategoryForm(prefix="new_category")
         paper_categories_forms = PaperCategoryForm(prefix="paper_categories")
-       # author_form = AuthorForm(prefix="new_author")
         author_order_formset = self.AuthorOrderFormset(prefix="author")
-        #paper_author_form = PaperAuthorForm(prefix="paper_authors")
 
         context_dict = {"original_form_name": "newSave",
                         "type_of_edit": "New Entry"}
@@ -116,19 +114,19 @@ class EnterData(View):
             isNeedForDiscussion = current_paper.is_need_for_discussion
             if isNeedForDiscussion:
                 current_paper.is_need_for_discussion = None
+                messages.success(request, 'Need for discussion resolved.')
             elif isNeedForDiscussion is None:
                 current_paper.is_need_for_discussion = True
-            print(current_paper)
+                messages.success(request, 'Need for discussion saved.')
             current_paper.save()
-            messages.success(request, 'Need for discussion saved.')
             return redirect(request.META['HTTP_REFERER'])
 
         elif request_data.get('verifyPaper', -1) != -1:
             current_paper = get_current_paper(request_data["paper_id"])
             creation_user = current_paper.creation_user
             if user == creation_user:
-                messages.error(request, 'The user who verifies a paper cannot be the same user who created this paper. '
-                                        '\nAsk a differnt user to verify this paper.')
+                messages.error(request, 'The user who verifies a paper cannot be the same user who created this paper. Ask a differnt user to verify this paper.')
+                print(messages)
                 return redirect(request.META['HTTP_REFERER'])
             else:
                 current_paper.verified_user = user
