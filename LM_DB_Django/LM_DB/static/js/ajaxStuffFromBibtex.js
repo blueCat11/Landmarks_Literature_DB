@@ -90,10 +90,6 @@ function sendAjaxToGetInfoFromBibtex(context){
 function add_authors(json){
     let authors = json.author;
     let num_author_forms = $(".author_related").children(".author_form").length;
-    console.log(num_author_forms);
-    console.log(authors.length);
-    console.log(authors);
-    console.log($(".author_related").children(".author_form"));
     for (let i = 0; i < authors.length; ++i){
         let id_part = "id_author-" + i + "-";
         if (num_author_forms < authors.length) {

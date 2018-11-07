@@ -42,7 +42,8 @@ CONTEXT_FOR_VIEW = "view"
 # Done add field "verified by" to paper (needs to be different user than created)
 # Done add boolean field "need for discussion" to paper
 # DONE: Bug fix: updating bibtex again authors: empty forms again and again, and first author delete-this-checked
-
+# DONE: Bug fix page numbers get displayed as True and False
+# TODO: after verify or download or needForDiscussion, return to previous table row (anchor link jumping)
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -798,7 +799,7 @@ class EnterData(View):
                                 if data.get("delete_this_core_attribute", "None") == False:
                                     core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
                                     is_literal_quotation = data.get('is_literal_quotation', None)
-                                    page_num = data.get('is_literal_quotation', None)
+                                    page_num = data.get('page_num', None)
                                     current_core_attribute = CoreAttributes(core_attribute=core_attribute,
                                                                             is_literal_quotation=is_literal_quotation,
                                                                             page_num=page_num,
