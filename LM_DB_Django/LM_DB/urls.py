@@ -11,7 +11,8 @@ app_name = 'LM_DB'
 # DONE decomment this for production, it restricts access to views
 urlpatterns = [
     re_path(r'^viewData/$', login_required(ViewData.as_view()), name="viewData"),
-    re_path(r'^enterData/$', login_required(EnterData.as_view()), name="enterData")
+    re_path(r'^enterData/$', login_required(EnterData.as_view()), name="enterData"),
+    re_path(r'^userInteraction/$', login_required(UserInteraction.as_view()), name="userInteraction"),
 
 ]
 #urlpatterns = [  # DONE leave this commented for production

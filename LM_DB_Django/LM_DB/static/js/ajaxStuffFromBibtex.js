@@ -12,7 +12,6 @@ $(document).ready( function() {
     $("#id_paper-bibtex").blur( function(event) {
         sendAjaxToGetInfoFromBibtex("bibtex_enter");
     });
-
 });
 
 
@@ -76,7 +75,6 @@ function sendAjaxToGetInfoFromBibtex(context){
                 }else{
                    //console.log("success")
                 }
-
             },
 
             // handle a non-successful response
@@ -88,16 +86,23 @@ function sendAjaxToGetInfoFromBibtex(context){
 }
 
 
+// write values concerning authors to form (and new form)
 function add_authors(json){
     let authors = json.author;
+    let num_author_forms = $(".author_related").children(".author_form").length;
+    console.log(num_author_forms);
+    console.log(authors.length);
+    console.log(authors);
+    console.log($(".author_related").children(".author_form"));
     for (let i = 0; i < authors.length; ++i){
         let id_part = "id_author-" + i + "-";
-        if (i > 0) {
-            $("#add_author").click(); //click on + button
-
-        }else{
-            // "delete this" is previously checked for first form, the click unchecks (and triggers the non-red-outline)
-            $("#"+id_part+"delete_this_author").click()
+        if (num_author_forms < authors.length) {
+            if (i > 0) {
+                $("#add_author").click(); //click on + button
+            } else {
+                // "delete this" is previously checked for first form, the click unchecks (and triggers the non-red-outline)
+                $("#" + id_part + "delete_this_author").click()
+            }
         }
         let author = authors[i];
         $("#"+id_part+"first_name").val(author.first_name);
