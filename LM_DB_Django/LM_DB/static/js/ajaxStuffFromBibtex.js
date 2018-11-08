@@ -64,6 +64,7 @@ function sendAjaxToGetInfoFromBibtex(context){
                         // checkmark is always added to newly added elements in ajaxSaveKeyword.js
                     }
                 }
+                $("#id_paper-don_t_overwrite").prop('checked', true); // assures that bibtex is not by default updated more than once
                 if (json.hasOwnProperty('error')){
                     //console.log(json.error);
                     UIkit.notification({

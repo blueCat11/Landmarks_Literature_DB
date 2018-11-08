@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -92,6 +93,11 @@ TEMPLATES = [
 ]
 #leave this line commented if running on localhost
 #WSGI_APPLICATION = 'LM_DB_Django.wsgi.application'
+
+
+# stuff related to messages
+
+
 
 
 # Database

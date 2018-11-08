@@ -28,6 +28,10 @@
                         timeout: 2500
                     });
                 </script>
+                {% elif message.level == ANCHOR_ID %}
+                    <script>
+                    alert({{ message }});
+                    </script>
                 {% else %}
                     <script>
                     UIkit.notification({

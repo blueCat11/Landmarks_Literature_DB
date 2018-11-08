@@ -14,10 +14,15 @@ from LM_DB.tables import PaperTable
 from LM_DB_Django.settings import MEDIA_ROOT
 from LM_DB.forms import *
 
-CONTEXT_NEW_SAVE = "newSave"
-CONTEXT_EDIT = "editSave"
-CONTEXT_FOR_DB = "db"
-CONTEXT_FOR_VIEW = "view"
+#CONTEXT_NEW_SAVE = "newSave"
+#CONTEXT_EDIT = "editSave"
+#CONTEXT_FOR_DB = "db"
+#CONTEXT_FOR_VIEW = "view"
+
+# custom message level
+ANCHOR_ID = 21
+# TODO see https://simpleisbetterthancomplex.com/tips/2016/09/06/django-tip-14-messages-framework.html
+
 # To-Dos
 
 # DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
@@ -35,7 +40,7 @@ CONTEXT_FOR_VIEW = "view"
 # DONE update keywords from bibtex
 # DONE check where files are uploaded
 # DONE sticky table header
-# TODO: set checkmark (bibtex) automatically, after first bibtex update
+# TODO: TEST set checkmark (bibtex) automatically, after first bibtex update
 # DONE make new Author relation Paper_Author mediator table
 # DONE incorporate author-paper many-to-many relationship into code
 # DONE add possibility to specify order of author for given paper
@@ -70,7 +75,8 @@ class UserInteraction(View):
         request_data = request.POST
         user = get_current_auth_user(request.user)
         if request_data.get('needForDiscussion', -1) != -1:
-            current_paper = get_current_paper(request_data["paper_id"])
+            paper_id = request_data["paper_id"]
+            current_paper = get_current_paper(paper_id)
             isNeedForDiscussion = current_paper.is_need_for_discussion
             if isNeedForDiscussion:
                 current_paper.is_need_for_discussion = None
@@ -78,21 +84,24 @@ class UserInteraction(View):
             elif isNeedForDiscussion is None:
                 current_paper.is_need_for_discussion = True
                 messages.success(request, 'Need for discussion saved.')
+            messages.add_message(request, ANCHOR_ID, str(paper_id))
             current_paper.save()
             return redirect(request.META['HTTP_REFERER'])
 
         elif request_data.get('verifyPaper', -1) != -1:
-            current_paper = get_current_paper(request_data["paper_id"])
+            paper_id = request_data["paper_id"]
+            current_paper = get_current_paper(paper_id)
             creation_user = current_paper.creation_user
             if user == creation_user:
                 messages.error(request, 'The user who verifies a paper cannot be the same user who created this paper. Ask a differnt user to verify this paper.')
-                print(messages)
+                messages.add_message(request, ANCHOR_ID, str(paper_id))
                 return redirect(request.META['HTTP_REFERER'])
             else:
                 current_paper.verified_user = user
                 current_paper.verified_timestamp = datetime.now(timezone.utc).astimezone()
                 current_paper.save()
                 messages.success(request, 'Paper verified.')
+                messages.add_message(request, ANCHOR_ID, str(paper_id))
                 return redirect(request.META['HTTP_REFERER'])
 
 
