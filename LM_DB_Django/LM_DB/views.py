@@ -14,17 +14,17 @@ from LM_DB.tables import PaperTable
 from LM_DB_Django.settings import MEDIA_ROOT
 from LM_DB.forms import *
 
-#CONTEXT_NEW_SAVE = "newSave"
-#CONTEXT_EDIT = "editSave"
-#CONTEXT_FOR_DB = "db"
-#CONTEXT_FOR_VIEW = "view"
+CONTEXT_NEW_SAVE = "newSave"
+CONTEXT_EDIT = "editSave"
+CONTEXT_FOR_DB = "db"
+CONTEXT_FOR_VIEW = "view"
 
 # custom message level
 ANCHOR_ID = 21
-# TODO see https://simpleisbetterthancomplex.com/tips/2016/09/06/django-tip-14-messages-framework.html
 
+
+# DONE see https://simpleisbetterthancomplex.com/tips/2016/09/06/django-tip-14-messages-framework.html
 # To-Dos
-
 # DONE authentification: http://www.tangowithdjango.com/book17/chapters/login.html;
 # DONE user permissions # https://docs.djangoproject.com/en/2.1/topics/auth/default/#topic-authorization
 # DONE enable file uploading: https://docs.djangoproject.com/en/2.1/topics/http/file-uploads/
@@ -40,7 +40,7 @@ ANCHOR_ID = 21
 # DONE update keywords from bibtex
 # DONE check where files are uploaded
 # DONE sticky table header
-# TODO: TEST set checkmark (bibtex) automatically, after first bibtex update
+# DONE: TEST set checkmark (bibtex) automatically, after first bibtex update
 # DONE make new Author relation Paper_Author mediator table
 # DONE incorporate author-paper many-to-many relationship into code
 # DONE add possibility to specify order of author for given paper
@@ -48,7 +48,9 @@ ANCHOR_ID = 21
 # Done add boolean field "need for discussion" to paper
 # DONE: Bug fix: updating bibtex again authors: empty forms again and again, and first author delete-this-checked
 # DONE: Bug fix page numbers get displayed as True and False
-# TODO: after verify or download or needForDiscussion, return to previous table row (anchor link jumping)
+# DONE: after verify or download or needForDiscussion, return to previous table row (anchor link jumping)
+# TODO get abstract-column wider
+# TODO visualize spaces after each item for categories, links, etc
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -912,10 +914,11 @@ def get_info_from_bibtex(request_data):
         authors = ""
         keywords = ""
         doi = ""
+        abstract = ""
 
         error = "No bibtex is present."
         response_data = {"result": " ", "year": "", "year_for_file": year, "title": title, "cite_command": cite_command, "author": authors,
-                         "doi": doi, "keywords": keywords, "error": error}
+                         "doi": doi, "keywords": keywords, "abstract": abstract, "error": error}
     else:
         context = request_data.get("context", -1)
         response_data = called_by_bibtex_upload(bibtex_str, context)
@@ -933,6 +936,7 @@ def called_by_bibtex_upload(bibtex_str, context):
     keywords = ""
     doi = ""
     year_for_file = ""
+    abstract = ""
 
     try:
         bib = bibtexparser.loads(bibtex_str)
@@ -961,6 +965,12 @@ def called_by_bibtex_upload(bibtex_str, context):
         print(e)
 
     try:
+        abstract = str(paper["abstract"])
+    except KeyError as e:
+        error += "\n Could not find abstract. "
+        print(e)
+
+    try:
         keywords = get_keywords_list(str(paper["keywords"]))
     except KeyError as e:
         error += "\n Could not find keywords. "
@@ -985,7 +995,8 @@ def called_by_bibtex_upload(bibtex_str, context):
         print(e)
 
     response_data = {"result": "year extracted from bibtex! ", "title": title, "cite_command": cite_command,
-                     "year": year, "year_for_file": year_for_file, "author": authors, "doi": doi, "keywords": keywords}
+                     "year": year, "year_for_file": year_for_file, "author": authors, "doi": doi, "keywords": keywords,
+                     "abstract": abstract}
     if error != "":
         response_data["error"] = error
 

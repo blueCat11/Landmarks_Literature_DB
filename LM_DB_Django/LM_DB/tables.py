@@ -22,7 +22,7 @@ class ActionColumn(tables.Column):
 class ActionDiscussionColumn(tables.Column):
     def render(self, value):
         form = '<form action="/LM_DB/userInteraction/" method="post" class="action_form">' \
-               ' <input type="hidden" name="paper_id" value="{}">' \
+               ' <input type="hidden" class="user_interaction" name="paper_id" value="{}">' \
                '<div class="uk-margin-small">' \
                '<input class="button uk-button uk-button-primary uk-button-small" type="submit" name="verifyPaper" value="Verify"/>' \
                '</div>' \
