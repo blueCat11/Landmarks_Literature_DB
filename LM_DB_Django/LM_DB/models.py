@@ -157,7 +157,7 @@ class CoreAttributes(models.Model):
         else:
             string += str(self.core_attribute)
         if self.page_num is not None:
-            string += ', p. ' + str(self.page_num)
+            string += ' (p. ' + str(self.page_num) + ')'
             print(self.page_num)
         return string
 
