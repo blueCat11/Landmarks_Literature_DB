@@ -212,7 +212,7 @@ class Files(models.Model):
         # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
         # in case user did not enter data for file_name, use default of previous name of file
         print(filename)
-        if instance.file_name != "" or instance.file_name is not None:
+        if instance.file_name != "" and instance.file_name is not None:
             file_name_for_path = instance.file_name
         else:
             file_name_for_path = filename

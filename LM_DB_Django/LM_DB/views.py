@@ -51,6 +51,7 @@ ANCHOR_ID = 21
 # DONE: after verify or download or needForDiscussion, return to previous table row (anchor link jumping)
 # DONE get abstract-column wider (https://stackoverflow.com/questions/19847371/django-how-to-change-the-column-width-in-django-tables2)
 # DONE visualize spaces after each item for categories, links, etc
+# TODO test whether keywords still work
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -394,8 +395,8 @@ class EnterData(View):
                                         for entry in author_form.changed_data:
                                             if entry == "delete_this_author":
                                                 is_to_be_deleted = data["delete_this_author"]
-                                            elif entry == "order_for_paper":
-                                                current_paper_author.author_order_on_paper = data["order_for_paper"]
+                                            elif entry == "author_order_on_paper":
+                                                current_paper_author.author_order_on_paper = data["author_order_on_paper"]
                                             elif entry == "first_name" or entry == "last_name":
                                                 current_paper_author = save_authors_information(data, current_paper_author, current_paper)
                                         if is_to_be_deleted:
@@ -629,7 +630,7 @@ class EnterData(View):
 
         elif request_data.get("isNewKeyword", -1) != -1:
             print("isNewKeyword")
-            keyword = request_data['keyword']
+            keyword = request_data['keyword'].lower()
             is_not_unique = Keywords.objects.filter(keyword=keyword).exists()
             if not is_not_unique:
                 new_keyword = Keywords(keyword=keyword)
@@ -637,7 +638,7 @@ class EnterData(View):
                 print("keyword saved")
                 response_data = {"result": "Create keyword successful!", "keyword": keyword, "keyword_id": new_keyword.pk}
             else:
-                response_data = {"result": "Creating keyword not successful!", "error":"This keyword already exists."}
+                response_data = {"result": "Creating keyword not successful!", "error": "This keyword already exists."}
             json_response = JsonResponse(response_data)
             return json_response
 
@@ -971,7 +972,10 @@ def called_by_bibtex_upload(bibtex_str, context):
         print(e)
 
     try:
-        keywords = get_keywords_list(str(paper["keywords"]))
+        keywords_random_case = get_keywords_list(str(paper["keywords"]))
+        # for uniformity (some bibtex-files have upper, some lower)
+        keywords = [keyword.lower() for keyword in keywords_random_case]
+
     except KeyError as e:
         error += "\n Could not find keywords. "
         print(e)
@@ -1115,7 +1119,10 @@ def get_keywords_list(keywords_from_bibtex):
 def save_authors_information(data, current_paper_author, current_paper):
     first_name = convert_empty_string_to_none(data.get("first_name", None))
     last_name = convert_empty_string_to_none(data.get("last_name", None))
-    order = data.get("order_for_paper", None)
+    order = data.get("author_order_on_paper", None)
+    print("order on paper")
+    print(data)
+    print(order)
 
     authors = Authors.objects.filter(first_name=first_name, last_name=last_name)
     if len(authors) !=0:  # author is in database
