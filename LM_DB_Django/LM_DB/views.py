@@ -49,8 +49,8 @@ ANCHOR_ID = 21
 # DONE: Bug fix: updating bibtex again authors: empty forms again and again, and first author delete-this-checked
 # DONE: Bug fix page numbers get displayed as True and False
 # DONE: after verify or download or needForDiscussion, return to previous table row (anchor link jumping)
-# TODO get abstract-column wider
-# TODO visualize spaces after each item for categories, links, etc
+# DONE get abstract-column wider (https://stackoverflow.com/questions/19847371/django-how-to-change-the-column-width-in-django-tables2)
+# DONE visualize spaces after each item for categories, links, etc
 
 # This View displays all current database entries in a table format
 class ViewData(View):

@@ -108,7 +108,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     current_links = Links.objects.filter(ref_link_to_paper=current_paper_pk)
     links_data = ''
     for link in current_links:
-        links_data += str(link) + "; "
+        links_data += str(link) + " ; "
     paper_data['links'] = links_data
 
     # the keywords that are linked to a paper
@@ -122,7 +122,7 @@ def get_dict_of_all_data_on_one_paper(current_paper_pk):
     current_categories = Categories.objects.filter(papercategory__ref_paper_category_to_paper=current_paper_pk)
     categories_data = ""
     for category in current_categories:
-        categories_data += str(category) + ";"
+        categories_data += str(category) + ", "
     paper_data['categories'] = categories_data
 
     current_purposes = Purposes.objects.filter(ref_purpose_to_paper=current_paper_pk)

@@ -15,3 +15,11 @@ table thead {
 .table-container {
     height: 100vh;
 }
+
+
+.abstract_col {
+    white-space: normal;
+    display:block;
+    width: 350px;
+
+}

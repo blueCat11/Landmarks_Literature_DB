@@ -43,7 +43,7 @@ class PaperTable(tables.Table):
     title = tables.Column()
     year = tables.Column()
     authors = tables.Column()
-    abstract = tables.Column()
+    abstract = tables.Column(attrs={"td": {"class": "abstract_col"}})
     is_fulltext_in_repo = tables.Column()
     concept_name = tables.Column()
     core_attributes = tables.Column()
