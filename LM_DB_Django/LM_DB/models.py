@@ -208,17 +208,20 @@ class DjangoSession(models.Model):
 
 class Files(models.Model):
     # method from docs (strg f for files: https://docs.djangoproject.com/en/2.1/ref/models/fields/)
-    def year_directory_path(instance, file_name):
+    def year_directory_path(instance, filename):
         # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
         # in case user did not enter data for file_name, use default of previous name of file
+        print(filename)
         if instance.file_name != "" or instance.file_name is not None:
-            filename = instance.file_name
+            file_name_for_path = instance.file_name
+        else:
+            file_name_for_path = filename
         year = instance.year
         print(year)
         if instance.year is None or instance.year == "":
             year = "unknown_year"
 
-        path = os.path.join(year, filename)
+        path = os.path.join(year, file_name_for_path)
         return path
 
     file_id = models.AutoField(primary_key=True)
