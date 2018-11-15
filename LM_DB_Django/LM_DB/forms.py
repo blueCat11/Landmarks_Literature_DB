@@ -62,16 +62,14 @@ class CoreAttributeForm (forms.ModelForm):
 
 class LinkForm (forms.ModelForm):
     link_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    link_text = forms.CharField(widget=forms.Textarea, required=False)
+    link_text = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
     is_local_link = forms.BooleanField(required=False)
     delete_this_link = forms.BooleanField(required=False, initial=True)
 
     class Meta:
         model = Links
         fields = ('link_id', 'link_text', 'is_local_link')
-        widgets = {
-            'link_text': Textarea(attrs={'cols': 40, 'rows': 1}),
-        }
+
 
 
 class KeywordForm(forms.ModelForm):
