@@ -51,7 +51,10 @@ ANCHOR_ID = 21
 # DONE: after verify or download or needForDiscussion, return to previous table row (anchor link jumping)
 # DONE get abstract-column wider (https://stackoverflow.com/questions/19847371/django-how-to-change-the-column-width-in-django-tables2)
 # DONE visualize spaces after each item for categories, links, etc
-# TODO test whether keywords still work
+# DONE: test whether keywords still work
+# DONE: check whether file of this name is already in media folder (ensure it's not overwriting) -> default behavior
+# TODO: hide "add new xyz" from view default because uses up lots of space which you have to scroll down
+# DONE: update file-year-field whenever paper-year-field gets changed, and once at document load
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -101,7 +104,7 @@ class UserInteraction(View):
                 return redirect(request.META['HTTP_REFERER'])
             else:
                 current_paper.verified_user = user
-                current_paper.verified_timestamp = datetime.now(timezone.utc).astimezone()
+                current_paper.verified_timestamp = get_current_time()
                 current_paper.save()
                 messages.success(request, 'Paper verified.')
                 messages.add_message(request, ANCHOR_ID, str(paper_id))
@@ -174,11 +177,10 @@ class EnterData(View):
             creation_user = current_paper.creation_user
             if user == creation_user:
                 messages.error(request, 'The user who verifies a paper cannot be the same user who created this paper. Ask a differnt user to verify this paper.')
-                print(messages)
                 return redirect(request.META['HTTP_REFERER'])
             else:
                 current_paper.verified_user = user
-                current_paper.verified_timestamp = datetime.now(timezone.utc).astimezone()
+                current_paper.verified_timestamp = get_current_time()
                 current_paper.save()
                 messages.success(request, 'Paper verified.')
                 return redirect(request.META['HTTP_REFERER'])
@@ -204,11 +206,9 @@ class EnterData(View):
             purpose_formset = self.PurposeFormset(prefix="purpose", initial=purpose_data)
 
             link_data = all_table_data["link"]
-            print("link initial data")
             link_formset = self.LinkFormset(prefix="link", initial=link_data)
 
             core_attribute_data = all_table_data["core_attribute"]
-            print(core_attribute_data)
             core_attribute_formset = self.CoreAttributeFormset(prefix="core_attribute", initial=core_attribute_data)
 
             keyword_form = KeywordForm(prefix="new_keyword")
@@ -310,7 +310,6 @@ class EnterData(View):
                                 elif entry == "bibtex":
                                     current_paper.bibtex = convert_empty_string_to_none(data.get('bibtex', None))
                                 elif entry == "cite_command":
-                                    print(data.get('cite_command', "none"))
                                     current_paper.cite_command = convert_empty_string_to_none(data.get('cite_command', None))
                                 elif entry == "title":
                                     current_paper.title = convert_empty_string_to_none(data.get('title', None))
@@ -356,10 +355,8 @@ class EnterData(View):
                         else:
                             data = file_form.cleaned_data
                             if data.get('file_id', None) is not None:#changing old file
-                                print(data)
                                 current_file = Files.objects.get(file_id=data['file_id'])
                                 for entry in file_form.changed_data:
-                                    print(entry)
                                     if entry == "year":
                                         current_file.year = convert_empty_string_to_none(data['year'])
                                     elif entry == "file_name":
@@ -373,9 +370,6 @@ class EnterData(View):
                                 if file_name is None:
                                     file_name = file.name
                                 year = data["year"]
-                                print(data)
-                                print("year: ")
-                                print(year)
                                 current_file = Files(file_name=file_name, complete_file_path=file, year=year,
                                                      ref_file_to_paper_id=current_paper_pk)
                                 current_file.save()
@@ -881,8 +875,7 @@ def add_forms_to_context_dict(context_dict, paper, file, concept_name, paper_con
 # the attributes of user who performed the last edit on data related to a paper and time of the edit are updated
 # to current user and time
 def update_last_edit(current_paper, current_user):
-    current_utc_dt = datetime.now(timezone.utc)  # UTC time
-    current_date_time = current_utc_dt.astimezone()
+    current_date_time = get_current_time()
 
     current_paper.last_edit_user = current_user
     current_paper.last_edit_timestamp = current_date_time
@@ -890,8 +883,8 @@ def update_last_edit(current_paper, current_user):
 
 
 def set_creation_meta_data(current_paper, current_user):
-    current_utc_dt = datetime.now(timezone.utc)  # UTC time
-    current_date_time = current_utc_dt.astimezone()
+
+    current_date_time = get_current_time()
 
     current_paper.creation_user = current_user
     current_paper.creation_timestamp = current_date_time
@@ -938,65 +931,70 @@ def called_by_bibtex_upload(bibtex_str, context):
     doi = ""
     year_for_file = ""
     abstract = ""
+    is_bibtex_correct = False
 
     try:
         bib = bibtexparser.loads(bibtex_str)
         paper = bib.entries[0]
-        title = str(bib.entries[0]['title'])
+        is_bibtex_correct = True
     except IndexError as e:
-        error = "No bibtex-present"
+        error = "Error in bibtex."
         print(e)
-
-    try:
-        title = paper['title']
     except KeyError as e:
-        error += "\n Could not find title. "
+        error = "Error in bibtex."
         print(e)
 
-    try:
-        authors = get_authors_from_bibtex(paper['author'])
-    except KeyError as e:
-        error += "\n Could not find authors. "
-        print(e)
+    if is_bibtex_correct:
+        try:
+            title = paper['title']
+        except KeyError as e:
+            error += "\n Could not find title. "
+            print(e)
 
-    try:
-        cite_command = str(paper["ID"])
-    except KeyError as e:
-        error += "\n Could not find cite-command. "
-        print(e)
+        try:
+            authors = get_authors_from_bibtex(paper['author'])
+        except KeyError as e:
+            error += "\n Could not find authors. "
+            print(e)
 
-    try:
-        abstract = str(paper["abstract"])
-    except KeyError as e:
-        error += "\n Could not find abstract. "
-        print(e)
+        try:
+            cite_command = str(paper["ID"])
+        except KeyError as e:
+            error += "\n Could not find cite-command. "
+            print(e)
 
-    try:
-        keywords_random_case = get_keywords_list(str(paper["keywords"]))
-        # for uniformity (some bibtex-files have upper, some lower)
-        keywords = [keyword.lower() for keyword in keywords_random_case]
+        try:
+            abstract = str(paper["abstract"])
+        except KeyError as e:
+            error += "\n Could not find abstract. "
+            print(e)
 
-    except KeyError as e:
-        error += "\n Could not find keywords. "
-        print(e)
+        try:
+            keywords_random_case = get_keywords_list(str(paper["keywords"]))
+            # for uniformity (some bibtex-files have upper, some lower)
+            keywords = [keyword.lower() for keyword in keywords_random_case]
 
-    try:
-        doi = str(paper["doi"])
-    except KeyError as e:
-        error += "\n Could not find doi. "
-        print(e)
+        except KeyError as e:
+            error += "\n Could not find keywords. "
+            print(e)
 
-    try:
-        year = paper["year"]
-        year_for_file = str(year)
-    except KeyError as e:
-        if context == "file_upload":
-            error = "\n Could not find year. Saving to folder 'unknown_year' instead. "
-            year_for_file = "unknown_year"
-        else:
-            error += "\n Could not find year. "
-            year_for_file = "unknown_year"
-        print(e)
+        try:
+            doi = str(paper["doi"])
+        except KeyError as e:
+            error += "\n Could not find doi. "
+            print(e)
+
+        try:
+            year = paper["year"]
+            year_for_file = str(year)
+        except KeyError as e:
+            if context == "file_upload":
+                error = "\n Could not find year. Saving to folder 'unknown_year' instead. "
+                year_for_file = "unknown_year"
+            else:
+                error += "\n Could not find year. "
+                year_for_file = "unknown_year"
+            print(e)
 
     response_data = {"result": "year extracted from bibtex! ", "title": title, "cite_command": cite_command,
                      "year": year, "year_for_file": year_for_file, "author": authors, "doi": doi, "keywords": keywords,
@@ -1043,13 +1041,10 @@ def uniqueness_check(bibtex, doi, cite_command, context, current_paper):
     else:
         context_dict["is_unique"] = False
         if not bibtex_unique:
-            print("bibtex not")
             context_dict["bibtex_unique"] = "Bibtex not unique. A paper with this bibtex is already in the database."
         if not cite_command_unique:
-            print("cite_command not")
             context_dict["cite_command_unique"] = "Cite-command not unique. A paper with this cite-command is already in the database."
         if not doi_unique:
-            print("doi not")
             context_dict["doi_unique"] = "Doi not unique. A paper with this doi is already in the database."
 
     return context_dict
@@ -1059,7 +1054,6 @@ def is_bibtex_unique(bibtex_str, context, current_paper):
     if bibtex_str == "" or bibtex_str is None:
         return True
     poss_other_bibtex = Papers.objects.filter(bibtex=bibtex_str)
-    print(poss_other_bibtex)
     if context == CONTEXT_NEW_SAVE:
         return is_unique_for_new_data(poss_other_bibtex)
     else:
@@ -1070,7 +1064,6 @@ def is_doi_unique(doi_str, context, current_paper):
     if doi_str == "" or doi_str is None:
         return True
     poss_other_doi = Papers.objects.filter(doi=doi_str)
-    print(poss_other_doi)
     if context == CONTEXT_NEW_SAVE:
         return is_unique_for_new_data(poss_other_doi)
     else:
@@ -1079,11 +1072,9 @@ def is_doi_unique(doi_str, context, current_paper):
 
 def is_cite_command_unique(cite_command_str, context, current_paper):
     print("inside cite_command")
-    print(cite_command_str)
     if cite_command_str == "" or cite_command_str is None:
         return True
     poss_other_cite_command = Papers.objects.filter(cite_command=cite_command_str)
-    print(poss_other_cite_command)
     if context == CONTEXT_NEW_SAVE:
         return is_unique_for_new_data(poss_other_cite_command)
     else:
@@ -1120,9 +1111,6 @@ def save_authors_information(data, current_paper_author, current_paper):
     first_name = convert_empty_string_to_none(data.get("first_name", None))
     last_name = convert_empty_string_to_none(data.get("last_name", None))
     order = data.get("author_order_on_paper", None)
-    print("order on paper")
-    print(data)
-    print(order)
 
     authors = Authors.objects.filter(first_name=first_name, last_name=last_name)
     if len(authors) !=0:  # author is in database
@@ -1141,3 +1129,9 @@ def update_current_paper_author(current_paper_author, current_author, current_pa
         current_paper_author = PaperAuthor(ref_paper_author_to_paper=current_paper, author_order_on_paper=order,
                                        ref_paper_author_to_author=current_author)
     return current_paper_author
+
+
+def get_current_time():
+    current_time = datetime.now().astimezone()
+    print (current_time)
+    return datetime.now().astimezone()
