@@ -24,7 +24,6 @@ def get_dict_for_enter_data(current_paper_pk):
     current_concept_name = ConceptNames.objects.filter(
         paperconceptname__ref_paper_concept_name_to_paper=current_paper_pk)
     concept_name_data = current_concept_name.values_list('concept_name_id', flat=True)
-    print(concept_name_data)
     # priorly empty forms are automatically set to be deleted
     all_table_data["paper_concept_name"] = concept_name_data
 
@@ -39,7 +38,6 @@ def get_dict_for_enter_data(current_paper_pk):
     for link in links_data:
         link['delete_this_link'] = False  # makes default for already there data not deleted automatically
     all_table_data["link"] = links_data
-    print(links_data)
 
     current_paper_keywords = Keywords.objects.filter(paperkeyword__ref_paper_keyword_to_paper=current_paper_pk)
     paper_keywords_data = current_paper_keywords.values_list('keyword_id', flat=True)
@@ -55,7 +53,6 @@ def get_dict_for_enter_data(current_paper_pk):
         data_object = current_paper_authors_order[i]
         author = Authors.objects.get(author_id=data_object.ref_paper_author_to_author_id)
         paper_authors_order_data[i]['first_name'] = author.first_name
-        print(author.first_name)
         paper_authors_order_data[i]['last_name'] = author.last_name
         paper_authors_order_data[i]['author_id'] = author.author_id
         paper_authors_order_data[i]["delete_this_author"] = False
@@ -173,10 +170,11 @@ def get_user_name(user):
     else:
         return " "
 
+
 # formats username and time appropriately
 def get_user_name_time_string(user_name, time):
-    time_str = str(time)[:-7]  # shave off milliseconds...
-    if len(user_name)<2: # empty string, that is to say no user
+    time_str = str(time)[:-13]  # shave off milliseconds etc...
+    if len(user_name) < 2:  # empty string, that is to say no user
         return None
     else:
         return "at " + time_str + ", by " + user_name
@@ -220,8 +218,6 @@ def get_authors_from_bibtex(authors):
     for author in author_list:
         author_num = i
         comma_separated = author.split(",")
-        print("one author: ")
-        print(comma_separated)
         if len(comma_separated) == 2:
             last_name = comma_separated[0].strip()
             first_name = comma_separated[1].strip()

@@ -13,20 +13,3 @@ function pinTableHeader(){
     console.log("adjusted");
 
 }
-
-//TODO find a way to optimize this
-/*$(function(){
-        // Check the initial Poistion of the Sticky Header
-        var stickyHeaderTop = $('.uk-table > thead:nth-child(1)').offset().top;
-
-        $(window).scroll(function(){
-                if( $(window).scrollTop() > stickyHeaderTop ) {
-                        $('.uk-table > thead:nth-child(1)').css({position: 'fixed', top: '0px', background: "white"});
-                } else {
-                        $('.uk-table > thead:nth-child(1)').css({position: 'static', top: '0px', background: "white"});
-
-                }
-        });
-  });
-
-  */

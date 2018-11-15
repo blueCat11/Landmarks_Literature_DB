@@ -207,6 +207,7 @@ class DjangoSession(models.Model):
 
 
 class Files(models.Model):
+
     # method from docs (strg f for files: https://docs.djangoproject.com/en/2.1/ref/models/fields/)
     def year_directory_path(instance, filename):
         # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -229,7 +230,6 @@ class Files(models.Model):
     file_name = models.CharField(max_length=50, blank=True, null=True)
     complete_file_path = models.FileField(upload_to=year_directory_path, blank=True, null=True)  # only path saved here, not filename
     year = models.CharField(max_length=12, blank=True, null=True)#DONE change widget to hidden and prepopulate from bibtex
-
 
     def filename(self):
         return os.path.basename(self.file.name)
