@@ -239,8 +239,8 @@ class Files(models.Model):
         db_table = 'files'
 
     def __str__(self):
-        if self.complete_file_path is not None and self.file_name is not None:
-            return str(self.file_name)
+        if self.complete_file_path is not None:
+            return str(self.complete_file_path)
         else:
             return "None"
 
