@@ -350,7 +350,7 @@ class EnterData(View):
                     if file_form.has_changed():
                         data = file_form.cleaned_data
                         if data['complete_file_path'] == False:
-                            print("delete file")  # Done (No) really delete it, from folders as well?
+                            print("delete file")
                             current_file = Files.objects.get(file_id=data['file_id'], ref_file_to_paper=current_paper_pk)
                             current_file.delete()
                         else:
@@ -367,13 +367,14 @@ class EnterData(View):
                                 current_file.save()
                             else:# new file
                                 file_name = convert_empty_string_to_none(data.get('file_name', None))
-                                file = request.FILES["file-complete_file_path"]
-                                if file_name is None:
-                                    file_name = file.name
-                                year = data["year"]
-                                current_file = Files(file_name=file_name, complete_file_path=file, year=year,
-                                                     ref_file_to_paper_id=current_paper_pk)
-                                current_file.save()
+                                file = request.FILES.get("file-complete_file_path", False)
+                                if file != False:
+                                    if file_name is None:
+                                        file_name = file.name
+                                    year = data["year"]
+                                    current_file = Files(file_name=file_name, complete_file_path=file, year=year,
+                                                         ref_file_to_paper_id=current_paper_pk)
+                                    current_file.save()
                         pass
                     if author_order_formset.has_changed():
                         print("author changed")
