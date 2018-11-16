@@ -100,6 +100,8 @@ function add_authors(json){
                 // "delete this" is previously checked for first form, the click unchecks (and triggers the non-red-outline)
                 $("#" + id_part + "delete_this_author").click()
             }
+        }else{
+            $("#" + id_part + "delete_this_author").click()
         }
         let author = authors[i];
         $("#"+id_part+"first_name").val(author.first_name);
