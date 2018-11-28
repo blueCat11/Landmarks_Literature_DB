@@ -957,11 +957,11 @@ def called_by_bibtex_upload(bibtex_str, context):
         paper = bib.entries[0]
         is_bibtex_correct = True
     except IndexError as e:
-        error = "Error in bibtex."
-        print(e)
+        error = "Error in bibtex: " + str(e)
+        print("indexError in Bibtex: " + str(e))
     except KeyError as e:
-        error = "Error in bibtex."
-        print(e)
+        error = "Error in bibtex: " + str(e)
+        print("keyError in Bibtex: " + str(e))
 
     if is_bibtex_correct:
         try:
