@@ -345,6 +345,7 @@ class EnterData(View):
                             else:
                                 current_paper.save()
                         else:
+                            print("error display should be managed in outside else-clause.")
                             # error display is managed in outside else-clause, all have to be valid to get here
                             pass
                     if file_form.has_changed():

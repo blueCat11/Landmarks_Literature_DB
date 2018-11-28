@@ -115,7 +115,7 @@ class PurposeForm(forms.ModelForm):
         fields = ('purpose_id', 'purpose',)
 
 
-# TODO delete PaperAuthorForm where used
+# Done delete PaperAuthorForm where used
 class PaperAuthorForm(forms.Form):
     paper_authors = forms.ModelMultipleChoiceField(label="", queryset=Authors.objects.all().order_by('last_name'),
                                                    widget=forms.CheckboxSelectMultiple, required=False)
@@ -129,7 +129,7 @@ class AuthorOrderForm(forms.Form):
     delete_this_author = forms.BooleanField(required=False, initial=True)
 
 
-# TODO delete AuthorForm where used
+# Done delete AuthorForm where used
 class AuthorForm(forms.ModelForm):
     author_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     last_name = forms.CharField(max_length=100, required=False)
