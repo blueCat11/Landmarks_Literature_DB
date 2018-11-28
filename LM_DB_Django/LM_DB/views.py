@@ -838,7 +838,23 @@ class EnterData(View):
 
                 return redirect("LM_DB:viewData")
             else:
-                pass
+                context_dict = {"original_form_name": "newSave", "type_of_edit": "New Entry",
+                                }
+                context_dict = add_forms_to_context_dict(context_dict, paper=paper_form,
+                                                         file=file_form,
+                                                         concept_name=concept_name_form,
+                                                         paper_concept_name=paper_concept_names_form,
+                                                         purpose=purpose_formset,
+                                                         core_attribute=core_attribute_formset,
+                                                         links=link_formset,
+                                                         keyword=keyword_form,
+                                                         paper_keywords=paper_keywords_form,
+                                                         category=category_form,
+                                                         paper_categories=paper_categories_form,
+                                                         author_order=author_order_formset,
+                                                         )
+
+                return render(request, "LM_DB/enterData.html", context_dict)
                 # TODO: error handling
 
         else:
