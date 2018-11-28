@@ -31,9 +31,7 @@
                     <script>
                     $( document ).ready(function() {
                         let current_paper_id = {{ message }};
-                        console.log(current_paper_id);
                         let $current_input = $("input[value='"+({{ message }})+"'][name='paper_id'][class='user_interaction']");
-                        console.log($current_input);
                         //scrolls the td element for the actions and the relevant paper into view
                         //this automatically puts the verified and need-for-discussion-info into view, too
                         $current_input.parent().parent().get(0).scrollIntoView(false);

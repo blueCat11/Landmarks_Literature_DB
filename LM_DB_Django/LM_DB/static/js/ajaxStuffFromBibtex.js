@@ -97,15 +97,18 @@ function add_authors(json){
     let num_author_forms = $(".author_related").children(".author_form").length;
     for (let i = 0; i < authors.length; ++i){
         let id_part = "id_author-" + i + "-";
+        let $current_delete_author_element = $("#" + id_part + "delete_this_author");
         if (num_author_forms < authors.length) {
-            if (i > 0) {
+            if (i > 0){
                 $("#add_author").click(); //click on + button
             } else {
                 // "delete this" is previously checked for first form, the click unchecks (and triggers the non-red-outline)
-                $("#" + id_part + "delete_this_author").click()
+                $current_delete_author_element.click()
             }
         }else{
-            $("#" + id_part + "delete_this_author").click()
+            if ($current_delete_author_element.is(':checked')) {
+                $current_delete_author_element.click();
+            }
         }
         let author = authors[i];
         $("#"+id_part+"first_name").val(author.first_name);

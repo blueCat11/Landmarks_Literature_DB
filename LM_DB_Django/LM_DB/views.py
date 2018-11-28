@@ -56,6 +56,7 @@ ANCHOR_ID = 21
 # TODO: hide "add new xyz" from view default because uses up lots of space which you have to scroll down
 # DONE: update file-year-field whenever paper-year-field gets changed, and once at document load
 # TODO: save default name of file, if user doesn't enter anything into the field.
+# TODO: if no doi: display help -> current no_doi_[number]
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -856,7 +857,7 @@ class EnterData(View):
                                                          )
 
                 return render(request, "LM_DB/enterData.html", context_dict)
-                # TODO: error handling
+                # Done: error handling
 
         else:
             print("default")
