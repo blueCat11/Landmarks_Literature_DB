@@ -321,7 +321,7 @@ class PaperKeyword(models.Model):
 
 class Papers(models.Model):
     paper_id = models.AutoField(primary_key=True)
-    doi = models.CharField(max_length=50, blank=True, null=True)
+    doi = models.CharField(max_length=150, blank=True, null=True)
     bibtex = models.TextField(blank=True, null=True)
     cite_command = models.CharField(max_length=50, blank=True, null=True)
     title = models.TextField(blank=True, null=True)

@@ -8,7 +8,7 @@ from LM_DB.models import *
 # form for main information on paper
 class PaperForm (forms.ModelForm):
     paper_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    doi = forms.CharField(max_length=50)
+    doi = forms.CharField(max_length=150)
     bibtex = forms.CharField(widget=forms.Textarea, required=False,)
     don_t_overwrite = forms.BooleanField(label="don't overwrite when bibtex is updated", required=False)
     cite_command = forms.CharField(max_length=50, required=False)
