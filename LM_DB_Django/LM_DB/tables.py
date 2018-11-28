@@ -46,7 +46,7 @@ class PaperTable(tables.Table):
     abstract = tables.Column(attrs={"td": {"class": "abstract_col"}})
     is_fulltext_in_repo = tables.Column()
     concept_name = tables.Column()
-    core_attributes = tables.Column()
+    core_attributes = tables.Column(attrs={"td":{"class": "core_attribute_col"}})
     links = tables.Column()
     keywords = tables.Column()
     categories = tables.Column()
