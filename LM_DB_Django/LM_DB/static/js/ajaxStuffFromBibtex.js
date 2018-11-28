@@ -2,11 +2,15 @@
 // possible data: title, cite_command, year, author(s), keyword(s)
 // add javascript-call to file-upload field
 $(document).ready( function() {
-    $("#id_file-complete_file_path").click( function(event) {
+    let $file_path_input_field = $("#id_file-complete_file_path");
+    $file_path_input_field.click( function(event) {
         sendAjaxToGetInfoFromBibtex("file_upload");
     });
-
+    $file_path_input_field.change( function(event) {
+        setOriginalFileName();
+    });
 });
+
 
 $(document).ready( function() {
     $("#id_paper-bibtex").blur( function(event) {
@@ -168,4 +172,12 @@ $(function() {
 
 
 });
+
+function setOriginalFileName(){
+    let file_input = document.getElementById("id_file-complete_file_path");
+    let file = file_input.files[0];
+    if (file !== undefined){
+       $("#id_file-file_name").val(file.name);
+    }
+}
 
