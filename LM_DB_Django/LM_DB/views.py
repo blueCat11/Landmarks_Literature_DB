@@ -8,6 +8,7 @@ from datetime import datetime, timezone  # for edit and creation times
 from django_tables2 import RequestConfig
 
 from LM_DB.display_methods import *
+from LM_DB.general import *
 from django.views import View
 
 from LM_DB.tables import PaperTable
@@ -1001,7 +1002,10 @@ def called_by_bibtex_upload(bibtex_str, context):
         try:
             doi = str(paper["doi"])
         except KeyError as e:
-            error += "\n Could not find doi. "
+            no_doi_number = int(get_non_doi_number())+1
+            no_doi_text = "If there is no doi for this paper, please enter 'no_doi_"+no_doi_number+"'. "
+            error += "\n Could not find doi. "+ no_doi_text
+
             print(e)
 
         try:
@@ -1155,3 +1159,5 @@ def get_current_time():
     current_time = datetime.now().astimezone()
     print (current_time)
     return datetime.now().astimezone()
+
+

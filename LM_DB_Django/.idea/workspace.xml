@@ -20,8 +20,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LM_DB/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="58" column="58" selection-start-line="58" selection-start-column="58" selection-end-line="58" selection-end-column="58" />
+            <state relative-caret-position="155">
+              <caret line="1006" column="59" selection-start-line="1006" selection-start-column="59" selection-end-line="1006" selection-end-column="59" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -29,10 +29,19 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="general.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LM_DB/general.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="tables.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LM_DB/tables.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
+            <state relative-caret-position="748">
               <caret line="45" column="77" selection-start-line="45" selection-start-column="77" selection-end-line="45" selection-end-column="77" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
@@ -53,7 +62,7 @@
       <file leaf-file-name="enterData.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LM_DB/static/css/enterData.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
+            <state relative-caret-position="425">
               <caret line="25" column="52" selection-start-line="25" selection-start-column="52" selection-end-line="25" selection-end-column="52" />
             </state>
           </provider>
@@ -62,7 +71,7 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LM_DB/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
+            <state relative-caret-position="5457">
               <caret line="323" column="38" selection-start-line="323" selection-start-column="38" selection-end-line="323" selection-end-column="38" />
               <folding>
                 <element signature="e#468#477#0" expanded="true" />
@@ -74,7 +83,7 @@
       <file leaf-file-name="ViewData.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/LM_DB/ViewData.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
+            <state relative-caret-position="561">
               <caret line="33" column="128" selection-start-line="33" selection-start-column="128" selection-end-line="33" selection-end-column="128" />
             </state>
           </provider>
@@ -83,7 +92,7 @@
       <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LM_DB/forms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
+            <state relative-caret-position="119">
               <caret line="10" column="40" selection-start-line="10" selection-start-column="40" selection-end-line="10" selection-end-column="40" />
               <folding>
                 <element signature="e#1#25#0" expanded="true" />
@@ -107,15 +116,14 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
-        <option value="Python Script" />
         <option value="CSS File" />
         <option value="JavaScript File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>get_use</find>
       <find>verify</find>
       <find>messages</find>
       <find>uikit.noti</find>
@@ -145,6 +153,7 @@
       <find>newSave</find>
       <find>papers</find>
       <find>bibtex</find>
+      <find>doi</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -191,6 +200,7 @@
         <option value="$PROJECT_DIR$/LM_DB/models.py" />
         <option value="$PROJECT_DIR$/LM_DB/forms.py" />
         <option value="$PROJECT_DIR$/LM_DB/static/js/ajaxStuffFromBibtex.js" />
+        <option value="$PROJECT_DIR$/LM_DB/general.py" />
         <option value="$PROJECT_DIR$/LM_DB/views.py" />
       </list>
     </option>
@@ -403,7 +413,7 @@
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32843137" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.27287582" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.32843137" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2700454" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27382752" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="right" id="SciView" order="3" />
@@ -423,25 +433,25 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2473525" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3382353" />
-      <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.27287582" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32843137" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32843137" />
+      <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39869282" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="bottom" id="Terminal" order="12" weight="0.32843137" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="right" id="SciView" order="3" />
-      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32843137" />
       <window_info anchor="bottom" id="Concurrent Activities Diagram" order="13" weight="0.32843137" />
-      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32843137" />
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,7 +469,7 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/LM_DB/views.py</url>
-          <line>66</line>
+          <line>67</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -494,9 +504,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/LM_DB_Django/urls.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/EnterDataNew.html" />
     <entry file="file://$PROJECT_DIR$/templates/EnterDataEdit.html" />
     <entry file="file://$PROJECT_DIR$/LM_DB/templatetags/__init__.py">
@@ -751,14 +758,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/static/css/enterData.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
+        <state relative-caret-position="425">
           <caret line="25" column="52" selection-start-line="25" selection-start-column="52" selection-end-line="25" selection-end-column="52" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/tables.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
+        <state relative-caret-position="748">
           <caret line="45" column="77" selection-start-line="45" selection-start-column="77" selection-end-line="45" selection-end-column="77" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
@@ -775,7 +782,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="119">
           <caret line="10" column="40" selection-start-line="10" selection-start-column="40" selection-end-line="10" selection-end-column="40" />
           <folding>
             <element signature="e#1#25#0" expanded="true" />
@@ -792,14 +799,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/LM_DB/ViewData.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
+        <state relative-caret-position="561">
           <caret line="33" column="128" selection-start-line="33" selection-start-column="128" selection-end-line="33" selection-end-column="128" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
+        <state relative-caret-position="5457">
           <caret line="323" column="38" selection-start-line="323" selection-start-column="38" selection-end-line="323" selection-end-column="38" />
           <folding>
             <element signature="e#468#477#0" expanded="true" />
@@ -814,10 +821,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/LM_DB/general.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/LM_DB/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="58" column="58" selection-start-line="58" selection-start-column="58" selection-end-line="58" selection-end-column="58" />
+        <state relative-caret-position="155">
+          <caret line="1006" column="59" selection-start-line="1006" selection-start-column="59" selection-end-line="1006" selection-end-column="59" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
