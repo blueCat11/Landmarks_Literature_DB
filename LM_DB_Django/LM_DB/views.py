@@ -56,8 +56,10 @@ ANCHOR_ID = 21
 # DONE: check whether file of this name is already in media folder (ensure it's not overwriting) -> default behavior
 # TODO: hide "add new xyz" from view default because uses up lots of space which you have to scroll down
 # DONE: update file-year-field whenever paper-year-field gets changed, and once at document load
-# TODO: save default name of file, if user doesn't enter anything into the field.
-# TODO: if no doi: display help -> current no_doi_[number]
+# DONE: save default name of file, if user doesn't enter anything into the field.
+#(default name is entered, if deleted, then still none saved)
+# DONE: if no doi: display help -> current no_doi_[number]
+# TODO add logout in navbar
 
 # This View displays all current database entries in a table format
 class ViewData(View):
