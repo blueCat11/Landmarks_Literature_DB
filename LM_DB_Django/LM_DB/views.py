@@ -1002,7 +1002,7 @@ def called_by_bibtex_upload(bibtex_str, context):
         try:
             doi = str(paper["doi"])
         except KeyError as e:
-            no_doi_number = int(get_non_doi_number())+1
+            no_doi_number = str(int(get_non_doi_number())+1)
             no_doi_text = "If there is no doi for this paper, please enter 'no_doi_"+no_doi_number+"'. "
             error += "\n Could not find doi. "+ no_doi_text
 
