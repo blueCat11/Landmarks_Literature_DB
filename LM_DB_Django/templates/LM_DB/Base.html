@@ -33,6 +33,9 @@
                 </ul>
 
             </div>
+            <div class="uk-margin-right">
+               <a class="uk-button" {% block login_logout %}href="/accounts/logout">Logout{% endblock %}</a>
+            </div>
             </nav>
         </header>
         <div class = "content uk-container {% block container-size %}uk-container-small{% endblock %}">

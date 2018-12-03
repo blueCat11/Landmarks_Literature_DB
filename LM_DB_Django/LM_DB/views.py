@@ -59,7 +59,7 @@ ANCHOR_ID = 21
 # DONE: save default name of file, if user doesn't enter anything into the field.
 #(default name is entered, if deleted, then still none saved)
 # DONE: if no doi: display help -> current no_doi_[number]
-# TODO add logout in navbar
+# DONE add logout in navbar
 
 # This View displays all current database entries in a table format
 class ViewData(View):
