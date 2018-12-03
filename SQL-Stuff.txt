@@ -1,0 +1,10 @@
+﻿find papers with strange keywords: 
+
+SELECT papers.paper_id, keywords.keyword FROM papers
+INNER JOIN paper_keyword ON papers.paper_id = paper_keyword.ref_paper_keyword_to_paper
+INNER JOIN keywords ON keywords.keyword_id = paper_keyword.ref_paper_keyword_to_keyword
+WHERE keywords.keyword = 'retrosplenial complex,spatial memory';
+
+
+delete single keywords (need to check if not still used before):
+DELETE FROM keywords WHERE keyword = 'prio_0';
