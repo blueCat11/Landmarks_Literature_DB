@@ -8,6 +8,17 @@ table thead {
     position: sticky;
 }
 
+div.table-container ul.pagination {
+    background-color: white;
+    bottom:0;
+    position: -webkit-sticky;
+    position: sticky;
+    list-style-type: none;
+}
+div.table-container ul.pagination li {
+    display:inline;
+}
+
 .overflow {
     overflow: scroll;
 }
