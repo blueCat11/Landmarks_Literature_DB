@@ -1,4 +1,5 @@
 from LM_DB.models import *
+import re
 
 
 # This file contains methods used to get data in a form suited for handling in the templates
@@ -210,9 +211,9 @@ def reformat_authors(authors):
         return authors_string
 
 
-# TODO need to test this method
+# DONE need to test this method
 def get_authors_from_bibtex(authors):
-    author_list = authors.split(" and ")
+    author_list = re.split(" and ", authors, flags=re.IGNORECASE)
     i = 1
     author_dict_list = []
     for author in author_list:
