@@ -60,6 +60,7 @@ ANCHOR_ID = 21
 #(default name is entered, if deleted, then still none saved)
 # DONE: if no doi: display help -> current no_doi_[number]
 # DONE add logout in navbar
+# TODO: add field for experiment design
 
 # This View displays all current database entries in a table format
 class ViewData(View):
