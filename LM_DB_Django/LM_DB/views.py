@@ -1007,6 +1007,7 @@ def called_by_bibtex_upload(bibtex_str, context):
             no_doi_number = str(int(get_non_doi_number())+1)
             no_doi_text = "If there is no doi for this paper, please enter 'no_doi_"+no_doi_number+"'. "
             error += "\n Could not find doi. "+ no_doi_text
+            doi = no_doi_number
 
             print(e)
 
