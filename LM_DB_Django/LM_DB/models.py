@@ -337,6 +337,8 @@ class Papers(models.Model):
     verified_timestamp = models.DateTimeField(blank=True, null=True)
     verified_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='verified_user', blank=True, null=True)
     is_need_for_discussion = models.NullBooleanField()
+    experiment_design = models.TextField(blank=True, null=True)
+
 
     class Meta:
         managed = False
