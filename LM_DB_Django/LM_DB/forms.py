@@ -15,11 +15,12 @@ class PaperForm (forms.ModelForm):
     title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
     year = forms.IntegerField(required=False)
-
+    experiment_design = forms.CharField(widget=forms.Textarea, label="Experiment design", required=False)
 
     class Meta:
         model = Papers
-        fields = ('paper_id', 'doi', 'bibtex', 'don_t_overwrite', 'cite_command', 'title', 'abstract', "year")
+        fields = ('paper_id', 'doi', 'bibtex', 'don_t_overwrite', 'cite_command', 'title', 'abstract', "year",
+                  "experiment_design")
 
 
 class FileForm (forms.ModelForm):
@@ -69,7 +70,6 @@ class LinkForm (forms.ModelForm):
     class Meta:
         model = Links
         fields = ('link_id', 'link_text', 'is_local_link')
-
 
 
 class KeywordForm(forms.ModelForm):
