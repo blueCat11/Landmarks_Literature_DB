@@ -326,11 +326,13 @@ class EnterData(View):
                                     current_paper.authors = convert_empty_string_to_none(data.get('authors', None))
                                 elif entry == "year":
                                     current_paper.year = data.get('year', None)
+                                elif entry == "experiment_design":
+                                    current_paper.experiment_design = convert_empty_string_to_none(data.get('experiment_design', None))
 
                             are_errors = uniqueness_check(bibtex=current_paper.bibtex, doi=current_paper.doi,
                                                               cite_command=current_paper.cite_command,
                                                               context=CONTEXT_EDIT, current_paper=current_paper)
-                            if not are_errors.get("is_unique", False):
+                            if not are_errors.get("is_unique", False):  # if there are uniqueness errors
                                 context_dict = {"original_form_name": "editSave", "type_of_edit": "Edit Entry",
                                                 "uniqueness_errors": are_errors}
                                 context_dict = add_forms_to_context_dict(context_dict, paper=paper_form,
@@ -734,6 +736,7 @@ class EnterData(View):
                     abstract = convert_empty_string_to_none(data.get('abstract', None))
                     authors = convert_empty_string_to_none(data.get('authors', None))
                     year = data.get('year', None)
+                    experiment_design = convert_empty_string_to_none(data.get('experiment_design', None))
 
                     are_errors = uniqueness_check(bibtex=bibtex, doi=doi, cite_command=cite_command,
                                                   context=CONTEXT_NEW_SAVE, current_paper=None)
@@ -760,7 +763,8 @@ class EnterData(View):
                         return render(request, "LM_DB/enterData.html", context_dict)
 
                     current_paper = Papers(doi=doi, bibtex=bibtex, cite_command=cite_command, title=title,
-                                           abstract=abstract, authors=authors, year=year)
+                                           abstract=abstract, authors=authors, year=year,
+                                           experiment_design=experiment_design)
                     set_creation_meta_data(current_paper, user)
                     current_paper.save()
 
@@ -814,7 +818,7 @@ class EnterData(View):
                                 if data.get("delete_this_core_attribute", "None") == False:
                                     core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
                                     is_literal_quotation = data.get('is_literal_quotation', None)
-                                    page_num = data.get('page_num', None)
+                                    page_num = convert_empty_string_to_none(data.get('page_num', None))
                                     current_core_attribute = CoreAttributes(core_attribute=core_attribute,
                                                                             is_literal_quotation=is_literal_quotation,
                                                                             page_num=page_num,
@@ -904,7 +908,7 @@ def update_last_edit(current_paper, current_user):
 
     current_paper.last_edit_user = current_user
     current_paper.last_edit_timestamp = current_date_time
-    current_paper.save()
+    current_paper.save() # TODO check if this is necessary and can't just return current_paper
 
 
 def set_creation_meta_data(current_paper, current_user):
@@ -971,7 +975,6 @@ def called_by_bibtex_upload(bibtex_str, context):
     except ParseException as e:
         error = "Error in bibtex: " + str(e)
         print ("ParseException during parsing bibtex: "+str(e))
-
 
     if is_bibtex_correct:
         try:
