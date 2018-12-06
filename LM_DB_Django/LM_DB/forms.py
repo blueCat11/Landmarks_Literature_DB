@@ -15,7 +15,7 @@ class PaperForm (forms.ModelForm):
     title = forms.CharField(max_length=500, required=False)
     abstract = forms.CharField(widget=forms.Textarea, required=False)
     year = forms.IntegerField(required=False)
-    experiment_design = forms.CharField(widget=forms.Textarea, label="Experiment design", required=False)
+    experiment_design = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), label="Experiment design", required=False)
 
     class Meta:
         model = Papers
