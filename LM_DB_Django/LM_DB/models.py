@@ -206,18 +206,6 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 
-# the data in this model comes from the categories in the excel file with "e([something])"
-class ExperimentDesigns(models.Model):
-    experiment_design_id = models.AutoField(primary_key=True)
-    ref_experiment_design_to_paper = models.ForeignKey('Papers', models.DO_NOTHING, db_column='ref_experiment_design_to_paper', blank=True, null=True)
-    total_num_participants = models.IntegerField(blank=True, null=True)
-    experiment_design = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'experiment_designs'
-
-
 class Files(models.Model):
 
     # method from docs (strg f for files: https://docs.djangoproject.com/en/2.1/ref/models/fields/)
