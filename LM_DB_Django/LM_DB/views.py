@@ -6,6 +6,7 @@ import bibtexparser  # for bibtex
 from datetime import datetime, timezone  # for edit and creation times
 
 from django_tables2 import RequestConfig
+from pyparsing import ParseException
 
 from LM_DB.display_methods import *
 from LM_DB.general import *
@@ -967,6 +968,10 @@ def called_by_bibtex_upload(bibtex_str, context):
     except KeyError as e:
         error = "Error in bibtex: " + str(e)
         print("keyError in Bibtex: " + str(e))
+    except ParseException as e:
+        error = "Error in bibtex: " + str(e)
+        print ("ParseException during parsing bibtex: "+str(e))
+
 
     if is_bibtex_correct:
         try:
