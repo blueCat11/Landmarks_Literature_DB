@@ -818,7 +818,7 @@ class EnterData(View):
                                 if data.get("delete_this_core_attribute", "None") == False:
                                     core_attribute = convert_empty_string_to_none(data.get('core_attribute', None))
                                     is_literal_quotation = data.get('is_literal_quotation', None)
-                                    page_num = data.get('page_num', None)
+                                    page_num = convert_empty_string_to_none(data.get('page_num', None))
                                     current_core_attribute = CoreAttributes(core_attribute=core_attribute,
                                                                             is_literal_quotation=is_literal_quotation,
                                                                             page_num=page_num,
