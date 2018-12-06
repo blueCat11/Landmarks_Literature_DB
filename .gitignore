@@ -2,3 +2,4 @@ LM_DB_Django/media/2012/2012_Book_SpatialCognitionVIII.pdf
 LM_DB_Django/media/1998/Burnett1998.pdf
 LM_DB_Django/.idea/workspace.xml
 LM_DB_Django/LM_DB/__pycache__/forms.cpython-36.pyc
+*.pyc
