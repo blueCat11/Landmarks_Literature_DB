@@ -1,7 +1,6 @@
 from LM_DB.models import *
 import re
 
-
 # This file contains methods used to get data in a form suited for handling in the templates
 
 
