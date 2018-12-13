@@ -66,6 +66,7 @@ ANCHOR_ID = 21
 # TODO: make papers appear sorted alphabetically (in the long run)
 # TODO: distinguish current page (at the bottom of table) visibly (maybe underline)
 # TODO: add padding to heading
+# TODO: make link field larger
 
 # This View displays all current database entries in a table format
 class ViewData(View):
