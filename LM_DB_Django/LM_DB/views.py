@@ -59,9 +59,14 @@ ANCHOR_ID = 21
 # DONE: update file-year-field whenever paper-year-field gets changed, and once at document load
 # DONE: save default name of file, if user doesn't enter anything into the field.
 # (default name is entered, if deleted, then still none saved)
-# DONE: if no doi: display help -> current no_doi_[number]
+# TODO: if no doi: display help -> current no_doi_[number] - currently only [number] is displayed
 # DONE add logout in navbar
 # DONE: add field for experiment design
+# TODO: do something about performance
+# TODO: make papers appear sorted alphabetically (in the long run)
+# TODO: distinguish current page (at the bottom of table) visibly (maybe underline)
+# DONE: add padding to heading
+# DONE: make link field larger
 
 # This View displays all current database entries in a table format
 class ViewData(View):

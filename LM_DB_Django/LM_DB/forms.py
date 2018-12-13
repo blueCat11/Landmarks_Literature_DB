@@ -63,7 +63,7 @@ class CoreAttributeForm (forms.ModelForm):
 
 class LinkForm (forms.ModelForm):
     link_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    link_text = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 1}), required=False)
+    link_text = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 3}), required=False)
     is_local_link = forms.BooleanField(required=False)
     delete_this_link = forms.BooleanField(required=False, initial=True)
 

@@ -39,3 +39,12 @@ div.table-container ul.pagination li {
     display: block;
     width: 200px;
 }
+
+/* for deactivating link, see: https://stackoverflow.com/questions/2091168/how-to-disable-a-link-using-only-css*/
+ul.pagination li.active a{
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+    color: #707070 !important;
+    font-weight: bold;
+}
