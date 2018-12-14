@@ -707,7 +707,7 @@ class EnterData(View):
             json_response = get_info_from_bibtex(request_data)
             return json_response
 
-        elif request_data.get('newSave', -1) != 1:
+        elif request_data.get('newSave_viewData', -1) != 1 or request_data.get('newSave_enterData', -1) != -1:
             print("newSave")
             # make new object(s) and save those to DB
             # construct forms from data here
@@ -852,7 +852,7 @@ class EnterData(View):
                     # paper form is not valid
                     print("paper form not valid")
 
-                return redirect("LM_DB:viewData")
+                return disambiguate_submit_button(request_data)
             else:
                 context_dict = {"original_form_name": "newSave", "type_of_edit": "New Entry",
                                 }
@@ -1179,3 +1179,10 @@ def get_current_time():
     return datetime.now().astimezone()
 
 
+def disambiguate_submit_button(request_data):
+    if request_data.get("newSave_enterData", -1) != -1:
+        return redirect("LM_DB:enterData")
+    elif request_data.get("newSave_viewData", -1) != -1:
+        return redirect("LM_DB:viewData")
+    else:
+        return redirect("LM_DB:viewData")
