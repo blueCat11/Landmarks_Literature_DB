@@ -59,12 +59,12 @@ ANCHOR_ID = 21
 # DONE: update file-year-field whenever paper-year-field gets changed, and once at document load
 # DONE: save default name of file, if user doesn't enter anything into the field.
 # (default name is entered, if deleted, then still none saved)
-# TODO: if no doi: display help -> current no_doi_[number] - currently only [number] is displayed
+# DONE: if no doi: display help -> current no_doi_[number] - currently only [number] is displayed
 # DONE add logout in navbar
 # DONE: add field for experiment design
 # TODO: do something about performance
 # TODO: make papers appear sorted alphabetically (in the long run)
-# TODO: distinguish current page (at the bottom of table) visibly (maybe underline)
+# DONE: distinguish current page (at the bottom of table) visibly (maybe underline)
 # DONE: add padding to heading
 # DONE: make link field larger
 
@@ -1019,9 +1019,10 @@ def called_by_bibtex_upload(bibtex_str, context):
             doi = str(paper["doi"])
         except KeyError as e:
             no_doi_number = str(int(get_non_doi_number())+1)
-            no_doi_text = "If there is no doi for this paper, please enter 'no_doi_"+no_doi_number+"'. "
+            no_doi_help = 'no_doi_'+no_doi_number
+            no_doi_text = "If there is no doi for this paper, please enter '"+no_doi_help+"'. "
             error += "\n Could not find doi. "+ no_doi_text
-            doi = no_doi_number
+            doi = no_doi_help
 
             print(e)
 
