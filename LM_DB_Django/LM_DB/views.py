@@ -72,7 +72,7 @@ ANCHOR_ID = 21
 class ViewData(View):
     def get(self, request):
         # how to form queryset into list: https://stackoverflow.com/questions/7811556/how-do-i-convert-a-django-queryset-into-list-of-dicts
-        all_papers = Papers.objects.all()
+        all_papers = Papers.objects.order_by('-creation_timestamp')
         paper_list = []
         for paper in all_papers:
             paper_data = get_dict_of_all_data_on_one_paper(paper.pk)
