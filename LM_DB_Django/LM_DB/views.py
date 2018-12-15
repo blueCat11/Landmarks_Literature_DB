@@ -254,7 +254,7 @@ class EnterData(View):
                                                      )
             return render(request, "LM_DB/EnterData.html", context_dict)
 
-        elif request_data.get('editSave', -1) != -1:
+        elif request_data.get('editSave_viewData', -1) != -1 or request_data.get('editSave_enterData',-1) != -1:
             print("editSave")
 
             # get corresponding data-object(s) from DB, make changes to it and save changes
@@ -636,7 +636,7 @@ class EnterData(View):
                                                              )
 
                     return render(request, "LM_DB/enterData.html", context_dict)
-            return redirect("LM_DB:viewData")
+            return disambiguate_submit_button(request_data)#redirect("LM_DB:viewData")
 
         elif request_data.get("isNewKeyword", -1) != -1:
             print("isNewKeyword")
@@ -1179,10 +1179,19 @@ def get_current_time():
     return datetime.now().astimezone()
 
 
+# This method determines which submit button in enterData-view was clicked (and which view to return to)
 def disambiguate_submit_button(request_data):
-    if request_data.get("newSave_enterData", -1) != -1:
+    relevant_keys = [key for key, value in request_data.items() if 'Save_' in key]
+    relevant_key = ""
+    if len(relevant_keys) != 0:
+        relevant_key = relevant_keys[0]
+
+    if "Save_enterData" in relevant_key:
+        print("back to enterData")
         return redirect("LM_DB:enterData")
-    elif request_data.get("newSave_viewData", -1) != -1:
+    elif "Save_viewData" in relevant_key:
+        print("back to viewData")
         return redirect("LM_DB:viewData")
     else:
+        print("else")
         return redirect("LM_DB:viewData")
