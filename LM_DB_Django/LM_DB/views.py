@@ -59,12 +59,12 @@ ANCHOR_ID = 21
 # DONE: update file-year-field whenever paper-year-field gets changed, and once at document load
 # DONE: save default name of file, if user doesn't enter anything into the field.
 # (default name is entered, if deleted, then still none saved)
-# TODO: if no doi: display help -> current no_doi_[number] - currently only [number] is displayed
+# DONE: if no doi: display help -> current no_doi_[number] - currently only [number] is displayed
 # DONE add logout in navbar
 # DONE: add field for experiment design
 # TODO: do something about performance
 # TODO: make papers appear sorted alphabetically (in the long run)
-# TODO: distinguish current page (at the bottom of table) visibly (maybe underline)
+# DONE: distinguish current page (at the bottom of table) visibly (maybe underline)
 # DONE: add padding to heading
 # DONE: make link field larger
 
@@ -72,7 +72,7 @@ ANCHOR_ID = 21
 class ViewData(View):
     def get(self, request):
         # how to form queryset into list: https://stackoverflow.com/questions/7811556/how-do-i-convert-a-django-queryset-into-list-of-dicts
-        all_papers = Papers.objects.all()
+        all_papers = Papers.objects.order_by('-creation_timestamp')
         paper_list = []
         for paper in all_papers:
             paper_data = get_dict_of_all_data_on_one_paper(paper.pk)
@@ -254,7 +254,7 @@ class EnterData(View):
                                                      )
             return render(request, "LM_DB/EnterData.html", context_dict)
 
-        elif request_data.get('editSave', -1) != -1:
+        elif request_data.get('editSave_viewData', -1) != -1 or request_data.get('editSave_enterData',-1) != -1:
             print("editSave")
 
             # get corresponding data-object(s) from DB, make changes to it and save changes
@@ -636,7 +636,7 @@ class EnterData(View):
                                                              )
 
                     return render(request, "LM_DB/enterData.html", context_dict)
-            return redirect("LM_DB:viewData")
+            return disambiguate_submit_button(request_data)#redirect("LM_DB:viewData")
 
         elif request_data.get("isNewKeyword", -1) != -1:
             print("isNewKeyword")
@@ -707,7 +707,7 @@ class EnterData(View):
             json_response = get_info_from_bibtex(request_data)
             return json_response
 
-        elif request_data.get('newSave', -1) != 1:
+        elif request_data.get('newSave_viewData', -1) != 1 or request_data.get('newSave_enterData', -1) != -1:
             print("newSave")
             # make new object(s) and save those to DB
             # construct forms from data here
@@ -852,7 +852,7 @@ class EnterData(View):
                     # paper form is not valid
                     print("paper form not valid")
 
-                return redirect("LM_DB:viewData")
+                return disambiguate_submit_button(request_data)
             else:
                 context_dict = {"original_form_name": "newSave", "type_of_edit": "New Entry",
                                 }
@@ -1019,9 +1019,10 @@ def called_by_bibtex_upload(bibtex_str, context):
             doi = str(paper["doi"])
         except KeyError as e:
             no_doi_number = str(int(get_non_doi_number())+1)
-            no_doi_text = "If there is no doi for this paper, please enter 'no_doi_"+no_doi_number+"'. "
+            no_doi_help = 'no_doi_'+no_doi_number
+            no_doi_text = "If there is no doi for this paper, please enter '"+no_doi_help+"'. "
             error += "\n Could not find doi. "+ no_doi_text
-            doi = no_doi_number
+            doi = no_doi_help
 
             print(e)
 
@@ -1178,3 +1179,19 @@ def get_current_time():
     return datetime.now().astimezone()
 
 
+# This method determines which submit button in enterData-view was clicked (and which view to return to)
+def disambiguate_submit_button(request_data):
+    relevant_keys = [key for key, value in request_data.items() if 'Save_' in key]
+    relevant_key = ""
+    if len(relevant_keys) != 0:
+        relevant_key = relevant_keys[0]
+
+    if "Save_enterData" in relevant_key:
+        print("back to enterData")
+        return redirect("LM_DB:enterData")
+    elif "Save_viewData" in relevant_key:
+        print("back to viewData")
+        return redirect("LM_DB:viewData")
+    else:
+        print("else")
+        return redirect("LM_DB:viewData")
