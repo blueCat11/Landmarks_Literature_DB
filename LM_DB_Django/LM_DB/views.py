@@ -67,6 +67,7 @@ ANCHOR_ID = 21
 # DONE: distinguish current page (at the bottom of table) visibly (maybe underline)
 # DONE: add padding to heading
 # DONE: make link field larger
+# DONE: uniqueness-check before adding first attempting paper-save
 
 # This View displays all current database entries in a table format
 class ViewData(View):
@@ -171,6 +172,33 @@ class EnterData(View):
             current_paper_pk = request_data["paper_id"]
             file = get_file_for_paper(current_paper_pk)
             return serve_file(file, request)
+
+        elif request_data.get('uniqueness_check',-1) != -1:
+            print(request_data)
+            doi = request_data.get("doi",-1)
+            bibtex = request_data.get("bibtex", -1)
+            cite_command = request_data.get("cite_command", -1)
+            context = request_data.get("context", -1)
+            paper_id = request_data.get("current_paper_id", -1)
+            if paper_id != -1 or paper_id != "":
+                current_paper = get_current_paper(int(paper_id))
+            else:
+                current_paper = None
+            are_errors = uniqueness_check(doi=doi, bibtex=bibtex, cite_command=cite_command, current_paper=current_paper, context=context)
+            if not are_errors.get("is_unique", False):  # if there are uniqueness errors
+                error_text = ""
+                for key, value in are_errors.items():
+                    if key == "is_unique":
+                        continue
+                    else:
+                        error_text += value
+                response_data = {"result": "Something is not unique", "error": error_text}
+                json_response = JsonResponse(response_data)
+                return json_response
+            else:
+                response_data = {"result": "Everything unique"}
+                json_response = JsonResponse(response_data)
+                return json_response
 
         elif request_data.get('needForDiscussion', -1) != -1:
             current_paper = get_current_paper(request_data["paper_id"])
@@ -1050,8 +1078,8 @@ def called_by_bibtex_upload(bibtex_str, context):
 # make files available for download (are automatically saved in temp folder)
 def serve_file(file, request):
     if not file:
-        #handle case when file = False, that is to say the given paper doesn't have a file
-        #return render_to_response('LM_DB/EnterData.html', message='This paper does not have an associated file.')
+        # handle case when file = False, that is to say the given paper doesn't have a file
+        # return render_to_response('LM_DB/EnterData.html', message='This paper does not have an associated file.')
         messages.error(request, 'This paper does not have an associated file.')
         return redirect(request.META['HTTP_REFERER'])
     else:
