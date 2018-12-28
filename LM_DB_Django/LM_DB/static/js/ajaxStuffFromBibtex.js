@@ -19,11 +19,66 @@ $(document).ready( function() {
 });
 
 
+
+$(document).ready( function() {
+    $("#id_paper-doi").blur( function(event) {
+        sendAjaxForUniquenessCheck();
+    });
+    $("#id_paper-bibtex").blur( function(event) {
+        sendAjaxForUniquenessCheck();
+    });
+    $("#id_paper-cite_command").blur( function(event) {
+        sendAjaxForUniquenessCheck();
+    });
+});
+
+
+function sendAjaxForUniquenessCheck(){
+    let doi = $('#id_paper-doi').val();
+    let bibtex = $('#id_paper-bibtex').val();
+    let cite_command = $('#id_paper-cite_command').val();
+    let context = $('#state_of_form').val();
+    let current_paper_id = $('#id_paper-paper_id').val();
+
+    $.ajax({
+            url : "/LM_DB/enterData/", // the endpoint
+            type : "POST", // http method
+            data : {
+                uniqueness_check: "uniqueness-check",
+                doi: doi,
+                bibtex: bibtex,
+                cite_command: cite_command,
+                context: context,
+                current_paper_id: current_paper_id
+            }, // data sent with the post request
+
+            //Done: don't overwrite stuff after first time
+            // handle a successful response
+            success : function(json) {
+                if (json.hasOwnProperty('error')){
+                    //console.log(json.error);
+                    UIkit.notification({
+                        message: json.error,
+                        status: 'warning',
+                        pos: 'bottom-center',
+                        timeout: 2500
+                    });
+                }else{
+                   //console.log("success")
+                }
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                //console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+            });
+}
+
 function sendAjaxToGetInfoFromBibtex(context){
     let bibtex = $('#id_paper-bibtex').val();
 
     let dontSendFlag = $("#id_paper-don_t_overwrite").is(':checked');
-    console.log(dontSendFlag);
     if (dontSendFlag) {
         UIkit.notification({
                 message: "Fields not updated from Bibtex.",
