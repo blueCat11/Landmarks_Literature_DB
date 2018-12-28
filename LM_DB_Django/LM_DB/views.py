@@ -173,14 +173,13 @@ class EnterData(View):
             file = get_file_for_paper(current_paper_pk)
             return serve_file(file, request)
 
-        elif request_data.get('uniqueness_check',-1) != -1:
-            print(request_data)
-            doi = request_data.get("doi",-1)
+        elif request_data.get('uniqueness_check', -1) != -1:
+            doi = request_data.get("doi", -1)
             bibtex = request_data.get("bibtex", -1)
             cite_command = request_data.get("cite_command", -1)
             context = request_data.get("context", -1)
             paper_id = request_data.get("current_paper_id", -1)
-            if paper_id != -1 or paper_id != "":
+            if paper_id != -1 and paper_id != "":
                 current_paper = get_current_paper(int(paper_id))
             else:
                 current_paper = None
